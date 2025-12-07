@@ -8,27 +8,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "users")
+@Table(name = "cart")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
-    private String username;
-    private String password;
-    private String email;
-    private String phone;
-    private String name;
+    private Long cart_id;
     private LocalDate created_at;
-    private Boolean is_active;
-    private String user_rank;
-    public enum Role{
-        USER, ADMIN
-    }
-
-
 
 
 }
