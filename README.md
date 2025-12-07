@@ -8,8 +8,8 @@ Tài liệu này quy định quy trình làm việc (workflow) của team để 
 
 1.  **Clone repository về máy:**
     ```bash
-    git clone <link-repo>
-    cd shoe_store
+    git clone https://github.com/nvbao117/online_shoe_store.git
+    cd online_shoe_store
     ```
 
 ### 🔄 2. Quy Trình Làm Việc Hàng Ngày (Workflow)
