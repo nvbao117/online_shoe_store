@@ -52,7 +52,9 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", foreignKey = @ForeignKey(name = "FK_Variant_Review"))
     private ProductVariant productvariant;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_User_Review"))
+    private User user;
 
 
 

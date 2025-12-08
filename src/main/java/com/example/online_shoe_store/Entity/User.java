@@ -36,7 +36,10 @@ public class User {
     private Boolean is_active;
     @Column(name = "user_rank")
     private String user_rank;
-    public enum Role{
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private Role role = Role.USER;
+    public enum Role {
         USER, ADMIN
     }
     @PrePersist
@@ -69,6 +72,8 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)   // trỏ ngược về tên biến bên User
     private Cart cart;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
 
 }

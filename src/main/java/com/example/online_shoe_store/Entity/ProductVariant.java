@@ -46,7 +46,7 @@ public class ProductVariant {
     @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "FK_ProductVariant_Product"))
     private Product product;
 
-    @OneToOne(mappedBy = "productvariant", cascade = CascadeType.ALL)   // trỏ ngược về tên biến bên User
+    @OneToOne(mappedBy = "productvariant", cascade = CascadeType.ALL, orphanRemoval = true)   // trỏ ngược về tên biến bên User
     private CartItem cartitem;
 
 

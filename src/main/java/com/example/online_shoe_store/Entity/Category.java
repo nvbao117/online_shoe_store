@@ -31,7 +31,7 @@ public class Category {
 
     @OneToMany (mappedBy = "category",
             fetch = FetchType. LAZY
-            )
+    )
     private List<Product> products = new ArrayList <>();
 
 
