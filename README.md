@@ -130,5 +130,7 @@ Nên viết commit có tiền tố để dễ phân loại:
 | Xem danh sách branch | `git branch` |
 | Xóa branch (sau khi merge) | `git branch -d ten-branch` |
 
+### �📝 7. Tạo nhánh trên local gắn với nhánh đã có trên repo
+vd git checkout -b dev origin/dev
 ---
 **Lưu ý:** Luôn giao tiếp với team khi chuẩn bị merge những thay đổi lớn!
