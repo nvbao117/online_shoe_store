@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Entity
@@ -17,9 +18,8 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
-    private Long paymentId;
+    @Column(name = "payment_id", length = 36)
+    private String paymentId;
 
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
@@ -42,5 +42,21 @@ public class Payment {
         if (paymentStatus == null) {
             paymentStatus = "pending";
         }
+        if (paymentId == null) {
+            paymentId = UUID.randomUUID().toString();
+        }
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_method_id ", foreignKey = @ForeignKey(name = "FK_Payment_PaymentMethod"))
+    private PaymentMethod paymentmethod;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")   // khóa ngoại nằm trên bảng User
+    private Order order;
+
+
+
+
+
 }

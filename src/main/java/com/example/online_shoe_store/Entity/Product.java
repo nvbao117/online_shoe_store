@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -17,9 +20,8 @@ import java.time.LocalDateTime;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
-    private Long productId;
+    @Column(name = "product_id", length = 36)
+    private String productId;
 
     @Column(name = "name", nullable = false, length = 200)
     private String name;
@@ -49,10 +51,34 @@ public class Product {
         if (status == null) {
             status = "active";
         }
+        if (productId == null) {
+            productId = UUID.randomUUID().toString();
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany (mappedBy = "product",
+            cascade = CascadeType.ALL,
+            fetch = FetchType. LAZY)
+    private List<ProductVariant> productvariants = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn (name = "brand_id", foreignKey = @ForeignKey (name = "FK_Brand_Product"))
+    private Brand brand;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn (name = "category_id", foreignKey = @ForeignKey (name = "FK_Category_Product"))
+    private Category category;
+
+    @ManyToMany (fetch = FetchType.LAZY)
+    @JoinTable(name = "Product_Voucher",
+            joinColumns = {@JoinColumn(name = "product_id")},
+            inverseJoinColumns = {@JoinColumn(name = "voucher_id")} )
+    private List<Voucher> vouchers = new ArrayList<>();
+
+
 }
