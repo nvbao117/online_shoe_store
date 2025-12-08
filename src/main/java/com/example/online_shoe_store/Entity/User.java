@@ -36,6 +36,11 @@ public class User {
     private Boolean is_active;
     @Column(name = "user_rank")
     private String user_rank;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private Role role = Role.USER;
+
     public enum Role{
         USER, ADMIN
     }
@@ -51,6 +56,9 @@ public class User {
             this.cart = newCart;
         }
     }
+
+
+
     @OneToMany (mappedBy = "user",
             cascade = CascadeType.ALL,
             fetch = FetchType. LAZY)
@@ -66,6 +74,9 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "voucher_id")} )
     private List<Voucher> vouchers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)   // trỏ ngược về tên biến bên User
     private Cart cart;

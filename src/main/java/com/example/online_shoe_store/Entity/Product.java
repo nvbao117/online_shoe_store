@@ -1,7 +1,9 @@
 package com.example.online_shoe_store.Entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,6 +46,18 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // Thêm vào các entity cần soft delete
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+    // Hoặc dùng Hibernate annotation
+    @Where(clause = "is_deleted = false")
+    @SQLDelete(sql = "UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE user_id = ?")
+
+
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -79,6 +93,5 @@ public class Product {
             joinColumns = {@JoinColumn(name = "product_id")},
             inverseJoinColumns = {@JoinColumn(name = "voucher_id")} )
     private List<Voucher> vouchers = new ArrayList<>();
-
 
 }

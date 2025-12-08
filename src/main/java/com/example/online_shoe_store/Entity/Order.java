@@ -3,6 +3,7 @@ package com.example.online_shoe_store.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,6 +37,10 @@ public class Order {
     @Column(name = "shipping_fee", precision = 10, scale = 2)
     private BigDecimal shippingFee;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 
     //Trước khi mày thực hiện lệnh INSERT dòng dữ liệu này vào Database,chạy hàm onCreate()
     @PrePersist
@@ -48,6 +53,7 @@ public class Order {
             orderId = UUID.randomUUID().toString();
         }
     }
+
 
     @OneToMany (mappedBy = "order",
             cascade = CascadeType.ALL,
