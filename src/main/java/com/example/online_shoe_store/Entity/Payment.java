@@ -52,11 +52,6 @@ public class Payment {
     private PaymentMethod paymentmethod;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")   // khóa ngoại nằm trên bảng User
+    @JoinColumn(name = "order_id", foreignKey = @ForeignKey(name = "FK_Payment_Order"))
     private Order order;
-
-
-
-
-
 }
