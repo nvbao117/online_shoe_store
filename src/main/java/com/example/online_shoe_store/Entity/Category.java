@@ -4,6 +4,10 @@ package com.example.online_shoe_store.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 @Entity
 @Table(name = "categories")
 @Getter
@@ -14,9 +18,8 @@ import lombok.*;
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
-    private Long categoryId;
+    @Column(name = "category_id", length = 36)
+    private String categoryId;
 
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
@@ -25,4 +28,17 @@ public class Category {
     //Thuộc tính columnDefinition="TEXT" ép database sử dụng kiểu text thay vì varchar
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @OneToMany (mappedBy = "category",
+            fetch = FetchType. LAZY
+            )
+    private List<Product> products = new ArrayList <>();
+
+
+    @PrePersist
+    public void prePersist() {
+        if (categoryId == null) {
+            categoryId = UUID.randomUUID().toString();
+        }
+    }
 }

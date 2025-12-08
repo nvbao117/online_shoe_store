@@ -6,6 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -14,21 +18,57 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    @Column(name = "user_id", length = 36)
+    private String user_id;
+    @Column(name = "username")
     private String username;
+    @Column(name = "password")
     private String password;
+    @Column(name = "email")
     private String email;
+    @Column(name = "phone")
     private String phone;
+    @Column(name = "name")
     private String name;
+    @Column(name = "created_at")
     private LocalDate created_at;
+    @Column(name = "is_active")
     private Boolean is_active;
+    @Column(name = "user_rank")
     private String user_rank;
     public enum Role{
         USER, ADMIN
     }
+    @PrePersist
+    protected void onCreate() {
+        created_at = LocalDate.now();
+        if (user_id == null) {
+            user_id = UUID.randomUUID().toString();
+        }
+        if (this.cart == null) {
+            Cart newCart = new Cart();
+            newCart.setUser(this);
+            this.cart = newCart;
+        }
+    }
+    @OneToMany (mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType. LAZY)
+    private List<Order> orders = new ArrayList<>();
 
+    @OneToMany (mappedBy = "user",
+            cascade = CascadeType.ALL,
+            fetch = FetchType. LAZY)
+    private List<ShipDetail> shipdetails = new ArrayList<>();
 
+    @ManyToMany (fetch = FetchType.LAZY)
+    @JoinTable(name = "User_Voucher",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "voucher_id")} )
+    private List<Voucher> vouchers = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)   // trỏ ngược về tên biến bên User
+    private Cart cart;
 
 
 }
