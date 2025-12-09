@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Sneaker Shop</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- CSS chung cho tất cả trang auth (background video, overlay, layout) -->
+  <link rel="stylesheet" th:href="@{/css/login/auth-layout.css}">
+  <!-- CSS riêng cho trang login (card + form) -->
+  <link rel="stylesheet" th:href="@{/css/login/login.css}">
+</head>
+<body>
+
+<!-- ====================== VIDEO BACKGROUND (DÙNG CHUNG) ====================== -->
+<div class="auth-bg-video-wrapper">
+  <video class="auth-bg-video"
+         id="authBgVideo"
+         autoplay
+         muted
+         playsinline>
+    Trình duyệt của bạn không hỗ trợ video.
+  </video>
+</div>
+
+<!-- Lớp phủ mờ để form login nổi hơn trên video -->
+<div class="auth-bg-overlay"></div>
+<!-- ======================================================================== -->
+
+<!--
+    auth-page-wrapper: căn giữa nội dung
+    auth-card: style card chung
+    login-card: style riêng cho card login (độ rộng, spacing...)
+-->
+<div class="auth-page-wrapper">
+  <div class="auth-card login-card">
+
+    <!-- Logo giày -->
+    <div class="login-logo text-center">
+      <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="5A STORE Logo" class="login-logo-img">
+    </div>
+
+    <!-- Tiêu đề -->
+    <h1 class="login-title text-center">WELCOME, ATHLETE</h1>
+
+    <!-- Subtitle -->
+    <p class="login-subtitle text-center">
+      Sign in and step into your best performance
+    </p>
+
+    <!-- FORM ĐĂNG NHẬP -->
+    <form th:action="@{/login}" method="post" class="mt-4">
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label class="form-label login-label">Username</label>
+        <div class="input-group">
+          <span class="input-group-text login-input-icon">
+            <i class="bi bi-person"></i>
+          </span>
+          <input type="text"
+                 class="form-control login-input"
+                 name="username"
+                 placeholder="Username">
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label class="form-label login-label">Password</label>
+        <div class="input-group">
+          <span class="input-group-text login-input-icon">
+            <i class="bi bi-lock"></i>
+          </span>
+          <input type="password"
+                 class="form-control login-input"
+                 name="password"
+                 placeholder="Password">
+          <span class="input-group-text login-input-icon-right">
+            <i class="bi bi-eye-slash"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Nút Login -->
+      <div class="d-grid mt-3">
+        <button type="submit" class="btn login-btn">
+          Login
+        </button>
+      </div>
+
+      <!-- Remember me + Forgot -->
+      <div class="d-flex justify-content-between align-items-center mt-3 login-remember-row">
+        <div class="form-check">
+          <!-- name="remember-me" để sau này Spring Security nhận đúng -->
+          <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
+          <label class="form-check-label" for="rememberMe">
+            Remember me
+          </label>
+        </div>
+        <a th:href="@{/forgot-password}" class="login-link-small">Forgot my password ?</a>
+      </div>
+
+      <!-- Divider -->
+      <div class="login-divider text-center mt-3 mb-2">
+        <span>or continue with</span>
+      </div>
+
+      <!-- Social buttons -->
+      <div class="d-flex justify-content-between gap-2 login-social-row">
+        <button type="button" class="btn login-social-btn flex-fill">
+          <img th:src="@{/images/icon/google-logo.png}" alt="Google" class="social-logo">
+          <span>Google</span>
+        </button>
+
+        <button type="button" class="btn login-social-btn flex-fill">
+          <img th:src="@{/images/icon/facebook-logo.png}" alt="Facebook" class="social-logo">
+          <span>Facebook</span>
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer text-center mt-4">
+      <span>Don't have account ?</span>
+      <a th:href="@{/register}" class="login-link-signup">Signup</a>
+    </div>
+
+  </div> <!-- /auth-card login-card -->
+</div> <!-- /auth-page-wrapper -->
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 1) Khai báo danh sách video cho TRANG LOGIN -->
+<script th:inline="javascript">
+  // Sau này muốn thêm / bớt video thì chỉ sửa mảng này
+  window.AUTH_VIDEO_SOURCES = [
+    "/videos/basketball.mp4",
+    "/videos/football.mp4",
+    "/videos/badminton.mp4",
+    "/videos/pingpong.mp4"
+  ];
+</script>
+
+<!-- 2) JS dùng chung điều khiển video nền -->
+<script th:src="@{/js/login/auth-bg.js}"></script>
+
+</body>
+</html>
