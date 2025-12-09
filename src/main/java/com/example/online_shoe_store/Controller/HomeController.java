@@ -4,6 +4,8 @@ import com.example.online_shoe_store.Entity.Category;
 import com.example.online_shoe_store.Entity.Product;
 import com.example.online_shoe_store.Service.CategoryService;
 import com.example.online_shoe_store.Service.ProductService;
+import com.example.online_shoe_store.dto.response.CategoryResponse;
+import com.example.online_shoe_store.dto.response.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Controller;
@@ -22,13 +24,13 @@ public class HomeController {
     CategoryService categoryService;
 
     @GetMapping("/new-products")
-    public List<Product> getNewProducts() {
+    public List<ProductResponse> getNewProducts() {
         return productService.getTop20Products();
     }
 
     @GetMapping("/category")
-    public List<Category> getCategories() {
-        return categoryService.getAllCategories();
+    public List<CategoryResponse> getCategories() {
+        return categoryService.getAllCategoriesResponses();
     }
 
 }
