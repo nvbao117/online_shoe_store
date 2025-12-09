@@ -1,0 +1,158 @@
+/* =========================================================
+   CSS RIÊNG CHO TRANG ĐĂNG KÝ (REGISTER)
+   - Layout, video nền, .auth-page-wrapper, .auth-card
+     đã xử lý trong auth-layout.css
+   - Ở đây chỉ style cho register-card + các phần tử bên trong
+   ========================================================= */
+
+/* Card chứa form đăng ký
+   - Kế thừa .auth-card, ở đây chỉ chỉnh kích thước + cảm giác mềm */
+.register-card {
+    width: 100%;
+    max-width: 1050px;           /* rộng 3 cột như design */
+    border-radius: 30px;         /* bo góc nhiều */
+    padding: 35px 45px;
+}
+
+/* -----------------------------
+   Logo & brand
+   ----------------------------- */
+
+.register-logo-img {
+    width: 150px;
+    height: auto;
+}
+
+.register-brand-name {
+    margin-top: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #1c9cd8;
+}
+
+/* -----------------------------
+   Title & subtitle
+   ----------------------------- */
+
+.register-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: #4fa8ff;              /* đồng bộ màu title với login */
+}
+
+.register-subtitle {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #f0f4ff;              /* chữ sáng hơn để nổi trên overlay */
+}
+
+/* -----------------------------
+   Input chung (glass giống login)
+   ----------------------------- */
+
+.register-input {
+    border-radius: 10px;
+    font-size: 14px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.16);          /* trắng mờ */
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #f5f7ff;
+}
+
+/* Màu danh sách option của Gender (và các select khác nếu dùng register-input) */
+.register-input option {
+    background-color: rgba(15, 18, 35, 0.96);  /* nền tối, hợp với overlay */
+    color: #f5f7ff;                            /* chữ sáng */
+}
+
+/* Nếu có optgroup thì cũng cho đồng bộ luôn */
+.register-input optgroup {
+    background-color: rgba(15, 18, 35, 0.96);
+    color: #c5d6ff;
+}
+
+.register-input::placeholder {
+    color: rgba(245, 247, 255, 0.7);
+}
+
+/* Giữ màu glass khi focus, không cho Bootstrap đổi sang trắng */
+.register-input:focus,
+.form-control.register-input:focus,
+.form-select.register-input:focus {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    color: #f5f7ff;
+    box-shadow: 0 0 0 1px rgba(79, 168, 255, 0.7);
+    border-color: rgba(79, 168, 255, 0.9);
+}
+
+/* -----------------------------
+   Icon bên phải trong ô password
+   ----------------------------- */
+
+/* Nền + border đồng bộ với input để nhìn thành 1 khối */
+.register-input-icon-right {
+    border-radius: 10px;
+    border-left: none;
+    background-color: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #f5f7ff;
+    cursor: pointer;
+}
+
+/* Bo viền liền mạch giữa input & icon phải */
+.input-group .form-control.register-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .input-group-text.register-input-icon-right {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* -----------------------------
+   Nút Sign Up (cùng tông với Login)
+   ----------------------------- */
+
+.register-submit-btn {
+    background: linear-gradient(135deg, #4fa8ff, #3b7ce5);
+    color: #ffffff;
+    border-radius: 999px;           /* bo tròn kiểu “viên thuốc” */
+    padding: 14px 45px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.register-submit-btn:hover {
+    background: linear-gradient(135deg, #66b6ff, #4b88f0);
+}
+
+.register-submit-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* -----------------------------
+   Responsive (màn hình nhỏ)
+   ----------------------------- */
+
+@media (max-width: 768px) {
+    .register-card {
+        padding: 25px 20px;
+        border-radius: 20px;
+    }
+
+    .register-title {
+        text-align: center;
+    }
+
+    .register-subtitle {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
