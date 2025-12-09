@@ -1,0 +1,34 @@
+package com.example.online_shoe_store.Controller;
+
+import com.example.online_shoe_store.Entity.Category;
+import com.example.online_shoe_store.Entity.Product;
+import com.example.online_shoe_store.Service.CategoryService;
+import com.example.online_shoe_store.Service.ProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+public class HomeController {
+    ProductService productService;
+    CategoryService categoryService;
+
+    @GetMapping("/new-products")
+    public List<Product> getNewProducts() {
+        return productService.getTop20Products();
+    }
+
+    @GetMapping("/category")
+    public List<Category> getCategories() {
+        return categoryService.getAllCategories();
+    }
+
+}
