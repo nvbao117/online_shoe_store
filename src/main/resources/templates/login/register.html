@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration - Sneaker Shop</title>
+
+    <!-- Bootstrap 5 CSS - dùng cho grid, form, button, layout -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons - dùng icon nếu cần ở password -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <!-- CSS chung cho tất cả trang auth (video nền, overlay, layout) -->
+    <link rel="stylesheet" th:href="@{/css/login/auth-layout.css}">
+    <!-- CSS riêng cho trang đăng ký -->
+    <link rel="stylesheet" th:href="@{/css/login/register.css}">
+</head>
+<body>
+
+<!-- ====================== VIDEO BACKGROUND (DÙNG CHUNG) ====================== -->
+<div class="auth-bg-video-wrapper">
+    <video class="auth-bg-video"
+           id="authBgVideo"
+           autoplay
+           muted
+           playsinline>
+        Trình duyệt của bạn không hỗ trợ video.
+    </video>
+</div>
+
+<!-- Lớp phủ mờ để form register nổi hơn trên video -->
+<div class="auth-bg-overlay"></div>
+<!-- ======================================================================== -->
+
+<!--
+    auth-page-wrapper: căn giữa nội dung (dùng chung cho login/register/forgot)
+    auth-card: style card trắng bo góc + shadow (dùng chung)
+    register-card: style riêng cho card đăng ký (độ rộng lớn hơn, v.v.) nằm trong register.css
+-->
+<div class="auth-page-wrapper">
+
+    <!-- Card trắng lớn bên trong, bo góc, giống design -->
+    <div class="auth-card register-card">
+
+        <!-- Hàng trên cùng: logo bên trái, tiêu đề bên phải -->
+        <div class="row align-items-start mb-4">
+
+            <!-- Cột logo bên trái -->
+            <div class="col-md-3 d-flex flex-column align-items-start">
+                <img th:src="@{/images/logo-shop/logo-sneaker.png}"
+                     alt="5A STORE Logo"
+                     class="register-logo-img">
+            </div>
+
+            <!-- Cột tiêu đề bên phải -->
+            <div class="col-md-9 text-center text-md-start">
+                <h1 class="register-title">Registration</h1>
+                <p class="register-subtitle">Personel Details</p>
+                <!-- (chữ Personel theo đúng design, nếu muốn đúng chính tả thì sửa thành Personal) -->
+            </div>
+        </div>
+
+        <!-- FORM ĐĂNG KÝ -->
+        <!--
+            Thời điểm này chỉ là giao diện, chưa xử lý backend.
+            th:action="@{/register}" chỉ là route mẫu, sau này bạn map controller theo ý.
+        -->
+        <form th:action="@{/register}" method="post">
+
+            <!-- Dòng 1: Fullname | Date of Birth | Email -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <input type="text"
+                           class="form-control register-input"
+                           name="fullName"
+                           placeholder="Fullname">
+                </div>
+                <div class="col-md-4">
+                    <input type="date"
+                           class="form-control register-input"
+                           name="dateOfBirth"
+                           placeholder="Date of Birth">
+                </div>
+                <div class="col-md-4">
+                    <input type="email"
+                           class="form-control register-input"
+                           name="email"
+                           placeholder="Email">
+                </div>
+            </div>
+
+            <!-- Dòng 2: Mobile Number | OTP | Gender -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <input type="text"
+                           class="form-control register-input"
+                           name="mobileNumber"
+                           placeholder="Mobile Number">
+                </div>
+                <div class="col-md-4">
+                    <!-- Chỉ là ô text nhập OTP, phần xử lý OTP sẽ làm sau -->
+                    <input type="text"
+                           class="form-control register-input"
+                           name="otp"
+                           placeholder="OTP">
+                </div>
+                <div class="col-md-4">
+                    <!-- Select giới tính -->
+                    <select class="form-select register-input"
+                            name="gender">
+                        <option value="" selected disabled>Gender</option>
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dòng 3: Username | Password | Confirm Password -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <input type="text"
+                           class="form-control register-input"
+                           name="username"
+                           placeholder="Username">
+                </div>
+
+                <!-- Password có icon ở bên phải (chỉ là UI, chưa show/hide) -->
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="password"
+                               class="form-control register-input border-end-0"
+                               name="password"
+                               placeholder="Password">
+                        <span class="input-group-text register-input-icon-right">
+              <!-- icon mắt, sau này có thể thêm JS để show/hide -->
+              <i class="bi bi-eye-slash"></i>
+            </span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="password"
+                               class="form-control register-input border-end-0"
+                               name="confirmPassword"
+                               placeholder="Confirm Password">
+                        <span class="input-group-text register-input-icon-right">
+              <i class="bi bi-eye-slash"></i>
+            </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút Sign Up lớn, ở góc phải dưới card (theo design) -->
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn register-submit-btn">
+                    Sign Up
+                </button>
+            </div>
+
+        </form>
+    </div> <!-- /auth-card register-card -->
+</div> <!-- /auth-page-wrapper -->
+
+<!-- Bootstrap JS bundle (nếu muốn dùng modal, dropdown, v.v. sau này) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 1) Cấu hình danh sách video cho TRANG REGISTER -->
+<script th:inline="javascript">
+    // Bạn có thể dùng chung playlist với login, hoặc làm playlist riêng
+    window.AUTH_VIDEO_SOURCES = [
+        "/videos/basketball.mp4",
+        "/videos/football.mp4",
+        "/videos/badminton.mp4",
+        "/videos/pingpong.mp4"
+    ];
+</script>
+
+<!-- 2) JS dùng chung điều khiển video nền -->
+<script th:src="@{/js/login/auth-bg.js}"></script>
+
+</body>
+</html>
