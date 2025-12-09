@@ -2,6 +2,8 @@ package com.example.online_shoe_store.Service;
 
 import com.example.online_shoe_store.Entity.Category;
 import com.example.online_shoe_store.Repository.CategoryRepository;
+import com.example.online_shoe_store.dto.response.CategoryResponse;
+import com.example.online_shoe_store.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
@@ -14,8 +16,9 @@ import java.util.List;
 
 public class CategoryService {
     CategoryRepository categoryRepository;
+    CategoryMapper categoryMapper;
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryResponse> getAllCategoriesResponses() {
+        return categoryMapper.toCategoryResponsesList(categoryRepository.findAll());
     }
 }

@@ -1,0 +1,13 @@
+package com.example.online_shoe_store.dto.response;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductResponse {
+    private String name;
+    private String imageUrl;
+    private double price;
+}
