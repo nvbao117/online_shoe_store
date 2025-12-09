@@ -1,0 +1,240 @@
+/* =========================================================
+   CSS RIÊNG CHO TRANG LOGIN
+   - KHÔNG set background toàn trang ở đây
+   - Layout, font, video nền, .auth-page-wrapper, .auth-card
+     đã được xử lý trong auth-layout.css
+   ========================================================= */
+
+/* Card trắng chứa toàn bộ nội dung login
+   - Kế thừa style chung từ .auth-card (auth-layout.css)
+   - Ở đây chỉ thêm/override những gì riêng cho login
+*/
+.login-card {
+    width: 380px; /* Độ rộng theo thiết kế (có thể chỉnh lại) */
+}
+
+/* -----------------------------
+   Logo & Brand name
+   ----------------------------- */
+
+.login-logo {
+    margin-bottom: 10px;
+}
+
+.login-logo-img {
+    width: 180px;   /* Kích thước logo */
+    height: auto;
+}
+
+.login-brand-name {
+    margin-top: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #1c9cd8;  /* Màu xanh cho chữ brand (nếu dùng) */
+    font-size: 16px;
+}
+
+/* -----------------------------
+   Title & Subtitle
+   ----------------------------- */
+
+.login-title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #4fa8ff;
+}
+
+.login-subtitle {
+    font-size: 13px;
+    margin: 0;
+    color: #e5f0ff;
+}
+
+/* -----------------------------
+   Text nhỏ, link
+   ----------------------------- */
+
+.login-label {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+/* Label & chữ nhỏ khác cũng nên sáng lên tí */
+.login-label,
+.login-remember-row,
+.login-footer {
+    color: #f0f4ff;
+}
+
+.login-link-small,
+.login-link-signup {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.login-link-small:hover,
+.login-link-signup:hover {
+    color: #c5ddff;
+    text-decoration: underline;
+}
+
+/* -----------------------------
+   Form input + icon
+   ----------------------------- */
+
+/* Icon trái & phải dùng cùng nền / border với input
+   => nhìn thành một khối glass liền mạch, không còn ô trắng riêng lẻ
+*/
+.login-input-icon,
+.login-input-icon-right {
+    background-color: rgba(255, 255, 255, 0.16);          /* trắng mờ */
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #f5f7ff;
+}
+
+/* Cắt viền giữa icon và input để không bị viền đôi */
+.login-input-icon {
+    border-right: none;
+}
+
+.login-input-icon-right {
+    border-left: none;
+}
+
+/* Input chính */
+.login-input {
+    background-color: rgba(255, 255, 255, 0.16);          /* trắng mờ */
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-left: none;                                    /* liền với icon trái */
+    font-size: 13px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #f5f7ff;                                       /* chữ trắng hơi xanh */
+}
+
+.login-input::placeholder {
+    color: rgba(245, 247, 255, 0.7);                      /* placeholder nhạt */
+}
+
+.login-input:focus {
+    box-shadow: 0 0 0 1px rgba(79, 168, 255, 0.7);
+    border-color: rgba(79, 168, 255, 0.9);
+}
+
+.form-control.login-input:focus {
+    background-color: rgba(255, 255, 255, 0.16);   /* giống màu lúc bình thường */
+    color: #f5f7ff;
+    box-shadow: 0 0 0 1px rgba(79, 168, 255, 0.7);
+    border-color: rgba(79, 168, 255, 0.9);
+}
+
+/* Bo tròn input-group cho đẹp */
+.input-group .form-control.login-input,
+.input-group .input-group-text.login-input-icon,
+.input-group .input-group-text.login-input-icon-right {
+    border-radius: 10px;
+}
+
+/* Cắt góc giữa icon trái và input */
+.input-group .input-group-text.login-input-icon {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control.login-input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Cắt góc giữa input và icon phải (mắt password) */
+.input-group .input-group-text.login-input-icon-right {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* -----------------------------
+   Nút Login
+   ----------------------------- */
+
+/* Làm nút mềm hơn, cùng tông với input & video background */
+.login-btn {
+    background: linear-gradient(135deg, #4fa8ff, #3b7ce5);
+    color: #ffffff;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 0;
+    border: none;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);  /* shadow nhẹ hơn */
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, #66b6ff, #4b88f0);
+    transform: translateY(-1px);
+}
+
+/* Khi focus bằng phím tab */
+.login-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.32);
+}
+
+/* -----------------------------
+   Remember me + Forgot password
+   ----------------------------- */
+
+.login-remember-row {
+    font-size: 12px;
+}
+
+/* -----------------------------
+   Divider "or continue with"
+   ----------------------------- */
+
+.login-divider span {
+    font-size: 12px;
+    color: #ffffff;
+}
+
+/* -----------------------------
+   Social buttons
+   ----------------------------- */
+
+.login-social-row {
+    margin-top: 6px;
+}
+
+.login-social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 999px;
+    padding: 6px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.08);   /* trắng mờ */
+    color: #f5f7ff;
+    backdrop-filter: blur(4px);
+}
+
+.login-social-btn:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.social-logo {
+    width: 18px;
+    height: 18px;
+}
+
+/* -----------------------------
+   Footer: Signup link
+   ----------------------------- */
+
+.login-footer {
+    font-size: 13px;
+}
