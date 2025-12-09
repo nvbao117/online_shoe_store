@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class HomeViewController {
 
-    @GetMapping
+    @GetMapping("/home")
     public String home() {
-        return "home/home";
+        return "/home/home";
     }
 }
