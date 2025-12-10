@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ChatResponse {
     private String response;
-    private String type; // "bot" or "user" (usually bot for response)
+    private String type;
+    private String sessionId;
 }

@@ -28,6 +28,7 @@ class ShoeStoreChatbot {
         this.isOpen = false;
         this.activeView = 'welcome'; // 'welcome' or 'conversation'
         this.isTyping = false;
+        this.sessionId = null;
 
         this.init();
     }
@@ -83,23 +84,29 @@ class ShoeStoreChatbot {
     sendMessage() {
         const text = this.input.value.trim();
         if (!text) return;
-
         this.addMessage(text, 'user');
         this.input.value = '';
-
         this.showTyping();
-
         // Call Backend API
         fetch('/api/chat/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ message: text })
+            body: JSON.stringify({
+                message: text,
+                sessionId: this.sessionId  // ← GỬI sessionId
+            })
         })
             .then(response => response.json())
             .then(data => {
                 this.hideTyping();
+
+                // Lưu sessionId từ response
+                if (data.sessionId) {
+                    this.sessionId = data.sessionId;  // ← LƯU sessionId
+                }
+
                 this.addMessage(data.response, 'bot');
             })
             .catch(error => {
@@ -108,7 +115,6 @@ class ShoeStoreChatbot {
                 this.addMessage("Xin lỗi, mình đang gặp sự cố kết nối. Vui lòng thử lại sau! 😔", 'bot');
             });
     }
-
     addMessage(text, type) {
         const div = document.createElement('div');
         div.className = `message ${type}-message`;
