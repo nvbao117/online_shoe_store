@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GiayTop1 - Giỏ hàng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+<header class="shadow-sm bg-white sticky top-0 z-50">
+  <div class="bg-sky-50 w-full px-4 py-3">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4 max-w-7xl mx-auto">
+      <div class="flex items-center justify-between md:justify-start gap-4">
+        <a href="/home" class="flex items-center gap-3">
+          <img src="/home/image/logo-Photoroom.png" alt="Logo" class="h-10 w-auto object-contain" />
+          <span class="hidden sm:inline text-blue-600 font-semibold">Hotline: 081895333355</span>
+        </a>
+      </div>
+
+      <div class="w-full md:flex-1 md:max-w-md">
+        <div class="relative">
+          <input type="text" placeholder="Tìm kiếm sản phẩm..." class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500 text-sm pl-10" />
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-gray-400"></i>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center gap-4">
+        <a href="/login" class="flex items-center gap-2 hover:text-blue-600 transition">
+          <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-gray-600">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <span class="font-medium text-sm">Tài khoản</span>
+        </a>
+
+        <a href="/cart" class="relative hover:text-blue-600 transition">
+          <div class="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-gray-600">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </div>
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">2</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="border-t border-gray-200 bg-white">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4">
+      <ul class="flex flex-wrap justify-center gap-6 sm:gap-8 py-3 text-sm sm:text-base font-bold text-gray-700">
+        <li><a href="/home" class="hover:text-blue-600 transition">TRANG CHỦ</a></li>
+        <li><a href="/products" class="hover:text-blue-600 transition">SẢN PHẨM</a></li>
+        <li><a href="#" class="hover:text-blue-600 transition text-red-500">SALE OFF</a></li>
+        <li><a href="#" class="hover:text-blue-600 transition">GIỚI THIỆU</a></li>
+        <li><a href="#" class="hover:text-blue-600 transition">LIÊN HỆ</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6" th:replace="${content}">
+</main>
+
+<footer class="bg-white border-t border-gray-200 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <p class="font-bold mb-3 text-blue-900">Công ty TNHH 5A STORE</p>
+        <p class="text-gray-600 text-sm mb-1"><i class="fa-solid fa-location-dot mr-2"></i>1 Võ Văn Ngân, Thủ Đức</p>
+        <p class="text-gray-600 text-sm"><i class="fa-solid fa-phone mr-2"></i>Hotline: 081895333355</p>
+      </div>
+      <div>
+        <p class="font-bold mb-3 text-blue-900">Hỗ trợ khách hàng</p>
+        <ul class="text-gray-600 text-sm space-y-2">
+          <li><a href="#" class="hover:text-blue-600">Hướng dẫn chọn size</a></li>
+          <li><a href="#" class="hover:text-blue-600">Chính sách đổi trả</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="font-bold mb-3 text-blue-900">Thanh toán</p>
+        <div class="flex gap-2">
+          <span class="bg-gray-100 px-3 py-1 rounded text-sm text-gray-600 font-semibold border">COD</span>
+          <span class="bg-gray-100 px-3 py-1 rounded text-sm text-blue-600 font-semibold border border-blue-200">VNPAY</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bg-gray-100 py-3 text-center text-xs text-gray-500">
+    &copy; 2024 5A Store. All rights reserved.
+  </div>
+</footer>
+
+</body>
+</html>
