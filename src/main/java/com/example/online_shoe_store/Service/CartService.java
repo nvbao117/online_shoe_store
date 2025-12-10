@@ -5,8 +5,7 @@ import com.example.online_shoe_store.Entity.CartItem;
 import com.example.online_shoe_store.Entity.Product;
 import com.example.online_shoe_store.Entity.ProductVariant;
 import com.example.online_shoe_store.Entity.User;
-import com.example.online_shoe_store.Repository.CartRepository;
-import com.example.online_shoe_store.Repository.UserRepository;
+import com.example.online_shoe_store.Repository.*;
 import com.example.online_shoe_store.dto.response.CartItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,8 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
+    private final CartItemRepository cartItemRepository;
+    private final ProductVariantRepository productVariantRepository;
 
     @Transactional(readOnly = true)
     public List<CartItemResponse> getCartItemsByUsername(String username) {
@@ -42,8 +43,6 @@ public class CartService {
             ProductVariant variant = item.getProductVariant();
             Product product = variant.getProduct();
 
-            // --- SỬA LỖI TẠI ĐÂY ---
-            // Vì product.getPrice() đã là BigDecimal nên lấy trực tiếp, không dùng valueOf()
             BigDecimal price = product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
 
             // Tính tổng tiền = Giá * Số lượng
@@ -71,5 +70,41 @@ public class CartService {
         return items.stream()
                 .map(CartItemResponse::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // 1. Cập nhật số lượng
+    @Transactional
+    public void updateItemQuantity(String cartItemId, int newQuantity) {
+        CartItem item = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+
+        if (newQuantity <= 0) {
+            cartItemRepository.delete(item); // Nếu số lượng <= 0 thì xóa luôn
+        } else {
+            item.setQuantity(newQuantity);
+            cartItemRepository.save(item);
+        }
+    }
+
+    // Xóa sản phẩm khỏi giỏ
+    @Transactional
+    public void deleteCartItem(String cartItemId) {
+        if (cartItemRepository.existsById(cartItemId)) {
+            cartItemRepository.deleteById(cartItemId);
+        }
+    }
+
+    // Đổi phân loại (Variant)
+    @Transactional
+    public void updateItemVariant(String cartItemId, String newVariantId) {
+        CartItem item = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+
+        ProductVariant newVariant = productVariantRepository.findById(newVariantId)
+                .orElseThrow(() -> new RuntimeException("Variant not found"));
+
+
+        item.setProductVariant(newVariant);
+        cartItemRepository.save(item);
     }
 }

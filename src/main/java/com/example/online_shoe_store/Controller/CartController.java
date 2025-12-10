@@ -7,6 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,7 +37,33 @@ public class CartController {
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("grandTotal", grandTotal);
         model.addAttribute("totalItems", cartItems.size());
+        model.addAttribute("username", currentUsername);
 
         return "cart/index";
+    }
+
+    // API: Tăng giảm số lượng
+    @PostMapping("/update-quantity")
+    @ResponseBody
+    public ResponseEntity<?> updateQuantity(@RequestParam String itemId, @RequestParam int quantity) {
+        cartService.updateItemQuantity(itemId, quantity);
+        return ResponseEntity.ok(Map.of("message", "Updated successfully"));
+    }
+
+    // API: Xóa sản phẩm
+    @PostMapping("/remove")
+    @ResponseBody
+    public ResponseEntity<?> removeItem(@RequestParam String itemId) {
+        cartService.deleteCartItem(itemId);
+        return ResponseEntity.ok(Map.of("message", "Deleted successfully"));
+    }
+
+    // API: Đổi phân loại (Size/Màu)
+    // Lưu ý: Frontend cần gửi variantId mới lên
+    @PostMapping("/update-variant")
+    @ResponseBody
+    public ResponseEntity<?> updateVariant(@RequestParam String itemId, @RequestParam String newVariantId) {
+        cartService.updateItemVariant(itemId, newVariantId);
+        return ResponseEntity.ok(Map.of("message", "Variant updated successfully"));
     }
 }
