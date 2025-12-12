@@ -1,0 +1,147 @@
+<!-- templates/fragments/header.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GiayTop1 - Trang Chủ</title>
+
+    <!-- Bootstrap + Bootstrap Icons (dùng cho header) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+    <!-- CSS header dùng chung -->
+    <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
+
+    <!-- Tailwind CSS (phần body bên dưới vẫn dùng tailwind như cũ) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .tab-active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .sport-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Ẩn thanh scroll ngang cho slider */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .slide-enter {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        .slide-enter-active {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.35s ease;
+        }
+
+        .slide-exit {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .slide-exit-active {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.35s ease;
+        }
+    </style>
+</head>
+<body>
+<header class="main-header" th:fragment="mainHeader">
+    <!-- ==================== HÀNG TRÊN: NỀN XANH NHẠT ==================== -->
+    <div class="header-top-wrapper">
+        <div class="header-top container d-flex align-items-center justify-content-between">
+
+            <!-- Logo + Hotline -->
+            <div class="d-flex align-items-center header-left">
+                <!-- Logo -->
+                <a th:href="@{/static}" class="header-logo">
+                    <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="5A STORE" class="header-logo-img">
+                </a>
+
+                <!-- Hotline (giữ style giống hình 1) -->
+                <div class="header-hotline ms-4">
+                    <div class="hotline-label">
+                        <i class="bi bi-telephone-fill me-1"></i> HOTLINE:
+                    </div>
+                    <div class="hotline-number">0819 893 3355</div>
+                </div>
+            </div>
+
+            <!-- Ô tìm kiếm -->
+            <div class="header-search flex-grow-1 mx-4">
+                <form th:action="@{/search}" method="get" class="search-form d-flex">
+                    <input type="text"
+                           class="form-control search-input"
+                           name="keyword"
+                           placeholder="Tìm kiếm sản phẩm...">
+                    <button type="submit" class="btn search-btn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tài khoản + Giỏ hàng (kiểu giống hình 2) -->
+            <div class="header-right d-flex align-items-center">
+
+                <!-- Tài khoản (avatar + tên) -->
+                <div class="header-right-item me-3 d-flex align-items-center">
+                    <div class="icon-circle">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <!-- Hiện tên user trên màn hình md trở lên -->
+                    <span class="ms-2 fw-semibold d-none d-md-inline">NhatHuy</span>
+                </div>
+
+                <!-- Giỏ hàng -->
+                <div class="header-right-item">
+                    <a th:href="@{/templates/cart}" class="text-decoration-none">
+                        <div class="icon-circle position-relative">
+                            <i class="bi bi-cart3"></i>
+                            <!-- Badge số lượng sản phẩm -->
+                            <span class="cart-count"
+                                  th:text="${cartItemCount}">0</span>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== HÀNG DƯỚI: MENU CHÍNH (NỀN TRẮNG, CHỮ XANH) ==================== -->
+    <nav class="header-nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li class="nav-item active">
+                    <a th:href="@{/home}">TRANG CHỦ</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/products}">SẢN PHẨM</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/sale-off}">SALE OFF</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/about}">GIỚI THIỆU</a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/contact}">LIÊN HỆ</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+</header>
+</body>
+</html>
