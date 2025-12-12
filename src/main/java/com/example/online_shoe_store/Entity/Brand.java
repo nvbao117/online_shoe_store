@@ -12,17 +12,18 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "brands", indexes = {
-        @Index(name = "idx_brand_name", columnList = "name")
+        @Index(name = "idx_brand_name", columnList = "name"),
+        @Index(name = "idx_brand_category", columnList = "category_id")
 })
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"products"})
+@ToString(exclude = {"products", "category"})
 @EqualsAndHashCode(of = "brandId")
 public class Brand {
-    
+
     @Id
     @Column(name = "brand_id", length = 36)
     private String brandId;
@@ -48,6 +49,11 @@ public class Brand {
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Product> products = new ArrayList<>();
+
+    // NEW: mỗi Brand thuộc về 1 Category
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "FK_Category_Brand"))
+    private Category category;
 
     @PrePersist
     public void prePersist() {
