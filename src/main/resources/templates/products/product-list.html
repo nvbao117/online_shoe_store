@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sản phẩm</title>
+
+  <!-- Bootstrap + Bootstrap Icons (dùng cho header) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+  <!-- CSS header dùng chung -->
+  <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
+
+  <!-- Tailwind CSS (phần body bên dưới vẫn dùng tailwind như cũ) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .tab-active {
+      background-color: #3b82f6;
+      color: white;
+    }
+    .sport-card:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Ẩn thanh scroll ngang cho slider */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .slide-enter {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    .slide-enter-active {
+      opacity: 1;
+      transform: translateX(0);
+      transition: all 0.35s ease;
+    }
+
+    .slide-exit {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .slide-exit-active {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: all 0.35s ease;
+    }
+  </style>
+</head>
+  <body class="bg-white">
+    <!-- Header -->
+  <div th:replace="fragments/header :: mainHeader"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-4">
+      <!-- Breadcrumb -->
+      <div class="bg-red-50 -m-4 text-gray-600 mb-4 w-full">
+        Trang Chủ > Sản Phẩm
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="flex gap-2 mb-6 overflow-x-auto">
+        <button class="tab-active px-6 py-3 font-medium whitespace-nowrap">
+          Tất cả
+        </button>
+        <button
+          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50"
+        >
+          Giày Cầu Lông
+        </button>
+        <button
+          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50"
+        >
+          Giày Bóng Đá
+        </button>
+        <button
+          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50 relative"
+        >
+          Giày Chạy Bộ
+          <span
+            class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+            >1</span
+          >
+        </button>
+        <button
+          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50"
+        >
+          Giày Bóng Bàn
+        </button>
+      </div>
+
+      <div class="flex gap-6">
+        <!-- Sidebar Filters -->
+        <aside class="w-64 flex-shrink-0">
+          <div class="bg-white rounded-lg border border-blue-200 p-4 space-y-6">
+            <!-- Price Filter -->
+            <div>
+              <h3 class="font-bold text-gray-800 mb-3">Chọn mức giá</h3>
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Dưới 500k</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Từ 500k - 1 Triệu</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Từ 1 Triệu - 2 Triệu</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Từ 2 Triệu - 3 Triệu</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Trên 3 Triệu</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Brand Filter -->
+            <div>
+              <h3 class="font-bold text-gray-800 mb-3">THƯƠNG HIỆU</h3>
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm"
+                class="w-full px-3 py-2 border border-gray-300 rounded mb-3 text-sm"
+              />
+              <div class="space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>YONEX</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>LINING</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Size Filter -->
+            <div>
+              <h3 class="font-bold text-gray-800 mb-3">CHỌN SIZE</h3>
+              <div class="space-y-2">
+                <div class="flex gap-4">
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4" />
+                    <span>42</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4" />
+                    <span>43</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4" />
+                    <span>43</span>
+                  </label>
+                </div>
+                <div class="flex gap-4">
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4" />
+                    <span>42</span>
+                  </label>
+                  <label class="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" class="w-4 h-4" />
+                    <span>43</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gender Filter -->
+            <div class="relative">
+              <h3 class="font-bold text-gray-800 mb-3">ĐỐI TƯỢNG</h3>
+              <div class="flex gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Nam</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="w-4 h-4" />
+                  <span>Nữ</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Products Section -->
+        <div class="flex-1">
+          <!-- Sort Options -->
+          <div class="flex items-center gap-4 mb-4 text-sm">
+            <span class="text-gray-600">Sắp xếp theo:</span>
+            <button class="font-medium hover:text-blue-600">Nổi bật</button>
+            <button class="font-medium hover:text-blue-600">Bán chạy</button>
+            <button class="font-medium hover:text-blue-600">Giảm giá</button>
+            <button class="font-medium hover:text-blue-600">Mới</button>
+            <div class="relative">
+              <!-- Button Giá -->
+              <button id="sortPriceBtn" class="font-medium hover:text-blue-600">
+                Giá
+              </button>
+
+              <!-- Dropdown -->
+              <div
+                id="priceDropdown"
+                class="hidden absolute left-0 top-full mt-1 bg-white border rounded shadow-md text-sm w-40"
+              >
+                <button
+                  class="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  data-sort="asc"
+                >
+                  Giá tăng dần
+                </button>
+                <button
+                  class="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  data-sort="desc"
+                >
+                  Giá giảm dần
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Grid -->
+          <div class="grid grid-cols-4 gap-4">
+            <!-- Product Card 1 -->
+            <div
+              class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+            >
+              <div class="relative">
+                <img
+                  src="/placeholder.svg?height=180&width=200"
+                  alt="Giày Victor"
+                  class="w-full h-44 object-cover"
+                />
+                <span
+                  class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded"
+                  >Sale Sập sàn 50%</span
+                >
+              </div>
+              <div class="p-3">
+                <h4 class="font-medium text-gray-800">Giày victor</h4>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-red-500 font-bold">1.200.000 đ</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-gray-400 line-through text-sm"
+                    >1.500.000 đ</span
+                  >
+                  <span class="text-red-400 text-sm">-41%</span>
+                </div>
+                <div class="flex items-center gap-3 mt-2 text-sm text-gray-600">
+                  <span>★ 5.0</span>
+                  <span>•</span>
+                  <span>Đã bán 10K</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <div th:replace="fragments/footer :: mainFooter"></div>
+    <script>
+      const btn = document.getElementById("sortPriceBtn");
+      const dropdown = document.getElementById("priceDropdown");
+
+      btn.addEventListener("click", () => {
+        dropdown.classList.toggle("hidden");
+      });
+
+      // Ẩn dropdown khi click ra ngoài
+      document.addEventListener("click", (e) => {
+        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.add("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>
