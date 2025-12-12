@@ -55,6 +55,14 @@
         Sign in and step into your best performance
       </p>
 
+      <!-- ALERT THÔNG BÁO LỖI ĐĂNG NHẬP -->
+      <div th:if="${param.error}"
+           class="alert alert-danger alert-dismissible fade show login-alert"
+           role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Sai tài khoản hoặc mật khẩu, vui lòng thử lại.
+      </div>
+
       <!-- FORM ĐĂNG NHẬP -->
       <form th:action="@{/login}" method="post" class="mt-4">
 
@@ -120,6 +128,10 @@
           </button>
         </div>
 
+        <!-- Thông báo sau khi logout -->
+        <p th:if="${param.logout}" style="color: #4caf50; margin-top: 5px;">
+          Bạn đã đăng xuất thành công.
+        </p>
       </form>
 
       <!-- Footer -->
@@ -158,6 +170,24 @@
 
   <!-- 4) Chatbot JS -->
   <script th:src="@{/js/chatbot.js}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const alertEl = document.querySelector('.login-alert');
+      if (alertEl) {
+        // Sau 3 giây tự động ẩn alert
+        setTimeout(function () {
+          try {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+            bsAlert.close();
+          } catch (e) {
+            // phòng trường hợp bootstrap chưa load
+            alertEl.style.display = 'none';
+          }
+        }, 1000);
+      }
+    });
+  </script>
 
 </body>
 
