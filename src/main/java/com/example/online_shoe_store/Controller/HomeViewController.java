@@ -13,8 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class HomeViewController {
 
-    @GetMapping
+    @GetMapping("/home")
     public String home() {
-        return "home/home";
+        return "/home/home";
     }
+    @GetMapping("/products")
+    public String produtcs() {
+        return "/products/product-list";
+    }
+
+    @GetMapping("/sale-off")
+    public String saleOff() {
+        return "/products/saleOf-list";
+    }
+
+    // gio hang duoc lay ben cart controller
+
+
+
 }

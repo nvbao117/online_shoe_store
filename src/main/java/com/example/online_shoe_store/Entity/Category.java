@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"products"})
+@ToString(exclude = {"products", "brands"})
 @EqualsAndHashCode(of = "categoryId")
 public class Category {
 
@@ -49,6 +49,11 @@ public class Category {
     @Builder.Default
     private List<Product> products = new ArrayList<>();
 
+    // NEW: một Category có nhiều Brand
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Brand> brands = new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         if (categoryId == null) {
@@ -59,6 +64,18 @@ public class Category {
         }
         if (isActive == null) {
             isActive = true;
+        }
+    }
+
+    // NEW: khi xóa Category, set null cho category trong các Brand liên quan
+    @PreRemove
+    public void preRemove() {
+        for (Brand b : brands) {
+            b.setCategory(null);
+        }
+        // nếu muốn cũng có thể null các product.category khi xóa category
+        for (Product p : products) {
+            p.setCategory(null);
         }
     }
 }

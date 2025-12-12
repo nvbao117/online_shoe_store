@@ -1,475 +1,272 @@
 <!DOCTYPE html>
-<html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GiayTop1 - Trang Chủ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      .tab-active {
-        background-color: #3b82f6;
-        color: white;
-      }
-      .sport-card:hover img {
-        transform: scale(1.05);
-      }
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GiayTop1 - Trang Chủ</title>
 
-      /* Ẩn thanh scroll ngang cho slider */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .slide-enter {
-        opacity: 0;
-        transform: translateX(30px);
-      }
-      .slide-enter-active {
-        opacity: 1;
-        transform: translateX(0);
-        transition: all 0.35s ease;
-      }
+  <!-- Bootstrap + Bootstrap Icons (dùng cho header) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
-      .slide-exit {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      .slide-exit-active {
-        opacity: 0;
-        transform: translateX(-30px);
-        transition: all 0.35s ease;
-      }
-    </style>
-  </head>
-  <body class="bg-gray-50">
-    <!-- Header -->
-    <header class="shadow-sm">
-      <div class="bg-sky-50 w-full px-4 py-3">
-        <div
-          class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4"
-        >
-          <!-- Logo & Hotline -->
-          <div class="flex items-center justify-between md:justify-start gap-4">
-            <div class="flex items-center gap-3">
-              <img
-                src="/home/image/logo-Photoroom.png"
-                alt="Logo"
-                class="h-10 w-auto object-contain"
-              />
-              <span class="hidden sm:inline text-blue-600 font-semibold"
-                >Hotline: 081895333355</span
-              >
-            </div>
+  <!-- CSS header dùng chung -->
+  <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
 
-            <!-- Mobile icons -->
-            <div class="flex items-center gap-3 md:hidden">
-              <div class="relative">
-                <svg
-                  class="w-7 h-7 text-gray-700"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0z"
-                  />
-                </svg>
-                <span
-                  class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center"
-                  >12</span
-                >
-              </div>
-              <div
-                class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-5 h-5 text-gray-600"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
+  <!-- Tailwind CSS (phần body bên dưới vẫn dùng tailwind như cũ) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-          <!-- Search -->
-          <div class="w-full md:flex-1 md:max-w-md">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
-            />
-          </div>
+  <style>
+    .tab-active {
+      background-color: #3b82f6;
+      color: white;
+    }
+    .sport-card:hover img {
+      transform: scale(1.05);
+    }
 
-          <!-- User & Cart (Desktop) -->
-          <div class="hidden md:flex items-center gap-4 mr-4">
-            <div class="flex items-center gap-2">
-              <div
-                class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-6 h-6 text-gray-600"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                  />
-                </svg>
-              </div>
-              <span class="font-medium">NhatHuy</span>
-            </div>
-            <div class="relative">
-              <svg
-                class="w-8 h-8 text-gray-700"
+    /* Ẩn thanh scroll ngang cho slider */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .slide-enter {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    .slide-enter-active {
+      opacity: 1;
+      transform: translateX(0);
+      transition: all 0.35s ease;
+    }
+
+    .slide-exit {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .slide-exit-active {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: all 0.35s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- ================== HEADER DÙNG CHUNG ================== -->
+<div th:replace="fragments/header :: mainHeader"></div>
+
+<!-- ================== PHẦN CÒN LẠI GIỮ NGUYÊN NHƯ CŨ ================== -->
+
+<!-- Hero Banner -->
+<section
+        class="relative h-[528px] sm:h-[528px] bg-gradient-to-r from-blue-900 to-blue-700 overflow-hidden"
+>
+  <img
+          src="/home/image/caulong.jpg"
+          alt="Columbia Banner"
+          class="absolute inset-0 w-full h-full object-cover opacity-80"
+  />
+  <div
+          class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-transparent"
+  ></div>
+  <div
+          class="relative max-w-7xl mx-auto px-4 h-full flex flex-col sm:flex-row items-center"
+  >
+    <div class="text-white max-w-lg text-center sm:text-left">
+      <div class="mb-2 sm:mb-4">
+            <span class="text-xl sm:text-2xl font-bold tracking-wider"
+            >❄❄Columbia</span
+            >
+      </div>
+      <h1
+              class="text-2xl sm:text-4xl font-bold italic leading-tight mb-3 sm:mb-4"
+      >
+        DẤU ẤN SUB-ZERO<br />
+        ĐÁNH TAN<br />
+        NGÀY LẠNH BUỐT
+      </h1>
+      <p class="text-xs sm:text-sm mb-4 sm:mb-6 opacity-90">
+        Cứ bước ra ngoài. Mọi thứ khác hãy để Columbia lo.
+      </p>
+    </div>
+    <div class="sm:ml-auto mt-3 sm:mt-0">
+      <button
+              class="bg-white text-gray-800 px-5 py-2 sm:px-6 sm:py-3 rounded font-bold flex items-center gap-2 hover:bg-gray-100 transition-colors text-sm sm:text-base"
+      >
+        MUA NGAY
+        <span class="text-lg">▶</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Shop by Sport -->
+<section class="max-w-7xl mx-auto px-4 py-8">
+  <div
+          id="categoryContainer"
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
+  >
+    <h2 class="text-lg sm:text-xl font-semibold">Shop by Sport</h2>
+
+    <div class="flex gap-2 self-end">
+      <button
+              id="prevBtn"
+              class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+      >
+        <svg
+                class="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-              >
-                <path
+        >
+          <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0z"
-                />
-              </svg>
-              <span
-                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-                >12</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
+                  d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
 
-      <!-- Navigation -->
-      <nav class="border-t border-gray-200">
-        <div class="max-w-7xl mx-auto px-2 sm:px-4">
-          <ul
-            class="flex flex-wrap justify-center gap-4 sm:gap-8 md:gap-16 py-3 text-sm sm:text-base"
-          >
-            <li>
-              <a
-                href="#"
-                class="text-blue-600 font-semibold hover:text-blue-800"
-                >TRANG CHỦ</a
-              >
-            </li>
-            <li>
-              <a
-                href="#"
-                class="text-blue-600 font-semibold hover:text-blue-800"
-                >SẢN PHẨM</a
-              >
-            </li>
-            <li>
-              <a
-                href="#"
-                class="text-blue-600 font-semibold hover:text-blue-800"
-                >SAFE OF</a
-              >
-            </li>
-            <li>
-              <a
-                href="#"
-                class="text-blue-600 font-semibold hover:text-blue-800"
-                >GIỚI THIỆU</a
-              >
-            </li>
-            <li>
-              <a
-                href="#"
-                class="text-blue-600 font-semibold hover:text-blue-800"
-                >LIÊN HỆ</a
-              >
-            </li>
-          </ul>
-        </div>
-      </nav>
-    </header>
+      <button
+              id="nextBtn"
+              class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+      >
+        <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+        >
+          <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
 
-    <!-- Hero Banner -->
-    <section
-      class="relative h-[528px] sm:h-[528px] bg-gradient-to-r from-blue-900 to-blue-700 overflow-hidden"
+  <div
+          id="sportGrid"
+          class="grid grid-cols-3 md:grid-cols-5 gap-4 overflow-hidden"
+  ></div>
+</section>
+
+<!-- New Products Section -->
+<section class="max-w-7xl mx-auto px-2 sm:px-4 py-8">
+  <h2 class="text-xl sm:text-2xl font-bold text-center mb-6">
+    SẢN PHẨM MỚI
+  </h2>
+
+  <!-- Category Tabs -->
+  <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+    <button class="tab-active px-4 sm:px-6 py-2 rounded-full font-medium">
+      Tất cả
+    </button>
+    <button
+            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
     >
-      <img
-        src="/home/image/caulong.jpg"
-        alt="Columbia Banner"
-        class="absolute inset-0 w-full h-full object-cover opacity-80"
-      />
-      <div
-        class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-transparent"
-      ></div>
-      <div
-        class="relative max-w-7xl mx-auto px-4 h-full flex flex-col sm:flex-row items-center"
-      >
-        <div class="text-white max-w-lg text-center sm:text-left">
-          <!-- Columbia Logo -->
-          <div class="mb-2 sm:mb-4">
-            <span class="text-xl sm:text-2xl font-bold tracking-wider"
-              >❄❄Columbia</span
-            >
-          </div>
-          <h1
-            class="text-2xl sm:text-4xl font-bold italic leading-tight mb-3 sm:mb-4"
-          >
-            DẤU ẤN SUB-ZERO<br />
-            ĐÁNH TAN<br />
-            NGÀY LẠNH BUỐT
-          </h1>
-          <p class="text-xs sm:text-sm mb-4 sm:mb-6 opacity-90">
-            Cứ bước ra ngoài. Mọi thứ khác hãy để Columbia lo.
-          </p>
-        </div>
-        <div class="sm:ml-auto mt-3 sm:mt-0">
-          <button
-            class="bg-white text-gray-800 px-5 py-2 sm:px-6 sm:py-3 rounded font-bold flex items-center gap-2 hover:bg-gray-100 transition-colors text-sm sm:text-base"
-          >
-            MUA NGAY
-            <span class="text-lg">▶</span>
-          </button>
-        </div>
-      </div>
-    </section>
+      Giày Cầu Lông
+    </button>
+    <button
+            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
+    >
+      Giày Bóng Đá
+    </button>
+    <button
+            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
+    >
+      Giày Chạy Bộ
+    </button>
+    <button
+            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
+    >
+      Giày Bóng Rổ
+    </button>
+  </div>
 
-    <!-- Shop by Sport -->
-    <section class="max-w-7xl mx-auto px-4 py-8">
-      <div
-        id="categoryContainer"
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
-      >
-        <h2 class="text-lg sm:text-xl font-semibold">Shop by Sport</h2>
-
-        <div class="flex gap-2 self-end">
-          <button
-            id="prevBtn"
-            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-          >
-            <svg
+  <!-- Products Slider Wrapper -->
+  <div class="bg-orange-100 rounded-lg p-3 sm:p-4 relative">
+    <!-- Nút trái/phải -->
+    <button
+            id="prevProducts"
+            class="hidden sm:flex absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow items-center justify-center hover:bg-gray-100 z-10"
+    >
+      <svg
               class="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-            >
-              <path
+      >
+        <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
-          <button
-            id="nextBtn"
-            class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-          >
-            <svg
+        />
+      </svg>
+    </button>
+    <button
+            id="nextProducts"
+            class="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow items-center justify-center hover:bg-gray-100 z-10"
+    >
+      <svg
               class="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-            >
-              <path
+      >
+        <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
+        />
+      </svg>
+    </button>
 
+    <!-- LIST PRODUCT -->
+    <div class="overflow-hidden">
       <div
-        id="sportGrid"
-        class="grid grid-cols-3 md:grid-cols-5 gap-4 overflow-hidden"
-      ></div>
-    </section>
-
-    <!-- New Products Section -->
-    <section class="max-w-7xl mx-auto px-2 sm:px-4 py-8">
-      <h2 class="text-xl sm:text-2xl font-bold text-center mb-6">
-        SẢN PHẨM MỚI
-      </h2>
-
-      <!-- Category Tabs -->
-      <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-        <button class="tab-active px-4 sm:px-6 py-2 rounded-full font-medium">
-          Tất cả
-        </button>
-        <button
-          class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-        >
-          Giày Cầu Lông
-        </button>
-        <button
-          class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-        >
-          Giày Bóng Đá
-        </button>
-        <button
-          class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-        >
-          Giày Chạy Bộ
-        </button>
-        <button
-          class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-        >
-          Giày Bóng Rổ
-        </button>
-      </div>
-
-      <!-- Products Slider Wrapper -->
-      <div class="bg-orange-100 rounded-lg p-3 sm:p-4 relative">
-        <!-- Nút trái/phải -->
-        <button
-          id="prevProducts"
-          class="hidden sm:flex absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow items-center justify-center hover:bg-gray-100 z-10"
-        >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <button
-          id="nextProducts"
-          class="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow items-center justify-center hover:bg-gray-100 z-10"
-        >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
-
-        <!-- LIST PRODUCT -->
-        <div class="overflow-hidden">
-          <div
-            id="productsContainer"
-            class="no-scrollbar flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth"
-          >
-            <!-- Start product -->
-            <!-- End product -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- AI Support Button -->
-    <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6">
-      <button
-        class="bg-blue-600 text-white px-4 py-2 sm:px-4 sm:py-3 rounded-full flex items-center gap-2 shadow-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              id="productsContainer"
+              class="no-scrollbar flex gap-2 sm:gap-3 overflow-x-auto scroll-smooth"
       >
-        <svg
-          class="w-4 h-4 sm:w-5 sm:h-5"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
-          />
-        </svg>
-        Tư Vấn AI
-      </button>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-10 sm:mt-12">
-      <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          <!-- Company Info -->
-          <div>
-            <p class="font-bold mb-2 text-sm sm:text-base">
-              Công ty TNHH Nhiều Thành Viên 5A STORE
-            </p>
-            <p class="text-gray-600 text-xs sm:text-sm">
-              Địa chỉ: 1 Võ Văn Ngân
-            </p>
-            <p class="text-gray-600 text-xs sm:text-sm mt-2">Nhân Sự:</p>
-            <ul class="text-gray-600 text-xs sm:text-sm list-disc list-inside">
-              <li>Huy</li>
-              <li>Định</li>
-              <li>Thiện</li>
-              <li>Bảo</li>
-              <li>Vĩ</li>
-            </ul>
-          </div>
-
-          <!-- Customer Support -->
-          <div>
-            <p class="font-bold mb-2 text-sm sm:text-base">Hỗ trợ khách hàng</p>
-            <ul class="text-gray-600 text-xs sm:text-sm space-y-1">
-              <li>
-                <a href="#" class="hover:text-blue-600">Chính sách giao hàng</a>
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600"
-                  >Chính sách đổi trả hàng - Bảo hành</a
-                >
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600">Chính sách trả góp</a>
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600">Chính sách bảo mật</a>
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600"
-                  >Hỗ trợ và giải đáp thắc mắc</a
-                >
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600">Hướng dẫn mua hàng</a>
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600">Hướng dẫn chọn size</a>
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600">Tra cứu đơn hàng</a>
-              </li>
-              <li>
-                <a href="#" class="hover:text-blue-600">Đóng góp ý kiến</a>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Payment Methods -->
-          <div>
-            <p class="font-bold mb-2 text-sm sm:text-base">
-              Phương Thức Thanh Toán
-            </p>
-            <p class="text-gray-600 text-xs sm:text-sm">VNPAY COD</p>
-          </div>
-        </div>
+        <!-- Start product -->
+        <!-- End product -->
       </div>
-    </footer>
-<!--    <script type="module" src="/home/script/script.js"></script>-->
-    <script type="module" src="/home/script/main.js"></script>
-  </body>
+    </div>
+  </div>
+</section>
+
+<!-- AI Support Button -->
+<div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6">
+  <button
+          class="bg-blue-600 text-white px-4 py-2 sm:px-4 sm:py-3 rounded-full flex items-center gap-2 shadow-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+  >
+    <svg
+            class="w-4 h-4 sm:w-5 sm:h-5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+    >
+      <path
+              d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
+      />
+    </svg>
+    Tư Vấn AI
+  </button>
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: mainFooter"></div>
+
+<!-- JS -->
+<script type="module" src="/home/script/main.js"></script>
+</body>
 </html>
