@@ -17,4 +17,18 @@ public class HomeViewController {
     public String home() {
         return "/home/home";
     }
+    @GetMapping("/products")
+    public String produtcs() {
+        return "/products/product-list";
+    }
+
+    @GetMapping("/sale-off")
+    public String saleOff() {
+        return "/products/saleOf-list";
+    }
+
+    // gio hang duoc lay ben cart controller
+
+
+
 }
