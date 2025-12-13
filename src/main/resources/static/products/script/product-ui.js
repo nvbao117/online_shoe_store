@@ -1,3 +1,4 @@
+import { fetchFilteredProducts } from "/products/script/product-api.js";
 export function renderProducts(products) {
     const container = document.getElementById("product-container");
     container.innerHTML = "";
@@ -64,3 +65,11 @@ for (let i = 0; i < numbers.length; i += checkboxesPerRow) {
 
     container.appendChild(row);
 }
+
+
+document.addEventListener("change", function(e) {
+    if (e.target.matches(".price-filter, .brand-filter, .size-filter, .gender-filter")) {
+        console.log("Filter changed");
+        fetchFilteredProducts();
+    }
+});

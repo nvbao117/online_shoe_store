@@ -80,27 +80,27 @@
               <h3 class="font-bold text-gray-800 mb-3">Chọn mức giá</h3>
               <div class="space-y-2" id="price-filters">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="0-500" class="price-filter w-4 h-4" />
+                  <input type="checkbox" value="0-500000" class="price-filter w-4 h-4" />
                   <span>Dưới 500k</span>
                 </label>
 
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="500-1000" class="price-filter w-4 h-4" />
+                  <input type="checkbox" value="500000-1000000" class="price-filter w-4 h-4" />
                   <span>Từ 500k - 1 Triệu</span>
                 </label>
 
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="1000-2000" class="price-filter w-4 h-4" />
+                  <input type="checkbox" value="1000000-2000000" class="price-filter w-4 h-4" />
                   <span>Từ 1 Triệu - 2 Triệu</span>
                 </label>
 
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="2000-3000" class="price-filter w-4 h-4" />
+                  <input type="checkbox" value="2000000-3000000" class="price-filter w-4 h-4" />
                   <span>Từ 2 Triệu - 3 Triệu</span>
                 </label>
 
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="3000-999999" class="price-filter w-4 h-4" />
+                  <input type="checkbox" value="3000000-999999" class="price-filter w-4 h-4" />
                   <span>Trên 3 Triệu</span>
                 </label>
               </div>
@@ -193,8 +193,8 @@
     </main>
     <!-- Footer -->
     <div th:replace="fragments/footer :: mainFooter"></div>
-    <script type="module" src="/category/script/category-ui.js"></script>
-    <script type="module" src="/brand/script/brand-ui.js"></script>
+    <script type="module" src="/category/script/category-ui.js" defer></script>
+    <script type="module" src="/brand/script/brand-ui.js" defer></script>
 
 
   </body>
