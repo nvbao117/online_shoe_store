@@ -18,6 +18,7 @@ public class CartController {
         if (principal == null) {
             return "redirect:/login";
         }
+
         String loginUsername = principal.getName();
 
         model.addAttribute("username", cartService.getUserFullName(loginUsername));
