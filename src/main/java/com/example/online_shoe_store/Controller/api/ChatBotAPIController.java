@@ -1,7 +1,7 @@
 package com.example.online_shoe_store.Controller.api;
 
-import com.example.online_shoe_store.dto.ChatRequest;
-import com.example.online_shoe_store.dto.ChatResponse;
+import com.example.online_shoe_store.dto.request.ChatRequest;
+import com.example.online_shoe_store.dto.response.ChatResponse;
 import com.example.online_shoe_store.Service.ChatBotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

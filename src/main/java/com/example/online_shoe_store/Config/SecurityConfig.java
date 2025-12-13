@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.Config;
+package com.example.online_shoe_store.config;
 
 import com.example.online_shoe_store.Security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;

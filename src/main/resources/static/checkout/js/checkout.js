@@ -61,3 +61,26 @@ function initCouponTags() {
         });
     });
 }
+
+/**
+ * VNPay Payment Loading Indicator
+ * Hiển thị loading khi chuyển hướng đến VNPay
+ */
+function initVNPayLoading() {
+    document.querySelector('form[action*="place-order"]')?.addEventListener('submit', function (e) {
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+
+        if (paymentMethod === 'vnpay') {
+            const btn = document.querySelector('.btn-continue');
+            if (btn) {
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang chuyển hướng...';
+                btn.disabled = true;
+            }
+        }
+    });
+}
+
+// Gọi hàm init VNPay loading
+document.addEventListener('DOMContentLoaded', function () {
+    initVNPayLoading();
+});
