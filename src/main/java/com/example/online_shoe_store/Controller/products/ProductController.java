@@ -21,6 +21,8 @@ public class ProductController {
     ProductService productService;
 // tamj để sửa sau
     ProductRepository productRepository;
+
+
     @GetMapping
     public List<ProductResponse> getProductsByCategory(
            @RequestParam(required = false) String categoryId) {

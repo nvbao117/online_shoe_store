@@ -22,5 +22,17 @@ export async function fetchFilteredProducts() {
     renderProducts(products);
 }
 
+export async function loadAllProducts() {
+    const res = await fetch("/api/products");
+    const products = await res.json();
+    renderProducts(products);
+}
+export async function loadProductsByCategory(categoryId) {
+    const res = await fetch(`/api/products?categoryId=${categoryId}`);
+    const products = await res.json();
+    renderProducts(products);
+}
+
+
 
 

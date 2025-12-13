@@ -1,4 +1,7 @@
 import { fetchFilteredProducts } from "/products/script/product-api.js";
+import { loadAllProducts, loadProductsByCategory } from "/products/script/product-api.js";
+import { handleCategorySelect } from "/category/script/category-ui.js";
+import { loadBrands } from "/brand/script/brand-ui.js";
 export function renderProducts(products) {
     const container = document.getElementById("product-container");
     container.innerHTML = "";
@@ -41,7 +44,6 @@ export function renderProducts(products) {
 const numbers = [30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48];
 const checkboxesPerRow = 3; // Số checkbox tối đa trên mỗi row
 const container = document.getElementById("checkbox-container");
-
 for (let i = 0; i < numbers.length; i += checkboxesPerRow) {
     const row = document.createElement("div");
     row.className = "flex gap-4";
@@ -73,3 +75,27 @@ document.addEventListener("change", function(e) {
         fetchFilteredProducts();
     }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const categoryIdFromHome = params.get("categoryId");
+
+    if (!categoryIdFromHome) return;
+
+    if (categoryIdFromHome) {
+        loadProductsByCategory(categoryIdFromHome);
+        loadBrands(categoryIdFromHome);
+    } else {
+        loadAllProducts();
+    }
+    const btn = document.querySelector(
+        `.tab-btn[data-category-id="${categoryIdFromHome}"]`
+    );
+
+    if (btn) {
+        handleCategorySelect(btn); // gọi logic chung
+    }
+});
+
+
+

@@ -1,56 +1,133 @@
-import { getCategories } from "/category/script/category-api.js";
-import { changeCategory } from "/category/script/category-api.js";
+import { getCategories, changeCategory } from "/category/script/category-api.js";
 import { renderProducts } from "/products/script/product-ui.js";
 import { loadBrands } from "/brand/script/brand-ui.js";
+
+/* ================= LOAD & RENDER TABS ================= */
 async function loadCategories() {
     const categories = await getCategories();
     const container = document.getElementById("category-tabs");
+    if (!container) return;
 
-    // Tạo nút “Tất cả”
-    container.innerHTML = `
-        <button 
-            class="tab-btn tab-active px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg whitespace-nowrap hover:bg-cyan-50"
-            data-category-id="0"
-        >Tất cả</button>
-    `;
+    container.innerHTML = "";
 
-    // Sinh nút từ API
+    // Nút "Tất cả"
+    container.appendChild(createTabButton({
+        categoryId: "0",
+        name: "Tất cả",
+        active: true
+    }));
+
+    // Tabs từ API
     categories.forEach(c => {
-        const btn = document.createElement("button");
-        btn.className = "tab-btn px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg  whitespace-nowrap hover:bg-cyan-50";
-        btn.dataset.categoryId = c.categoryId;
-        btn.textContent = c.name;
-
-        container.appendChild(btn);
+        container.appendChild(createTabButton(c));
     });
 
     attachClickEvents();
+    autoSelectCategoryFromHome(); // ← QUAN TRỌNG
+}
+
+/* ================= CREATE TAB ================= */
+function createTabButton({ categoryId, name, active = false }) {
+    const btn = document.createElement("button");
+
+    // base style (giống UI mẫu)
+    btn.className =
+        "tab-btn px-4 sm:px-6 py-2 rounded-full font-medium text-sm sm:text-base transition";
+
+    if (active) {
+        // tab active
+        btn.classList.add(
+            "tab-active",
+            "bg-blue-500",
+            "text-white"
+        );
+    } else {
+        // tab thường
+        btn.classList.add(
+            "border",
+            "border-blue-500",
+            "text-blue-600",
+            "bg-white",
+            "hover:bg-blue-50"
+        );
+    }
+
+    btn.dataset.categoryId = categoryId;
+    btn.textContent = name;
+
+    return btn;
 }
 
 
-
+/* ================= CLICK EVENTS ================= */
 function attachClickEvents() {
     document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.addEventListener("click", async function () {
-
-            document.querySelectorAll(".tab-btn")
-                .forEach(b => {
-                    b.classList.remove("tab-active");
-                    b.classList.add("hover:bg-cyan-50");
-                });
-            this.classList.add("tab-active");
-            this.classList.remove("hover:bg-cyan-50", "bg-white");
-
-            const id = this.dataset.categoryId;
-            // Gọi API
-            const products = await changeCategory(id);
-
-            // Render lại UI
-            renderProducts(products);
-            loadBrands(id);
-        });
+        btn.addEventListener("click", () => handleCategorySelect(btn));
     });
 }
 
+/* ================= HANDLE SELECT ================= */
+export async function handleCategorySelect(
+    btn,
+    options = {}
+) {
+    if (!btn) return;
 
+    const {
+        render = renderProducts,   // mặc định cho trang products
+        loadBrand = loadBrands     // mặc định cho trang products
+    } = options;
+
+    // reset tab UI
+    document.querySelectorAll(".tab-btn").forEach(b => {
+        b.classList.remove("tab-active", "bg-blue-500", "text-white");
+        b.classList.add(
+            "border",
+            "border-blue-500",
+            "text-blue-600",
+            "bg-white",
+            "hover:bg-blue-50"
+        );
+    });
+
+    btn.classList.add("tab-active", "bg-blue-500", "text-white");
+    btn.classList.remove(
+        "border",
+        "border-blue-500",
+        "text-blue-600",
+        "bg-white",
+        "hover:bg-blue-50"
+    );
+
+    const id = btn.dataset.categoryId;
+
+    const products = await changeCategory(id);
+
+    // 🔥 render theo trang đang dùng
+    render(products);
+
+    // chỉ load brand nếu cần
+    if (loadBrand) {
+        loadBrand(id);
+    }
+}
+
+
+/* ================= AUTO SELECT FROM HOME ================= */
+function autoSelectCategoryFromHome() {
+    const params = new URLSearchParams(window.location.search);
+    const categoryId = params.get("categoryId");
+
+    if (!categoryId) return;
+
+    const btn = document.querySelector(
+        `.tab-btn[data-category-id="${categoryId}"]`
+    );
+
+    if (btn) {
+        handleCategorySelect(btn);
+    }
+}
+
+/* ================= INIT ================= */
 loadCategories();
