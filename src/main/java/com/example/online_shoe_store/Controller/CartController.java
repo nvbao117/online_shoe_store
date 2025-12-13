@@ -15,8 +15,10 @@ public class CartController {
 
     @GetMapping
     public String showCartPage(Model model, Principal principal) {
-        // Lấy tên user từ Security hoặc mặc định 'othien' để test
-        String loginUsername = (principal != null) ? principal.getName() : "othien";
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        String loginUsername = principal.getName();
 
         model.addAttribute("username", cartService.getUserFullName(loginUsername));
         model.addAttribute("cartItems", cartService.getCartItemsByUsername(loginUsername));
