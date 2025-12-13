@@ -29,7 +29,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 
-//@Configuration
+@Configuration
 public class FaqAgentConfig {
     private static final Logger log= LoggerFactory.getLogger(FaqAgentConfig.class);
 
