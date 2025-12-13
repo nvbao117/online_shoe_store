@@ -66,35 +66,10 @@
       </div>
 
       <!-- Category Tabs -->
-      <div class="flex gap-2 mb-6 overflow-x-auto">
-        <button class="tab-active px-6 py-3 font-medium whitespace-nowrap">
-          Tất cả
-        </button>
-        <button
-          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50"
-        >
-          Giày Cầu Lông
-        </button>
-        <button
-          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50"
-        >
-          Giày Bóng Đá
-        </button>
-        <button
-          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50 relative"
-        >
-          Giày Chạy Bộ
-          <span
-            class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
-            >1</span
-          >
-        </button>
-        <button
-          class="px-6 py-3 font-medium border-2 border-cyan-400 rounded-lg bg-white whitespace-nowrap hover:bg-cyan-50"
-        >
-          Giày Bóng Bàn
-        </button>
+      <div  id="category-tabs" class="flex gap-2 mb-6 overflow-x-auto">
+<!--        đẩy nút từ database-->
       </div>
+
 
       <div class="flex gap-6">
         <!-- Sidebar Filters -->
@@ -103,25 +78,29 @@
             <!-- Price Filter -->
             <div>
               <h3 class="font-bold text-gray-800 mb-3">Chọn mức giá</h3>
-              <div class="space-y-2">
+              <div class="space-y-2" id="price-filters">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" value="0-500000" class="price-filter w-4 h-4" />
                   <span>Dưới 500k</span>
                 </label>
+
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" value="500000-1000000" class="price-filter w-4 h-4" />
                   <span>Từ 500k - 1 Triệu</span>
                 </label>
+
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" value="1000000-2000000" class="price-filter w-4 h-4" />
                   <span>Từ 1 Triệu - 2 Triệu</span>
                 </label>
+
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" value="2000000-3000000" class="price-filter w-4 h-4" />
                   <span>Từ 2 Triệu - 3 Triệu</span>
                 </label>
+
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" value="3000000-999999" class="price-filter w-4 h-4" />
                   <span>Trên 3 Triệu</span>
                 </label>
               </div>
@@ -135,46 +114,15 @@
                 placeholder="Tìm kiếm sản phẩm"
                 class="w-full px-3 py-2 border border-gray-300 rounded mb-3 text-sm"
               />
-              <div class="space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
-                  <span>YONEX</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
-                  <span>LINING</span>
-                </label>
+              <div id="bands-container" class="space-y-2">
               </div>
             </div>
 
             <!-- Size Filter -->
             <div>
               <h3 class="font-bold text-gray-800 mb-3">CHỌN SIZE</h3>
-              <div class="space-y-2">
-                <div class="flex gap-4">
-                  <label class="flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" class="w-4 h-4" />
-                    <span>42</span>
-                  </label>
-                  <label class="flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" class="w-4 h-4" />
-                    <span>43</span>
-                  </label>
-                  <label class="flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" class="w-4 h-4" />
-                    <span>43</span>
-                  </label>
-                </div>
-                <div class="flex gap-4">
-                  <label class="flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" class="w-4 h-4" />
-                    <span>42</span>
-                  </label>
-                  <label class="flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" class="w-4 h-4" />
-                    <span>43</span>
-                  </label>
-                </div>
+              <div id="checkbox-container" class="space-y-2">
+<!--                đẩy từ product-ui-->
               </div>
             </div>
 
@@ -183,17 +131,19 @@
               <h3 class="font-bold text-gray-800 mb-3">ĐỐI TƯỢNG</h3>
               <div class="flex gap-6">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" class="gender-filter w-4 h-4" />
                   <span>Nam</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="w-4 h-4" />
+                  <input type="checkbox" class="gender-filter w-4 h-4" />
                   <span>Nữ</span>
                 </label>
               </div>
             </div>
           </div>
         </aside>
+
+
 
         <!-- Products Section -->
         <div class="flex-1">
@@ -232,60 +182,20 @@
           </div>
 
           <!-- Products Grid -->
-          <div class="grid grid-cols-4 gap-4">
+          <div id="product-container" class="grid grid-cols-4 gap-4">
             <!-- Product Card 1 -->
-            <div
-              class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div class="relative">
-                <img
-                  src="/placeholder.svg?height=180&width=200"
-                  alt="Giày Victor"
-                  class="w-full h-44 object-cover"
-                />
-                <span
-                  class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded"
-                  >Sale Sập sàn 50%</span
-                >
-              </div>
-              <div class="p-3">
-                <h4 class="font-medium text-gray-800">Giày victor</h4>
-                <div class="flex items-center gap-2 mt-1">
-                  <span class="text-red-500 font-bold">1.200.000 đ</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-gray-400 line-through text-sm"
-                    >1.500.000 đ</span
-                  >
-                  <span class="text-red-400 text-sm">-41%</span>
-                </div>
-                <div class="flex items-center gap-3 mt-2 text-sm text-gray-600">
-                  <span>★ 5.0</span>
-                  <span>•</span>
-                  <span>Đã bán 10K</span>
-                </div>
-              </div>
-            </div>
+
+
+
           </div>
         </div>
       </div>
     </main>
     <!-- Footer -->
     <div th:replace="fragments/footer :: mainFooter"></div>
-    <script>
-      const btn = document.getElementById("sortPriceBtn");
-      const dropdown = document.getElementById("priceDropdown");
+    <script type="module" src="/category/script/category-ui.js" defer></script>
+    <script type="module" src="/brand/script/brand-ui.js" defer></script>
 
-      btn.addEventListener("click", () => {
-        dropdown.classList.toggle("hidden");
-      });
 
-      // Ẩn dropdown khi click ra ngoài
-      document.addEventListener("click", (e) => {
-        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
-          dropdown.classList.add("hidden");
-        }
-      });
-    </script>
   </body>
 </html>

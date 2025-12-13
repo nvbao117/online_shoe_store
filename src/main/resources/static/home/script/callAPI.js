@@ -1,9 +1,8 @@
-console.log("callAPI.js loaded");
+
 
 let sports = [];
 let currentIndex = 0;
 const itemsPerPage = 5;
-console.log("sr.js loaded");
 
 async function loadCategories() {
   sports = await getCategories();

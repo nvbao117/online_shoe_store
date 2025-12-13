@@ -25,32 +25,14 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/register",
-                                "/register/send-otp",
-                                "/login",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/videos/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
-                .formLogin(login -> login
-                        .loginPage("/login")                 // trang login custom
-                        .loginProcessingUrl("/login")        // form POST tới /login
-                        .defaultSuccessUrl("/home", true)        // ĐĂNG NHẬP XONG -> "/" (trang chủ)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll()
-                );
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable());
 
         return http.build();
     }
+
 
     // dùng BCrypt giống lúc đăng ký
     @Bean

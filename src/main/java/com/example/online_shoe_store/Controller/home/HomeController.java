@@ -1,14 +1,11 @@
-package com.example.online_shoe_store.Controller;
+package com.example.online_shoe_store.Controller.home;
 
-import com.example.online_shoe_store.Entity.Category;
-import com.example.online_shoe_store.Entity.Product;
 import com.example.online_shoe_store.Service.CategoryService;
 import com.example.online_shoe_store.Service.ProductService;
 import com.example.online_shoe_store.dto.response.CategoryResponse;
 import com.example.online_shoe_store.dto.response.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
