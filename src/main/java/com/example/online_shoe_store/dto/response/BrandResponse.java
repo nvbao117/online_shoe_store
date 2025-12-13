@@ -1,15 +1,12 @@
 package com.example.online_shoe_store.dto.response;
 
-
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryResponse {
-    private String categoryId;
+public class BrandResponse {
+    private String brandId;
     private String name;
-    private String imageUrl;
 }
