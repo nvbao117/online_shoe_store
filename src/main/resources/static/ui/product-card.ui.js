@@ -15,8 +15,9 @@ export function createProductCard(p) {
 
                 <div>
                     <span class="text-red-500 font-bold text-sm sm:text-base">
-                        ${p.price} đ
+                        ${p.price.toLocaleString("vi-VN")} đ
                     </span>
+
                     <div class="flex gap-2 text-xs sm:text-sm">
                         <span class="text-gray-400 line-through">1.500.000 đ</span>
                         <span class="text-red-400">-41%</span>

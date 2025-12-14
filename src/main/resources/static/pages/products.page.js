@@ -1,7 +1,10 @@
-import { fetchProductsByCategory } from "../api/product.api.js";
+import {fetchFilteredProducts, fetchProductsByCategory} from "../api/product.api.js";
 import { initCategoryTabs } from "../ui/category-tabs.ui.js";
 import { renderProductGrid } from "../ui/product-list.ui.js";
 import { getCategories } from "../api/category.api.js";
+import {renderBrandCheckboxes, renderSizeCheckboxes} from "../ui/product-filter.ui.js";
+import {getBrands} from "../api/brand.api.js";
+import {initSortPriceDropdown} from "../ui/product-sort.ui.js";
 
 async function initProductsPage() {
     // ✅ LẤY categoryId TỪ URL
@@ -23,6 +26,8 @@ async function initProductsPage() {
         async (selectedCategoryId) => {
             const products = await fetchProductsByCategory(selectedCategoryId);
             renderProductGrid(productContainer, products);
+            const brands = await getBrands(selectedCategoryId);
+            renderBrandCheckboxes(brands);
         },
         categoryId // 🔥 CHỈ THÊM DÒNG NÀY
     );
@@ -30,6 +35,30 @@ async function initProductsPage() {
     // load sản phẩm ban đầu
     const products = await fetchProductsByCategory(categoryId);
     renderProductGrid(productContainer, products);
+    // render checkbox size
+    renderSizeCheckboxes();
+    // render brand checkbox
+    const brands = await getBrands(categoryId);
+    renderBrandCheckboxes(brands);
 }
 
 initProductsPage();
+// nghe sự kiện click trên các checkbox lọc
+document.addEventListener("change", function(e) {
+    if (e.target.matches(".price-filter, .brand-filter, .size-filter, .gender-filter")) {
+        console.log("Filter changed");
+        fetchFilteredProducts();
+    }
+});
+
+initSortPriceDropdown()
+// nghe sự kiện click trên các nút sắp xếp
+let currentSort = null;
+document.querySelectorAll("[data-sort]").forEach(btn => {
+    btn.addEventListener("click", () => {
+        console.log("sort changed");
+        currentSort = btn.dataset.sort;
+        fetchFilteredProducts({ sortBy: currentSort });
+    });
+});
+

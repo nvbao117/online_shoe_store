@@ -53,6 +53,22 @@ public class Product {
     @Builder.Default
     private ProductStatus status = ProductStatus.ACTIVE;
 
+
+    @Column(name = "sold_count", nullable = false)
+    private Integer soldCount = 0;
+
+
+    // câập nhật số sản phẩm đã bán
+//    for (OrderItem item : order.getOrderItems()) {
+//        Product product = item.getProductVariant().getProduct();
+//        product.setSoldCount(
+//                product.getSoldCount() + item.getQuantity()
+//        );
+//    }
+//productRepository.saveAll(products);
+
+
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

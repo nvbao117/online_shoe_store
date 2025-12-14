@@ -150,10 +150,22 @@
           <!-- Sort Options -->
           <div class="flex items-center gap-4 mb-4 text-sm">
             <span class="text-gray-600">Sắp xếp theo:</span>
-            <button class="font-medium hover:text-blue-600">Nổi bật</button>
-            <button class="font-medium hover:text-blue-600">Bán chạy</button>
-            <button class="font-medium hover:text-blue-600">Giảm giá</button>
-            <button class="font-medium hover:text-blue-600">Mới</button>
+            <button class="font-medium hover:text-blue-600" data-sort="featured">
+              Nổi bật
+            </button>
+
+            <button class="font-medium hover:text-blue-600" data-sort="sold_desc">
+              Bán chạy
+            </button>
+
+            <button class="font-medium hover:text-blue-600" data-sort="newest">
+              Mới
+            </button>
+
+            <button class="font-medium hover:text-blue-600" data-sort="sale">
+              Giảm giá
+            </button>
+
             <div class="relative">
               <!-- Button Giá -->
               <button id="sortPriceBtn" class="font-medium hover:text-blue-600">
@@ -163,17 +175,17 @@
               <!-- Dropdown -->
               <div
                 id="priceDropdown"
-                class="hidden absolute left-0 top-full mt-1 bg-white border rounded shadow-md text-sm w-40"
+                class="z-50 hidden absolute left-0 top-full mt-1 bg-white border rounded shadow-md text-sm w-40"
               >
                 <button
                   class="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  data-sort="asc"
+                  data-sort="price_asc"
                 >
                   Giá tăng dần
                 </button>
                 <button
                   class="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  data-sort="desc"
+                  data-sort="price_desc"
                 >
                   Giá giảm dần
                 </button>

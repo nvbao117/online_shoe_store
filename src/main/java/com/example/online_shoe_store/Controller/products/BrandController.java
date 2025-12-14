@@ -22,6 +22,9 @@ public class BrandController {
 
     @GetMapping()
     public List<BrandResponse> getBrandByCategoryId(@RequestParam(required = false) String categoryId) {
+        if (categoryId.equals("21112005")) {
+            return brandService.getAllBrands();
+        }
         return brandService.getBrandsByCategoryId(categoryId);
     }
 }

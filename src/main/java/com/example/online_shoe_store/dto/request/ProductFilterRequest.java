@@ -15,4 +15,5 @@ public class ProductFilterRequest {
     List<String> brands;
     List<String> sizes;
     List<String> genders;
+    String sortBy;
 }
