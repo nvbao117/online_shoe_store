@@ -1,0 +1,157 @@
+/* ==========================================
+   Checkout Failure Page Styles
+   ========================================== */
+
+.failure-container {
+    max-width: 600px;
+    margin: 60px auto;
+    text-align: center;
+}
+
+.failure-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    animation: shake 0.5s ease-out;
+}
+
+.failure-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+.failure-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 8px;
+}
+
+.failure-subtitle {
+    color: #6B7280;
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+.error-card {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.error-card .error-code {
+    font-size: 14px;
+    color: #991B1B;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.error-card .error-message {
+    font-size: 14px;
+    color: #7F1D1D;
+    line-height: 1.5;
+}
+
+.order-info {
+    background: #F9FAFB;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.order-info .label {
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.order-info .value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-retry {
+    background: #4F46E5;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-retry:hover {
+    background: #4338CA;
+    color: white;
+}
+
+.btn-home {
+    background: white;
+    color: #4F46E5;
+    border: 2px solid #4F46E5;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-home:hover {
+    background: #4F46E5;
+    color: white;
+}
+
+.support-info {
+    margin-top: 32px;
+    padding: 16px;
+    background: rgba(79, 70, 229, 0.05);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.support-info i {
+    color: #4F46E5;
+}
+
+/* Progress step error state */
+.progress-step.error .step-number {
+    background: #EF4444;
+    color: white;
+}
