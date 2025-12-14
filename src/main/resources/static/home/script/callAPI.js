@@ -104,7 +104,7 @@ async function getTop20Product() {
               >
                 <div class="relative">
                   <img
-                    src="/${p.imageUrl}"
+                    src="${p.imageUrl}"
                     alt="Giày Victor"
                     class="w-full h-40 sm:h-44 object-cover"
                   />

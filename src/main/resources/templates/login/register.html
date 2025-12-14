@@ -58,7 +58,6 @@
             <div class="col-md-9 text-center text-md-start">
                 <h1 class="register-title">Registration</h1>
                 <p class="register-subtitle">Personel Details</p>
-                <!-- (chữ Personel theo đúng design, nếu muốn đúng chính tả thì sửa thành Personal) -->
             </div>
         </div>
 
@@ -69,21 +68,18 @@
                 <div class="col-md-4">
                     <input type="text"
                            class="form-control register-input"
-                           name="fullName"
                            th:field="*{fullName}"
                            placeholder="Fullname">
                 </div>
                 <div class="col-md-4">
                     <input type="date"
                            class="form-control register-input"
-                           name="dateOfBirth"
                            th:field="*{dateOfBirth}"
                            placeholder="Date of Birth">
                 </div>
                 <div class="col-md-4">
                     <input type="email"
                            class="form-control register-input"
-                           name="email"
                            th:field="*{email}"
                            placeholder="Email">
                 </div>
@@ -94,7 +90,6 @@
                 <div class="col-md-4">
                     <input type="text"
                            class="form-control register-input"
-                           name="mobileNumber"
                            th:field="*{mobileNumber}"
                            id="mobileNumber"
                            placeholder="Mobile Number">
@@ -116,7 +111,6 @@
                 <div class="col-md-4">
                     <!-- Select giới tính -->
                     <select class="form-select register-input"
-                            name="gender"
                             th:field="*{gender}">
                         <option value="" selected disabled>Gender</option>
                         <option value="MALE">Male</option>
@@ -131,36 +125,39 @@
                 <div class="col-md-4">
                     <input type="text"
                            class="form-control register-input"
-                           name="username"
                            th:field="*{username}"
                            placeholder="Username">
                 </div>
 
-                <!-- Password có icon ở bên phải (chỉ là UI, chưa show/hide) -->
+                <!-- Password -->
                 <div class="col-md-4">
                     <div class="input-group">
                         <input type="password"
                                class="form-control register-input border-end-0"
-                               name="password"
+                               id="passwordInput"
                                th:field="*{password}"
                                placeholder="Password">
-                        <span class="input-group-text register-input-icon-right">
-              <!-- icon mắt, sau này có thể thêm JS để show/hide -->
-              <i class="bi bi-eye-slash"></i>
-            </span>
+                        <span class="input-group-text register-input-icon-right"
+                              id="togglePassword"
+                              style="cursor: pointer;">
+                            <i class="bi bi-eye-slash"></i>
+                        </span>
                     </div>
                 </div>
 
+                <!-- Confirm Password -->
                 <div class="col-md-4">
                     <div class="input-group">
                         <input type="password"
                                class="form-control register-input border-end-0"
-                               name="confirmPassword"
+                               id="passwordInput1"
                                th:field="*{confirmPassword}"
                                placeholder="Confirm Password">
-                        <span class="input-group-text register-input-icon-right">
-              <i class="bi bi-eye-slash"></i>
-            </span>
+                        <span class="input-group-text register-input-icon-right"
+                              id="togglePassword1"
+                              style="cursor: pointer;">
+                            <i class="bi bi-eye-slash"></i>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -171,6 +168,7 @@
                     Sign Up
                 </button>
             </div>
+
             <!-- Hiển thị lỗi -->
             <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
         </form>
@@ -193,32 +191,57 @@
 
 <!-- 2) JS dùng chung điều khiển video nền -->
 <script th:src="@{/js/login/auth-bg.js}"></script>
+
+<!-- 3) JS: gửi OTP + show/hide password -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // --- Gửi OTP ---
         const btnSendOtp = document.getElementById('btnSendOtp');
         const phoneInput = document.getElementById('mobileNumber');
 
-        if (!btnSendOtp || !phoneInput) return;
+        if (btnSendOtp && phoneInput) {
+            btnSendOtp.addEventListener('click', function () {
+                const phone = phoneInput.value.trim();
 
-        btnSendOtp.addEventListener('click', function () {
-            const phone = phoneInput.value.trim();
+                if (!phone) {
+                    alert('Vui lòng nhập số điện thoại trước khi lấy OTP');
+                    return;
+                }
 
-            if (!phone) {
-                alert('Vui lòng nhập số điện thoại trước khi lấy OTP');
-                return;
-            }
-
-            fetch('/register/send-otp?phone=' + encodeURIComponent(phone), {
-                method: 'POST'
-            })
-                .then(resp => resp.text())
-                .then(msg => {
-                    alert(msg); // sẽ báo: "OTP đã được tạo. Kiểm tra console của server."
+                fetch('/register/send-otp?phone=' + encodeURIComponent(phone), {
+                    method: 'POST'
                 })
-                .catch(err => {
-                    console.error(err);
-                    alert('Không thể tạo OTP. Vui lòng thử lại.');
-                });
+                    .then(resp => resp.text())
+                    .then(msg => {
+                        alert(msg); // "OTP đã được tạo. Kiểm tra console của server."
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Không thể tạo OTP. Vui lòng thử lại.');
+                    });
+            });
+        }
+
+        // --- Show/hide password + confirm password ---
+        const pairs = [
+            { inputId: 'passwordInput',  toggleId: 'togglePassword'  },
+            { inputId: 'passwordInput1', toggleId: 'togglePassword1' }
+        ];
+
+        pairs.forEach(({ inputId, toggleId }) => {
+            const input  = document.getElementById(inputId);
+            const toggle = document.getElementById(toggleId);
+            if (!input || !toggle) return;
+
+            const icon = toggle.querySelector('i');
+
+            toggle.addEventListener('click', function () {
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+
+                icon.classList.toggle('bi-eye-slash', !isHidden);
+                icon.classList.toggle('bi-eye', isHidden);
+            });
         });
     });
 </script>

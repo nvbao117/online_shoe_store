@@ -32,7 +32,4 @@ public class HomeController {
     public List<CategoryResponse> getCategories() {
         return categoryService.getAllCategoriesResponses();
     }
-
-
-
 }
