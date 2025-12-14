@@ -38,7 +38,6 @@ public class ProductService {
    }
 
    public List<ProductResponse> getProductsByCategory(String categoryId) {
-       System.out.println("Service Received category: " + categoryId);
        return productMapper.toProductResponsesList(productRepository.findByCategoryCategoryId(categoryId).stream().toList());
    }
 
