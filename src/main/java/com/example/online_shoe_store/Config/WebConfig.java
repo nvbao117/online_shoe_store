@@ -1,33 +1,26 @@
 package com.example.online_shoe_store.Config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-    @Value("${app.storage.products}")
-    private String productsDir;
-
-    @Value("${app.storage.categories}")
-    private String categoriesDir;
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/src/data/images/products/**")
+                .addResourceLocations("file:src/data/images/products/");
 
-        registry.addResourceHandler("/images/products/**")
-                .addResourceLocations("file:" + ensureTrailingSlash(productsDir));
-
-        registry.addResourceHandler("/images/categories/**")
-                .addResourceLocations("file:" + ensureTrailingSlash(categoriesDir));
+        registry.addResourceHandler("/src/data/images/categories/**")
+                .addResourceLocations("file:src/data/images/categories/");
+//        /src/data/images/products/main_6d6bde8b.jpg
     }
 
-    private String ensureTrailingSlash(String path) {
-        if (path == null) return "";
-        String p = path.trim().replace("\\", "/");
-        if (p.isEmpty()) return "";
-        return p.endsWith("/") ? p : p + "/";
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
+

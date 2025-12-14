@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-
+    <link rel="icon" href="/favicon.ico">
     <!-- CSS header dùng chung -->
     <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
 
@@ -95,17 +95,22 @@
             <div class="header-right d-flex align-items-center">
 
                 <!-- Tài khoản (avatar + tên) -->
-                <div class="header-right-item me-3 d-flex align-items-center">
+                <a href="/profile"
+                   id="userProfileLink"
+                   class="header-right-item me-3 d-flex align-items-center text-decoration-none text-dark">
+
                     <div class="icon-circle">
                         <i class="bi bi-person"></i>
                     </div>
+
                     <!-- Hiện tên user trên màn hình md trở lên -->
                     <span class="ms-2 fw-semibold d-none d-md-inline">NhatHuy</span>
-                </div>
+                </a>
+
 
                 <!-- Giỏ hàng -->
                 <div class="header-right-item">
-                    <a th:href="@{/templates/cart}" class="text-decoration-none">
+                    <a th:href="@{/cart}" class="text-decoration-none">
                         <div class="icon-circle position-relative">
                             <i class="bi bi-cart3"></i>
                             <!-- Badge số lượng sản phẩm -->
@@ -123,15 +128,15 @@
     <nav class="header-nav">
         <div class="container">
             <ul class="nav-list">
-                <li class="nav-item active">
+                <li class="nav-item">
                     <a th:href="@{/home}">TRANG CHỦ</a>
                 </li>
                 <li class="nav-item">
                     <a th:href="@{/products}">SẢN PHẨM</a>
                 </li>
-                <li class="nav-item">
-                    <a th:href="@{/sale-off}">SALE OFF</a>
-                </li>
+<!--                <li class="nav-item">-->
+<!--                    <a th:href="@{/sale-off}">SALE OFF</a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a th:href="@{/about}">GIỚI THIỆU</a>
                 </li>

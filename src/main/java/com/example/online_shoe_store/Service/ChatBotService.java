@@ -1,8 +1,8 @@
 package com.example.online_shoe_store.Service;
 
 import com.example.online_shoe_store.Service.ai.agent.FaqAgent;
-import com.example.online_shoe_store.dto.ChatRequest;
-import com.example.online_shoe_store.dto.ChatResponse;
+import com.example.online_shoe_store.dto.request.ChatRequest;
+import com.example.online_shoe_store.dto.response.ChatResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

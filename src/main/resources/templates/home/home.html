@@ -153,10 +153,9 @@
     </div>
   </div>
 
-  <div
-          id="sportGrid"
-          class="grid grid-cols-3 md:grid-cols-5 gap-4 overflow-hidden"
-  ></div>
+  <div id="sportGrid" class="grid grid-cols-3 md:grid-cols-5 gap-4 overflow-hidden">
+<!--    call database-->
+  </div>
 </section>
 
 <!-- New Products Section -->
@@ -166,30 +165,11 @@
   </h2>
 
   <!-- Category Tabs -->
-  <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-    <button class="tab-active px-4 sm:px-6 py-2 rounded-full font-medium">
-      Tất cả
-    </button>
-    <button
-            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-    >
-      Giày Cầu Lông
-    </button>
-    <button
-            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-    >
-      Giày Bóng Đá
-    </button>
-    <button
-            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-    >
-      Giày Chạy Bộ
-    </button>
-    <button
-            class="px-4 sm:px-6 py-2 rounded-full font-medium border border-blue-500 text-blue-600 bg-white hover:bg-blue-50 text-sm sm:text-base"
-    >
-      Giày Bóng Rổ
-    </button>
+  <div id="categorytab-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+<!--    <button class="tab-active px-4 sm:px-6 py-2 rounded-full font-medium">-->
+<!--      Tất cả-->
+<!--    </button>-->
+
   </div>
 
   <!-- Products Slider Wrapper -->
@@ -267,6 +247,7 @@
 <div th:replace="fragments/footer :: mainFooter"></div>
 
 <!-- JS -->
-<script type="module" src="/home/script/main.js"></script>
+<!--<script type="module" src="/home/script/home-ui.js"></script>-->
+<script type="module" src="/pages/home.page.js"></script>
 </body>
 </html>
