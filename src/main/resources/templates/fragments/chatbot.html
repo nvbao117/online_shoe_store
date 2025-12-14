@@ -1,0 +1,100 @@
+<!--
+    Chatbot Fragment - AI Assistant for Shoe Store
+    Include this in your main layout with: th:replace="fragments/chatbot :: chatbot"
+-->
+<div th:fragment="chatbot">
+    <!-- Floating Chat Button -->
+    <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open chat">
+        <!-- Icon Closed (Chat Bubble) -->
+        <svg class="chatbot-icon icon-closed" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
+        </svg>
+        <!-- Icon Open (X) -->
+        <svg class="chatbot-icon icon-open hidden" viewBox="0 0 24 24" fill="currentColor">
+            <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+        </svg>
+    </button>
+
+    <!-- Chat Widget Container -->
+    <div class="chatbot-widget" id="chatbotWidget">
+
+        <!-- VIEW 1: WELCOME SCREEN (Like Cake Bank example) -->
+        <div class="chatbot-view welcome-view" id="welcomeView">
+            <div class="welcome-header">
+                <div class="brand-logo">
+                    <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="Logo"
+                        onerror="this.src='https://cdn-icons-png.flaticon.com/512/2589/2589903.png'">
+                </div>
+                <h2 class="brand-name">Shoe Store Support</h2>
+                <p class="brand-greeting">
+                    Chào bạn! 👋<br>
+                    Mình là trợ lý ảo AI chuyên về giày thể thao. Bạn cần tư vấn mẫu nào hôm nay?
+                </p>
+            </div>
+
+            <div class="welcome-actions">
+                <button class="start-chat-btn" id="startChatBtn">
+                    <div class="btn-content">
+                        <span class="btn-title">Bắt đầu trò chuyện</span>
+                        <span class="btn-subtitle">Chúng tôi thường trả lời ngay lập tức</span>
+                    </div>
+                    <svg class="btn-arrow" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="welcome-footer">
+                <span>Powered by <strong>ShoeAI</strong></span>
+            </div>
+        </div>
+
+        <!-- VIEW 2: CONVERSATION SCREEN (Standard Chat) -->
+        <div class="chatbot-view conversation-view hidden" id="conversationView">
+            <!-- Header -->
+            <div class="chatbot-header">
+                <div class="chatbot-header-left">
+                    <button class="chatbot-back" id="chatbotBack" aria-label="Back">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg>
+                    </button>
+                    <div class="chatbot-avatar-small">
+                        <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="Bot"
+                            onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
+                    </div>
+                    <div class="chatbot-header-info">
+                        <h3 class="chatbot-title">Tư vấn viên AI</h3>
+                        <span class="chatbot-status">Online</span>
+                    </div>
+                </div>
+                <div class="chatbot-header-right">
+                    <button class="header-action-btn" title="More options">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Message List -->
+            <div class="chatbot-messages" id="chatbotMessages">
+                <!-- Messages will be added here by JS -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="chatbot-input-area">
+                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Nhập tin nhắn..."
+                    autocomplete="off">
+                <button class="chatbot-send" id="chatbotSend">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
