@@ -22,10 +22,13 @@ public class ProductController {
 // tamj để sửa sau
     ProductRepository productRepository;
 
-
+    // Lấy sản phẩm theo categoryId (nếu có)
     @GetMapping
     public List<ProductResponse> getProductsByCategory(
            @RequestParam(required = false) String categoryId) {
+        if (categoryId.equals("21112005")) {
+            return productService.getTop20Products();
+        }
         return productService.getProductsByCategory(categoryId);
     }
 
