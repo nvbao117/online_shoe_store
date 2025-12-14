@@ -1,10 +1,6 @@
 package com.example.online_shoe_store.Service;
 
-import com.example.online_shoe_store.Entity.Cart;
-import com.example.online_shoe_store.Entity.CartItem;
-import com.example.online_shoe_store.Entity.Product;
-import com.example.online_shoe_store.Entity.ProductVariant;
-import com.example.online_shoe_store.Entity.User;
+import com.example.online_shoe_store.Entity.*;
 import com.example.online_shoe_store.Repository.*;
 import com.example.online_shoe_store.dto.response.CartItemResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,97 +10,75 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
-
-    private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductVariantRepository productVariantRepository;
+    private final ProductVariantRepository variantRepository;
 
     @Transactional(readOnly = true)
     public List<CartItemResponse> getCartItemsByUsername(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || user.getCart() == null) return new ArrayList<>();
 
-        if (user == null || user.getCart() == null) {
-            return new ArrayList<>();
-        }
-
-        Cart cart = user.getCart();
-        List<CartItem> items = cart.getCartItems();
-
-        if (items == null) {
-            return new ArrayList<>();
-        }
-
-        return items.stream().map(item -> {
-            ProductVariant variant = item.getProductVariant();
-            Product product = variant.getProduct();
-
-            BigDecimal price = product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
-
-            // Tính tổng tiền = Giá * Số lượng
-            BigDecimal total = price.multiply(BigDecimal.valueOf(item.getQuantity()));
-
+        return user.getCart().getCartItems().stream().map(item -> {
+            ProductVariant pv = item.getProductVariant();
+            Product p = pv.getProduct();
+            BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
             return CartItemResponse.builder()
                     .cartItemId(item.getCartItemId())
-                    .productId(product.getProductId())
-                    .productName(product.getName())
-                    .variantId(variant.getVariantId())
-                    .size(variant.getSize())
-                    .color(variant.getColor())
-                    .imageUrl(product.getImageUrl())
+                    .productId(p.getProductId())
+                    .productName(p.getName())
+                    .size(pv.getSize())
+                    .color(pv.getColor())
+                    .imageUrl(p.getImageUrl())
                     .price(price)
                     .quantity(item.getQuantity())
-                    .totalPrice(total)
+                    .totalPrice(price.multiply(BigDecimal.valueOf(item.getQuantity())))
                     .build();
         }).toList();
     }
 
-    public BigDecimal getCartTotal(List<CartItemResponse> items) {
-        if (items == null || items.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-        return items.stream()
-                .map(CartItemResponse::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public String getUserFullName(String username) {
+        return userRepository.findByUsername(username).map(User::getName).orElse("Người dùng");
     }
 
-    // 1. Cập nhật số lượng
+    public List<ProductVariant> getVariantsByProductId(String productId) {
+        return variantRepository.findByProductProductId(productId);
+    }
+
     @Transactional
-    public void updateItemQuantity(String cartItemId, int newQuantity) {
-        CartItem item = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
-
-        if (newQuantity <= 0) {
-            cartItemRepository.delete(item); // Nếu số lượng <= 0 thì xóa luôn
-        } else {
-            item.setQuantity(newQuantity);
-            cartItemRepository.save(item);
-        }
+    public void updateItemQuantity(String cartItemId, int qty) {
+        cartItemRepository.findById(cartItemId).ifPresent(i -> {
+            i.setQuantity(qty);
+            cartItemRepository.save(i);
+        });
     }
 
-    // Xóa sản phẩm khỏi giỏ
     @Transactional
     public void deleteCartItem(String cartItemId) {
-        if (cartItemRepository.existsById(cartItemId)) {
-            cartItemRepository.deleteById(cartItemId);
-        }
+        cartItemRepository.deleteById(cartItemId);
     }
 
-    // Đổi phân loại (Variant)
     @Transactional
     public void updateItemVariant(String cartItemId, String newVariantId) {
-        CartItem item = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+        CartItem item = cartItemRepository.findById(cartItemId).orElseThrow();
+        ProductVariant newVariant = variantRepository.findById(newVariantId).orElseThrow();
 
-        ProductVariant newVariant = productVariantRepository.findById(newVariantId)
-                .orElseThrow(() -> new RuntimeException("Variant not found"));
+        // Gộp nếu trùng variant trong giỏ
+        Optional<CartItem> duplicate = item.getCart().getCartItems().stream()
+                .filter(ci -> ci.getProductVariant().getVariantId().equals(newVariantId) && !ci.getCartItemId().equals(cartItemId))
+                .findFirst();
 
-
-        item.setProductVariant(newVariant);
-        cartItemRepository.save(item);
+        if (duplicate.isPresent()) {
+            duplicate.get().setQuantity(duplicate.get().getQuantity() + item.getQuantity());
+            cartItemRepository.delete(item);
+        } else {
+            item.setProductVariant(newVariant);
+            cartItemRepository.save(item);
+        }
     }
 }

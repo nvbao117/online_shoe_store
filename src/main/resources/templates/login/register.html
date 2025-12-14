@@ -63,30 +63,28 @@
         </div>
 
         <!-- FORM ĐĂNG KÝ -->
-        <!--
-            Thời điểm này chỉ là giao diện, chưa xử lý backend.
-            th:action="@{/register}" chỉ là route mẫu, sau này bạn map controller theo ý.
-        -->
-        <form th:action="@{/register}" method="post">
-
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post">
             <!-- Dòng 1: Fullname | Date of Birth | Email -->
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <input type="text"
                            class="form-control register-input"
                            name="fullName"
+                           th:field="*{fullName}"
                            placeholder="Fullname">
                 </div>
                 <div class="col-md-4">
                     <input type="date"
                            class="form-control register-input"
                            name="dateOfBirth"
+                           th:field="*{dateOfBirth}"
                            placeholder="Date of Birth">
                 </div>
                 <div class="col-md-4">
                     <input type="email"
                            class="form-control register-input"
                            name="email"
+                           th:field="*{email}"
                            placeholder="Email">
                 </div>
             </div>
@@ -97,19 +95,29 @@
                     <input type="text"
                            class="form-control register-input"
                            name="mobileNumber"
+                           th:field="*{mobileNumber}"
+                           id="mobileNumber"
                            placeholder="Mobile Number">
                 </div>
                 <div class="col-md-4">
-                    <!-- Chỉ là ô text nhập OTP, phần xử lý OTP sẽ làm sau -->
-                    <input type="text"
-                           class="form-control register-input"
-                           name="otp"
-                           placeholder="OTP">
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control register-input"
+                               th:field="*{otp}"
+                               placeholder="OTP">
+
+                        <button type="button"
+                                class="btn btn-outline-light"
+                                id="btnSendOtp">
+                            Get OTP
+                        </button>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <!-- Select giới tính -->
                     <select class="form-select register-input"
-                            name="gender">
+                            name="gender"
+                            th:field="*{gender}">
                         <option value="" selected disabled>Gender</option>
                         <option value="MALE">Male</option>
                         <option value="FEMALE">Female</option>
@@ -124,6 +132,7 @@
                     <input type="text"
                            class="form-control register-input"
                            name="username"
+                           th:field="*{username}"
                            placeholder="Username">
                 </div>
 
@@ -133,6 +142,7 @@
                         <input type="password"
                                class="form-control register-input border-end-0"
                                name="password"
+                               th:field="*{password}"
                                placeholder="Password">
                         <span class="input-group-text register-input-icon-right">
               <!-- icon mắt, sau này có thể thêm JS để show/hide -->
@@ -146,6 +156,7 @@
                         <input type="password"
                                class="form-control register-input border-end-0"
                                name="confirmPassword"
+                               th:field="*{confirmPassword}"
                                placeholder="Confirm Password">
                         <span class="input-group-text register-input-icon-right">
               <i class="bi bi-eye-slash"></i>
@@ -160,7 +171,8 @@
                     Sign Up
                 </button>
             </div>
-
+            <!-- Hiển thị lỗi -->
+            <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
         </form>
     </div> <!-- /auth-card register-card -->
 </div> <!-- /auth-page-wrapper -->
@@ -181,6 +193,35 @@
 
 <!-- 2) JS dùng chung điều khiển video nền -->
 <script th:src="@{/js/login/auth-bg.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnSendOtp = document.getElementById('btnSendOtp');
+        const phoneInput = document.getElementById('mobileNumber');
+
+        if (!btnSendOtp || !phoneInput) return;
+
+        btnSendOtp.addEventListener('click', function () {
+            const phone = phoneInput.value.trim();
+
+            if (!phone) {
+                alert('Vui lòng nhập số điện thoại trước khi lấy OTP');
+                return;
+            }
+
+            fetch('/register/send-otp?phone=' + encodeURIComponent(phone), {
+                method: 'POST'
+            })
+                .then(resp => resp.text())
+                .then(msg => {
+                    alert(msg); // sẽ báo: "OTP đã được tạo. Kiểm tra console của server."
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Không thể tạo OTP. Vui lòng thử lại.');
+                });
+        });
+    });
+</script>
 
 </body>
 </html>
