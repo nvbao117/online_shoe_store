@@ -60,6 +60,38 @@ public class ProductSpecification {
                 query.distinct(true);
             }
 
+            // ----- Lọc theo sortBy -----
+            if (request.getSortBy() != null && query != null) {
+                switch (request.getSortBy()) {
+
+                    // Nổi bật (tạm ví dụ: giá tăng dần)
+                    case "featured" ->
+                            query.orderBy(cb.asc(root.get("price")));
+
+                    // Bán chạy (CẦN soldCount trong Product)
+                    case "sold_desc" ->
+                            query.orderBy(cb.desc(root.get("soldCount")));
+
+                    // Mới nhất
+                    case "newest" ->
+                            query.orderBy(cb.desc(root.get("createdAt")));
+
+                    // sale    CHƯA LÀM
+                    case "sale" ->
+                            query.orderBy(cb.desc(root.get("createdAt")));
+                    // Giá tăng dần
+                    case "price_asc" ->
+                            query.orderBy(cb.asc(root.get("price")));
+
+                    // Giá giảm dần
+                    case "price_desc" ->
+                            query.orderBy(cb.desc(root.get("price")));
+
+                    default -> {
+                    }
+                }
+            }
+
 
             return predicate;
         };
