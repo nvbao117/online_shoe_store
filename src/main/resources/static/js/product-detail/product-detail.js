@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====== CONFIG ======
     const IMG_BASE = "/images/products/"; // khớp WebConfig: /images/products/**
 
-    // ====== GET productId from Thymeleaf ======
-    const productId = window.__PRODUCT_ID__;
+    // ====== GET productId from Thymeleaf or URL ======
+    const urlIdMatch = window.location.pathname.match(/product-detail\/([^/]+)/);
+    const productId = window.__PRODUCT_ID__ || (urlIdMatch ? urlIdMatch[1] : null);
     if (!productId) {
         console.error("Missing productId (window.__PRODUCT_ID__)");
         return;
@@ -24,6 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const descEl = document.getElementById("pd-desc");
     const codeEl = document.getElementById("pd-code");
     const bcNameEl = document.getElementById("pd-breadcrumb-name");
+    const buyNowBtn = document.querySelector(".btn-buy-now");
+    const addCartBtn = document.querySelector(".btn-add-cart");
+    const qtyInput = document.querySelector(".quantity-group .qty-input");
 
     // ====== STATE ======
     let product = null;
@@ -161,7 +165,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!sizesWrap) return;
         sizesWrap.innerHTML = "";
 
-        (sizes || []).forEach((s, idx) => {
+        const weight = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+        function sortSizes(list) {
+            return [...(list || [])].sort((a, b) => {
+                if (!isNaN(a) && !isNaN(b)) return Number(a) - Number(b);
+                const wa = weight.indexOf(String(a).toUpperCase());
+                const wb = weight.indexOf(String(b).toUpperCase());
+                if (wa !== -1 && wb !== -1) return wa - wb;
+                if (wa !== -1) return -1;
+                if (wb !== -1) return 1;
+                return String(a).localeCompare(String(b));
+            });
+        }
+
+        sortSizes(sizes).forEach((s, idx) => {
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "btn btn-outline-secondary btn-sm size-option" + (idx === 0 ? " active" : "");
@@ -276,9 +293,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====== QUANTITY (+ / -) giữ y nguyên logic của bạn ======
     const qtyGroup = document.querySelector(".quantity-group");
     if (qtyGroup) {
-        const qtyInput = qtyGroup.querySelector(".qty-input");
         const btnMinus = qtyGroup.querySelector(".btn-qty-minus");
         const btnPlus = qtyGroup.querySelector(".btn-qty-plus");
+
+        function getQuantity() {
+            const value = parseInt(qtyInput?.value || "1", 10);
+            return isNaN(value) || value < 1 ? 1 : value;
+        }
 
         function normalizeQty() {
             let value = parseInt(qtyInput.value, 10);
@@ -298,6 +319,72 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         qtyInput?.addEventListener("blur", normalizeQty);
+
+        // ====== ACTIONS: Buy Now & Add to Cart ======
+        function findVariantId() {
+            const vs = product?.variants || [];
+            const match = vs.find(v =>
+                (!selectedColor || v.color === selectedColor) &&
+                (!selectedSize || v.size === selectedSize)
+            );
+            return match?.variantId;
+        }
+
+        async function handleBuyNow() {
+            const variantId = findVariantId();
+            if (!variantId) {
+                alert("Vui lòng chọn phân loại sản phẩm");
+                return;
+            }
+            const quantity = getQuantity();
+            try {
+                const res = await fetch("/api/checkout/buy-now", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ variantId, quantity })
+                });
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text || `Lỗi ${res.status}`);
+                }
+                const data = await res.json();
+                if (!data.draftId) {
+                    throw new Error("Không nhận được draftId");
+                }
+                window.location.href = `/checkout/step1?draftId=${encodeURIComponent(data.draftId)}`;
+            } catch (err) {
+                console.error("Buy now failed", err);
+                alert("Không thể mua ngay. Vui lòng thử lại.");
+            }
+        }
+
+        async function handleAddToCart() {
+            const variantId = findVariantId();
+            if (!variantId) {
+                alert("Vui lòng chọn phân loại sản phẩm");
+                return;
+            }
+            const quantity = getQuantity();
+            try {
+                const res = await fetch("/api/cart/items", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ variantId, quantity })
+                });
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text || `Lỗi ${res.status}`);
+                }
+                await res.json();
+                alert("Đã thêm vào giỏ hàng");
+            } catch (err) {
+                console.error("Add to cart failed", err);
+                alert("Không thể thêm vào giỏ. Vui lòng thử lại.");
+            }
+        }
+
+        buyNowBtn?.addEventListener("click", handleBuyNow);
+        addCartBtn?.addEventListener("click", handleAddToCart);
     }
 
     // ====== FETCH API & START ======

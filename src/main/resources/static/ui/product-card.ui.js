@@ -1,8 +1,8 @@
 export function createProductCard(p) {
     return `
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col product-card" data-product-id="${p.productId || ''}">
             <div class="relative">
-                <img src="/${p.imageUrl}" class="w-full h-40 sm:h-44 object-cover" />
+                <img src="/${p.imageUrl}" class="w-full h-40 sm:h-44 object-cover product-card-img" data-product-id="${p.productId || ''}" />
                 <span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] sm:text-xs px-2 py-1 rounded">
                     Sản phẩm mới
                 </span>

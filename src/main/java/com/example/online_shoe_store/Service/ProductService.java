@@ -55,41 +55,35 @@ public class ProductService {
 //                .orElse(null));
 //    }
 
-    /**
-     * Chuyển imageUrl từ DB -> URL dùng được trên web.
-     * WebConfig đang serve: /images/products/** -> file:.../src/data/images/products/
-     *
-     * DB của bạn có thể lưu kiểu:
-     * - "src/data/images/products/main_xxx.jpg"  => "/images/products/main_xxx.jpg"
-     * - "/images/products/main_xxx.jpg"          => giữ nguyên
-     * - "main_xxx.jpg" hoặc "Badminton/main_xxx.jpg" => "/images/products/..."
-     * - full URL http/https => giữ nguyên
-     */
     private String toPublicProductImageUrl(String raw) {
         if (raw == null) return null;
 
         String v = raw.replace("\\", "/").trim();
 
-        // 1) nếu DB lưu kiểu: "src/data/images/products/main_xxx.jpg"
-        String prefix = "src/data/images/products/";
-        if (v.startsWith(prefix)) {
-            return "/images/products/" + v.substring(prefix.length());
+        // ✅ DB có thể lưu "/src/data/images/products/..."
+        String p1 = "/src/data/images/products/";
+        if (v.startsWith(p1)) {
+            return "/images/products/" + v.substring(p1.length());
         }
 
-        // 2) nếu DB lưu sẵn kiểu: "/images/products/main_xxx.jpg"
+        // ✅ DB có thể lưu "src/data/images/products/..."
+        String p2 = "src/data/images/products/";
+        if (v.startsWith(p2)) {
+            return "/images/products/" + v.substring(p2.length());
+        }
+
+        // ✅ nếu DB lưu sẵn "/images/products/..."
         if (v.startsWith("/images/products/")) {
             return v;
         }
 
-        // 3) nếu DB chỉ lưu: "main_xxx.jpg" hoặc "Badminton/main_xxx.jpg"
+        // ✅ nếu chỉ lưu "main_xxx.jpg" hoặc "Badminton/main_xxx.jpg"
         if (!v.startsWith("/") && !v.startsWith("http://") && !v.startsWith("https://")) {
             return "/images/products/" + v;
         }
 
-        // 4) nếu DB lưu full URL: "http..."
         return v;
     }
-
 
     // ✅ API: /api/products/{id}
     @Transactional(readOnly = true)

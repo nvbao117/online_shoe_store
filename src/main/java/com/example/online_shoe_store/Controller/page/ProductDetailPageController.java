@@ -15,17 +15,14 @@ public class ProductDetailPageController {
 
     @GetMapping("/product-detail/{id}")
     public String productDetailPage(@PathVariable String id, Model model) {
-
-        // Lấy full detail (bạn đã có sẵn hàm này)
         var product = productService.getDetail(id);
 
         model.addAttribute("product", product);
+        model.addAttribute("productId", id);
+
         return "product-detail/product-detail";
-        // ✅ CHÚ Ý: view này phải đúng với file của bạn:
-        // src/main/resources/templates/product-detail/product-detail.html
     }
 
-    // (tuỳ chọn) nếu ai đó vào /product-detail không có id
     @GetMapping("/product-detail")
     public String productDetailRoot() {
         return "redirect:/products";
