@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.config;
+package com.example.online_shoe_store.Config;
 
 import com.example.online_shoe_store.Security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+
     private final CustomUserDetailsService customUserDetailsService;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
@@ -22,25 +23,61 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        // ✅ PUBLIC: auth pages
+                        .requestMatchers("/login", "/register").permitAll()
+
+                        // ✅ PUBLIC: web pages
+                        .requestMatchers("/", "/home", "/products", "/sale-off", "/product-detail/**").permitAll()
+
+                        // ✅ PUBLIC: API cho trang home/detail (nếu bạn muốn public hết API thì giữ /api/**)
+                        .requestMatchers("/api/**").permitAll()
+
+                        // ✅ PUBLIC: static resources
+                        .requestMatchers(
+                                "/images/**",
+                                "/src/data/images/**",
+                                "/css/**",
+                                "/js/**",
+                                "/pages/**",
+                                "/home/**",
+                                "/ui/**",
+                                "/favicon.ico",
+                                "/webjars/**",
+                                "/static/**",
+                                "/assets/**"
+                        ).permitAll()
+
+                        // còn lại bắt login
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable())
-                .logout(logout -> logout.disable());
+
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll()
+                );
 
         return http.build();
     }
 
-
-    // dùng BCrypt giống lúc đăng ký
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // kết nối UserDetailsService + PasswordEncoder
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -49,10 +86,8 @@ public class SecurityConfig {
         return provider;
     }
 
-    // cần cho một số phiên bản Spring Security
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
