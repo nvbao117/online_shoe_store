@@ -2,11 +2,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // ====== CONFIG ======
     const IMG_BASE = "/images/products/"; // khớp WebConfig: /images/products/**
 
-    // ====== GET productId from Thymeleaf or URL ======
+    // ====== GET productId from URL path ======
     const urlIdMatch = window.location.pathname.match(/product-detail\/([^/]+)/);
-    const productId = window.__PRODUCT_ID__ || (urlIdMatch ? urlIdMatch[1] : null);
+    const productId = urlIdMatch ? urlIdMatch[1] : null;
     if (!productId) {
-        console.error("Missing productId (window.__PRODUCT_ID__)");
+        console.error("Missing productId in URL. Expected format: /product-detail/{id}");
         return;
     }
 
