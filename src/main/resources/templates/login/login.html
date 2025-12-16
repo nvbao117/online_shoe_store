@@ -22,7 +22,11 @@
 
 <!-- ====================== VIDEO BACKGROUND (DÙNG CHUNG) ====================== -->
 <div class="auth-bg-video-wrapper">
-  <video class="auth-bg-video" id="authBgVideo" autoplay muted playsinline>
+  <video class="auth-bg-video" id="authBgVideo"
+         autoplay muted playsinline
+         preload="metadata"
+         disablepictureinpicture
+         th:poster="@{/images/login-bg-poster.png}">
     Trình duyệt của bạn không hỗ trợ video.
   </video>
 </div>
@@ -149,10 +153,10 @@
 <!-- 1) Khai báo danh sách video cho TRANG LOGIN -->
 <script th:inline="javascript">
   window.AUTH_VIDEO_SOURCES = [
-    "/videos/basketball.mp4",
-    "/videos/football.mp4",
-    "/videos/badminton.mp4",
-    "/videos/pingpong.mp4"
+    /*[[@{/videos/basketball.mp4}]]*/,
+    /*[[@{/videos/football.mp4}]]*/,
+    /*[[@{/videos/badminton.mp4}]]*/,
+    /*[[@{/videos/pingpong.mp4}]]*/
   ];
 </script>
 
