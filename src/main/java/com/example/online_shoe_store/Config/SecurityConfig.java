@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register").permitAll()
 
                         // ✅ PUBLIC: web pages
-                        .requestMatchers("/", "/home", "/products", "/sale-off", "/product-detail/**").permitAll()
+                        .requestMatchers("/", "/home", "/products", "/sale-off", "/product-detail/**", "/admin/**").permitAll()
 
                         // ✅ PUBLIC: API cho trang home/detail (nếu bạn muốn public hết API thì giữ /api/**)
                         .requestMatchers("/api/**").permitAll()
