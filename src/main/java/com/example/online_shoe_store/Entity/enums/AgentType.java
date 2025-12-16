@@ -10,15 +10,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AgentType {
     SALES("sales_agent", "Hỗ trợ mua hàng"),
-    RECOMMENDATION("recommendation_agent", "Gợi ý sản phẩm"),
+    RECOMMEND("recommend_agent", "Gợi ý sản phẩm"),
+    CART("cart_agent", "Quản lý giỏ hàng"),
     SEARCH("search_agent", "Tìm kiếm sản phẩm"),
     SUPPORT("support_agent", "Hỗ trợ chung,FAQ"),
     COMPLAINTS("complaints_agent", "Xử lý khiếu nại"),
     INVENTORY("inventory_agent", "Kiểm tra tồn kho"),
     RETURNS("returns_agent", "Đổi trả hoàn tiền"),
-    PRICING("pricing_agent", "Giá và khuyến mãi"),
     LOGISTICS("logistics_agent", "Tracking giao hàng"),
-    ANALYTICS("analytics_agent", "Phân tích dữ liệu"),
     MARKETING("marketing_agent", "Marketing và chiến dịch");
 
     private final String code;

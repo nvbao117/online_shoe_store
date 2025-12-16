@@ -4,7 +4,10 @@ import com.example.online_shoe_store.Service.ai.agent.OrchestratorAgent;
 import com.example.online_shoe_store.Service.ai.agent.SearchAgent;
 import com.example.online_shoe_store.Service.ai.agent.SupportAgent;
 import com.example.online_shoe_store.Service.ai.agent.sales.SalesAgent;
+import com.example.online_shoe_store.Service.ai.agent.sales.CartAgent;
+import com.example.online_shoe_store.Service.ai.agent.sales.RecommendAgent;
 import com.example.online_shoe_store.Service.ai.agent.operations.LogisticsAgent;
+import com.example.online_shoe_store.Service.ai.agent.operations.InventoryAgent;
 import com.example.online_shoe_store.Service.ai.agent.marketing.MarketingAgent;
 import com.example.online_shoe_store.Service.ai.memory.HybridMemoryService;
 import com.example.online_shoe_store.dto.orchestrator.RoutingDecision;
@@ -25,7 +28,7 @@ import java.util.ArrayList;
 public class AgentExecutor {
 
         private static final Set<String> ALLOWED_AGENTS = Set.of(
-            "SEARCH", "SALES", "SUPPORT",
+             "SEARCH", "SALES", "SUPPORT",
             "LOGISTICS", "MARKETING", "INVENTORY", "RECOMMEND", "CART"
         );
 
@@ -51,6 +54,8 @@ public class AgentExecutor {
     // ═══════════════════════════════════════════
     private final SearchAgent searchAgent;
     private final SalesAgent salesAgent;
+    private final CartAgent cartAgent;
+    private final RecommendAgent recommendAgent;
 
     // ═══════════════════════════════════════════
     // SUPPORT DOMAIN
@@ -61,6 +66,7 @@ public class AgentExecutor {
     // OPERATIONS DOMAIN
     // ═══════════════════════════════════════════
     private final LogisticsAgent logisticsAgent;
+    private final InventoryAgent inventoryAgent;
 
     // ═══════════════════════════════════════════
     // MARKETING DOMAIN
@@ -80,7 +86,7 @@ public class AgentExecutor {
         RoutingDecision decision = orchestratorAgent.decide(userMessage, sessionId);
 
         String rawTargetAgent = decision.getTargetAgent();
-        String resolvedPrimary = decision.getPrimaryAgent() != null ? decision.getPrimaryAgent().name() : null;
+        String resolvedPrimary = decision.getPrimaryAgent();
         String targetAgentForRouting = rawTargetAgent != null && !rawTargetAgent.isBlank()
             ? rawTargetAgent
             : resolvedPrimary;
@@ -92,7 +98,8 @@ public class AgentExecutor {
             decision.getRiskLevel());
 
         String finalResponse;
-        boolean onlyDirectResponse = (rawTargetAgent == null && decision.getPrimaryAgent() == null)
+        boolean onlyDirectResponse = (rawTargetAgent == null || rawTargetAgent.isBlank()) 
+            && (resolvedPrimary == null || resolvedPrimary.isBlank())
             && decision.getDirectResponse() != null && !decision.getDirectResponse().isBlank();
 
         // BƯỚC 2: XỬ LÝ
@@ -148,8 +155,8 @@ public class AgentExecutor {
                 // SALES DOMAIN
                 case "SEARCH" -> searchAgent.search(sessionId, userMessage);
                 case "SALES" -> salesAgent.consult(sessionId, userMessage);
-                case "RECOMMEND" -> salesAgent.consult(sessionId, userMessage);
-                case "CART" -> salesAgent.consult(sessionId, userMessage);
+                case "RECOMMEND" -> recommendAgent.recommend(sessionId, userMessage);
+                case "CART" -> cartAgent.manage(sessionId, userMessage);
                 
                 // SUPPORT DOMAIN
                 case "SUPPORT" -> supportAgent.answer(sessionId, userMessage);
@@ -158,7 +165,7 @@ public class AgentExecutor {
                 
                 // OPERATIONS DOMAIN
                 case "LOGISTICS" -> logisticsAgent.track(sessionId, userMessage);
-                case "INVENTORY" -> salesAgent.consult(sessionId, userMessage);
+                case "INVENTORY" -> inventoryAgent.check(sessionId, userMessage);
                 
                 // MARKETING DOMAIN
                 case "MARKETING" -> marketingAgent.analyze(sessionId, userMessage);
@@ -188,12 +195,12 @@ public class AgentExecutor {
         if (decision.hasSecondaryAgents() && !Boolean.TRUE.equals(decision.getParallel())) {
             log.info("[SECONDARY AGENTS] count={} | agents={}", 
                 decision.getSecondaryAgents().size(), decision.getSecondaryAgents());
-            for (var secondary : decision.getSecondaryAgents()) {
+            for (String secondary : decision.getSecondaryAgents()) {
                 try {
-                    String result = routeToAgent(secondary.name(), sessionId, userMessage);
-                    secondaryResults.add("[" + secondary.name() + "] " + result);
+                    String result = routeToAgent(secondary, sessionId, userMessage);
+                    secondaryResults.add("[" + secondary + "] " + result);
                     log.info("[SECONDARY RESULT] agent={} | resultLength={}", 
-                        secondary.name(), result.length());
+                        secondary, result.length());
                 } catch (Exception e) {
                     log.warn("[SECONDARY ERROR] agent={} | error: {}", secondary, e.getMessage());
                 }
@@ -221,7 +228,9 @@ public class AgentExecutor {
         String normalized = normalizeAgent(agentName);
         return switch (normalized) {
             case "SEARCH" -> AgentType.SEARCH;
-            case "SALES", "RECOMMEND", "CART" -> AgentType.SALES;
+            case "SALES" -> AgentType.SALES;
+            case "RECOMMEND" -> AgentType.RECOMMEND;
+            case "CART" -> AgentType.CART;
             case "RETURNS" -> AgentType.RETURNS;
             case "COMPLAINT", "COMPLAINTS" -> AgentType.COMPLAINTS;
             case "INVENTORY" -> AgentType.INVENTORY;

@@ -106,7 +106,7 @@ public class ConversationService {
                 .extractedEntities(serializeEntities(classification.getEntities()))
                 .confidence(classification.getConfidence())
                 .urgency(classification.getUrgency())
-                .primaryAgent(routing.getPrimaryAgent())
+                .primaryAgent(parseAgentType(routing.getTargetAgent()))
                 .secondaryAgents(formatSecondaryAgents(routing.getSecondaryAgents()))
                 .wasParallel(routing.getParallel())
                 .riskLevel(routing.getRiskLevel())
@@ -208,10 +208,20 @@ public class ConversationService {
         }
     }
     
-    private String formatSecondaryAgents(List<AgentType> agents) {
+    private String formatSecondaryAgents(List<String> agents) {
         if (agents == null || agents.isEmpty()) return null;
-        return agents.stream()
-            .map(AgentType::name)
-            .collect(Collectors.joining(","));
+        return String.join(",", agents);
+    }
+    
+    private AgentType parseAgentType(String agentName) {
+        if (agentName == null || agentName.isBlank()) {
+            return AgentType.SUPPORT;
+        }
+        try {
+            return AgentType.valueOf(agentName.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Unknown agent type: {}, defaulting to SUPPORT", agentName);
+            return AgentType.SUPPORT;
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.online_shoe_store.dto.orchestrator;
 
-import com.example.online_shoe_store.Entity.enums.AgentType;
 import com.example.online_shoe_store.Entity.enums.RiskLevel;
 import dev.langchain4j.model.output.structured.Description;
 import lombok.AllArgsConstructor;
@@ -27,19 +26,19 @@ public class RoutingDecision {
     @Description("Phản hồi trực tiếp từ Orchestrator. Dùng khi: chào hỏi, thiếu thông tin, không cần agent.")
     private String directResponse;
 
-    @Description("Tên agent cần gọi. VD: SEARCH, SUPPORT, SALES, LOGISTICS, COMPLAINT")
+    @Description("Tên agent cần gọi: SEARCH, SALES, RECOMMEND, CART, SUPPORT, LOGISTICS, INVENTORY, MARKETING")
     private String targetAgent;
 
     //=========================================
     // AGENT ASSIGNMENT
     //=========================================
 
-    @Description("Agent chính xử lý. Enum: SALES, SUPPORT, INVENTORY,...")
-    private AgentType primaryAgent;
+    @Description("Agent chính xử lý. VD: SEARCH, SALES, SUPPORT, RECOMMEND, CART, LOGISTICS, INVENTORY, MARKETING")
+    private String primaryAgent;
 
-    @Description("Agents phụ hỗ trợ. VD: Sales bán hàng cần Inventory check kho → [INVENTORY]")
+    @Description("Agents phụ hỗ trợ. VD: ['INVENTORY'] nếu cần check kho")
     @Builder.Default
-    private List<AgentType> secondaryAgents = new ArrayList<>();
+    private List<String> secondaryAgents = new ArrayList<>();
 
     //=========================================
     // EXECUTION MODE
@@ -94,9 +93,9 @@ public class RoutingDecision {
         return secondaryAgents != null && !secondaryAgents.isEmpty();
     }
 
-    public List<AgentType> getAllAgents() {
-        List<AgentType> all = new ArrayList<>();
-        if (primaryAgent != null) {
+    public List<String> getAllAgents() {
+        List<String> all = new ArrayList<>();
+        if (primaryAgent != null && !primaryAgent.isBlank()) {
             all.add(primaryAgent);
         }
         if (secondaryAgents != null) {
