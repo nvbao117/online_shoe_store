@@ -1,5 +1,6 @@
 package com.example.online_shoe_store.Config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -8,14 +9,30 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Value("${app.storage.products}")
+    private String productsDir;
+
+    @Value("${app.storage.categories}")
+    private String categoriesDir;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String productsLocation = "file:" + (productsDir.endsWith("/") ? productsDir : productsDir + "/");
+        String categoriesLocation = "file:" + (categoriesDir.endsWith("/") ? categoriesDir : categoriesDir + "/");
+
+        registry.addResourceHandler("/images/products/**")
+                .addResourceLocations(productsLocation);
+
+        registry.addResourceHandler("/images/categories/**")
+                .addResourceLocations(categoriesLocation);
+
+        // tương thích ngược
         registry.addResourceHandler("/src/data/images/products/**")
-                .addResourceLocations("file:src/data/images/products/");
+                .addResourceLocations(productsLocation);
 
         registry.addResourceHandler("/src/data/images/categories/**")
-                .addResourceLocations("file:src/data/images/categories/");
-//        /src/data/images/products/main_6d6bde8b.jpg
+                .addResourceLocations(categoriesLocation);
     }
 
     @Bean
@@ -23,4 +40,3 @@ public class WebConfig implements WebMvcConfigurer {
         return new RestTemplate();
     }
 }
-
