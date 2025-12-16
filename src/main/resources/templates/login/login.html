@@ -121,10 +121,10 @@
 
       <!-- Social buttons -->
       <div class="d-flex justify-content-between gap-2 login-social-row">
-        <button type="button" class="btn login-social-btn flex-fill">
-          <img th:src="@{/images/icon/google-logo.png}" alt="Google" class="social-logo">
-          <span>Google</span>
-        </button>
+          <a th:href="@{/oauth2/authorization/google}" class="btn login-social-btn flex-fill">
+            <img th:src="@{/images/icon/google-logo.png}" alt="Google" class="social-logo">
+            <span>Google</span>
+          </a>
 
         <button type="button" class="btn login-social-btn flex-fill">
           <img th:src="@{/images/icon/facebook-logo.png}" alt="Facebook" class="social-logo">
