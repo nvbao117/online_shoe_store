@@ -85,6 +85,8 @@ public class AgentExecutor {
         log.info("Orchestrator analyzing intent...");
         RoutingDecision decision = orchestratorAgent.decide(userMessage, sessionId);
 
+        System.out.println("Orchestrator analyzing intent: " + decision);
+
         String rawTargetAgent = decision.getTargetAgent();
         String resolvedPrimary = decision.getPrimaryAgent();
         String targetAgentForRouting = rawTargetAgent != null && !rawTargetAgent.isBlank()

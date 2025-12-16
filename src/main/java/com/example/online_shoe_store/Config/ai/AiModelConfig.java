@@ -37,7 +37,7 @@ public class AiModelConfig {
                 .thinkingType("enabled")
                 .thinkingBudgetTokens(2048)
                 .maxTokens(2048+200)
-                .maxRetries(2)
+                .maxRetries(1)
                 .returnThinking(true)
                 .temperature(1.0)
                 .timeout(Duration.ofSeconds(90))
