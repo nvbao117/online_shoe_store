@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <!-- dùng HEAD của layout -->
+  <head th:replace="fragments/admin-layout :: head('Dashboard', null)">
+    <title>Dashboard</title>
+  </head>
+
+  <body>
+    <div class="min-h-screen">
+      <!-- ✅ SIDEBAR: dùng fragment của layout -->
+      <aside th:replace="fragments/admin-layout :: sidebar"></aside>
+
+      <!-- ✅ NỘI DUNG CHÍNH: giữ nguyên code dashboard của bạn -->
+
+      <!-- Main Content -->
+      <main class="lg:ml-64 p-4 lg:p-8 min-h-screen">
+        <div class="space-y-6">
+          <!-- Thời gian bao cáo -->
+          <div class="bg-white rounded-2xl p-4 shadow-lg">
+            <h3
+              class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b pb-2"
+            >
+              <svg
+                class="w-4 h-4 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Chọn Thời Gian Báo Cáo:
+            </h3>
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+              <button
+                class="time-btn active px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                data-value="today"
+              >
+                Hôm nay
+              </button>
+              <button
+                class="time-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                data-value="7days"
+              >
+                7 ngày
+              </button>
+              <button
+                class="time-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                data-value="1month"
+              >
+                1 tháng
+              </button>
+              <button
+                class="time-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                data-value="1year"
+              >
+                1 năm
+              </button>
+              <button
+                class="time-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                data-value="option-time"
+              >
+                Bộ lọc tùy chỉnh
+              </button>
+            </div>
+            <div id="custom-filter" class="hidden">
+              <h3
+                class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b pb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                Bộ Lọc Tùy Chỉnh:
+              </h3>
+              <div class="flex flex-wrap items-end gap-4">
+                <div class="flex flex-col">
+                  <label
+                    for="start-date"
+                    class="text-xs font-medium text-slate-600 mb-1"
+                    >Từ ngày:</label
+                  >
+                  <input
+                    type="date"
+                    id="start-date"
+                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-blue-500 focus:border-blue-500 w-full"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <label
+                    for="end-date"
+                    class="text-xs font-medium text-slate-600 mb-1"
+                    >Đến ngày:</label
+                  >
+                  <input
+                    type="date"
+                    id="end-date"
+                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-blue-500 focus:border-blue-500 w-full"
+                  />
+                </div>
+                <button
+                  class="px-4 py-2 rounded-xl text-sm font-medium bg-green-600 text-white shadow-md hover:bg-green-700 transition"
+                >
+                  Áp dụng
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- 4 Card -->
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <!-- LEFT: STAT CARDS -->
+              <div
+                class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4"
+              >
+                <!-- TỔNG ĐƠN -->
+                <div
+                  class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-t-4 border-blue-500 shadow-md"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="text-xs font-semibold text-blue-700 uppercase">
+                      Tổng đơn
+                    </div>
+                    <svg
+                      class="w-6 h-6 text-blue-500 opacity-60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    id="totalOrders"
+                    class="text-2xl font-extrabold text-blue-900 mb-2"
+                  >
+                    0
+                  </div>
+                  <button
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition"
+                  >
+                    Xem chi tiết →
+                  </button>
+                </div>
+
+                <!-- DOANH THU -->
+                <div
+                  class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-t-4 border-purple-500 shadow-md"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div
+                      class="text-xs font-semibold text-purple-700 uppercase"
+                    >
+                      Doanh thu
+                    </div>
+                    <svg
+                      class="w-6 h-6 text-purple-500 opacity-60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8"
+                      />
+                    </svg>
+                  </div>
+
+                  <div
+                    id="totalRevenue"
+                    class="text-2xl font-extrabold text-purple-900 mb-2"
+                  >
+                    0
+                  </div>
+
+                  <button
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 hover:bg-purple-600 hover:text-white transition"
+                  >
+                    Xem chi tiết →
+                  </button>
+                </div>
+
+                <!-- SP ĐÃ BÁN -->
+                <div
+                  class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-t-4 border-green-500 shadow-md"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="text-xs font-semibold text-green-700 uppercase">
+                      SP đã bán
+                    </div>
+                    <svg
+                      class="w-6 h-6 text-green-500 opacity-60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4"
+                      />
+                    </svg>
+                  </div>
+
+                  <div
+                    id="totalProducts"
+                    class="text-2xl font-extrabold text-green-900 mb-2"
+                  >
+                    0
+                  </div>
+
+                  <button
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full bg-green-100 text-green-700 hover:bg-green-600 hover:text-white transition"
+                  >
+                    Xem chi tiết →
+                  </button>
+                </div>
+
+                <!-- TOP SẢN PHẨM -->
+                <div
+                  class="bg-gradient-to-br from-amber-50 to-orange-100 rounded-xl p-4 border-t-4 border-orange-500 shadow-md"
+                >
+                  <div class="flex items-center justify-between mb-1">
+                    <div
+                      class="text-xs font-semibold text-orange-700 uppercase"
+                    >
+                      Top sản phẩm
+                    </div>
+                    <svg
+                      class="w-6 h-6 text-orange-500 opacity-60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 3v4M3 5h4m5-2l2.286 6.857L21 12l-5.714 2.143L13 21"
+                      />
+                    </svg>
+                  </div>
+
+                  <div class="text-sm font-bold text-orange-900">
+                    Giày Yonex
+                  </div>
+                  <div class="text-xs text-orange-700 mb-2">
+                    SL: <span class="text-xl font-extrabold">200</span>
+                  </div>
+
+                  <button
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full bg-orange-100 text-orange-700 hover:bg-orange-600 hover:text-white transition"
+                  >
+                    Xem tất cả →
+                  </button>
+                </div>
+              </div>
+
+              <!-- TRẠNG THÁI ĐƠN HÀNG -->
+              <div class="lg:col-span-4">
+                <div
+                  class="bg-white rounded-xl p-4 shadow-md h-full flex flex-col"
+                >
+                  <!-- TITLE -->
+                  <h3
+                    class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-4 h-4 text-slate-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
+                      />
+                    </svg>
+                    Trạng thái đơn hàng
+                  </h3>
+
+                  <!-- CHART -->
+                  <div class="flex-1 flex items-center justify-center">
+                    <div class="relative w-32 h-32">
+                      <svg
+                        class="w-full h-full -rotate-90"
+                        viewBox="0 0 100 100"
+                      >
+                        <!-- background -->
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#f1f5f9"
+                          stroke-width="10"
+                        />
+
+                        <!-- NEW -->
+                        <circle
+                          id="chart-new"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#3b82f6"
+                          stroke-width="10"
+                        />
+                        <!-- PROCESSING -->
+                        <circle
+                          id="chart-processing"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#f59e0b"
+                          stroke-width="10"
+                        />
+                        <!-- COMPLETED -->
+                        <circle
+                          id="chart-completed"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#10b981"
+                          stroke-width="10"
+                        />
+
+                        <!-- CANCELLED -->
+                        <circle
+                          id="chart-cancelled"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#ef4444"
+                          stroke-width="10"
+                        />
+                        <!-- RETURNED -->
+                        <circle
+                          id="chart-returned"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#8b5cf6"
+                          stroke-width="10"
+                        />
+                      </svg>
+
+                      <!-- CENTER TEXT -->
+                      <div
+                        class="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div class="text-center">
+                          <div
+                            id="chart-main-percent"
+                            class="text-xl font-extrabold text-blue-600"
+                          >
+                            --
+                          </div>
+                          <div
+                            id="chart-main-label"
+                            class="text-[11px] text-slate-600"
+                          >
+                            --
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- LEGEND -->
+                  <div class="space-y-2 mt-3 text-sm">
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-blue-500 rounded-full"
+                        ></span>
+                        Mới
+                      </span>
+                      <span class="font-semibold" id="percent-new">--%</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-orange-500 rounded-full"
+                        ></span>
+                        Đang xử lí
+                      </span>
+                      <span class="font-semibold" id="percent-processing">--%</span
+                      >
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-green-500 rounded-full"
+                        ></span>
+                        Hoàn thành
+                      </span>
+                      <span class="font-semibold" id="percent-completed"
+                        >--%</span
+                      >
+                    </div>
+
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-red-500 rounded-full"
+                        ></span>
+                        Đã hủy
+                      </span>
+                      <span class="font-semibold" id="percent-cancelled"
+                        >--%</span
+                      >
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-purple-500 rounded-full"
+                        ></span>
+                        Hoàn hàng
+                      </span>
+                      <span class="font-semibold" id="percent-returned"
+                        >--%</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- TOP SAN PHAM -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div
+                  class="flex items-center justify-between p-6 border-b border-slate-200"
+                >
+                  <h3
+                    class="text-lg font-bold text-slate-800 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-5 h-5 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                      ></path>
+                    </svg>
+                    Top Sản Phẩm Bán Chạy
+                  </h3>
+                  <button
+                    class="text-sm font-semibold text-green-600 hover:text-green-700 hover:underline transition"
+                  >
+                    Xem tất cả →
+                  </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="bg-green-50 border-b-2 border-green-200">
+                      <tr>
+                        <th
+                          class="px-4 py-3 text-left text-green-800 font-bold"
+                        >
+                          #
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-green-800 font-bold"
+                        >
+                          Tên sản phẩm
+                        </th>
+                        <th
+                          class="px-4 py-3 text-right text-green-800 font-bold"
+                        >
+                          SL bán
+                        </th>
+                        <th
+                          class="px-4 py-3 text-right text-green-800 font-bold"
+                        >
+                          Tồn kho
+                        </th>
+                        <th
+                          class="px-4 py-3 text-center text-green-800 font-bold"
+                        >
+                          Hành động
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      id="topSellingBody"
+                      class="divide-y divide-slate-100"
+                    ></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div
+                  class="flex items-center justify-between p-6 border-b border-slate-200"
+                >
+                  <h3
+                    class="text-lg font-bold text-slate-800 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-5 h-5 text-red-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
+                      ></path>
+                    </svg>
+                    Top Sản Phẩm Bán Ế
+                  </h3>
+                  <button
+                    class="text-sm font-semibold text-red-600 hover:text-red-700 hover:underline transition"
+                  >
+                    Xem tất cả →
+                  </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="bg-red-50 border-b-2 border-red-200">
+                      <tr>
+                        <th class="px-4 py-3 text-left text-red-800 font-bold">
+                          #
+                        </th>
+                        <th class="px-4 py-3 text-left text-red-800 font-bold">
+                          Tên sản phẩm
+                        </th>
+                        <th class="px-4 py-3 text-right text-red-800 font-bold">
+                          SL bán
+                        </th>
+                        <th class="px-4 py-3 text-right text-red-800 font-bold">
+                          Tồn kho
+                        </th>
+                        <th
+                          class="px-4 py-3 text-center text-red-800 font-bold"
+                        >
+                          Gợi ý xử lý
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      id="topSlowBody"
+                      class="divide-y divide-slate-100"
+                    ></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!-- Bộ lộc -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg mt-8">
+              <h3
+                class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 pb-3 border-b border-slate-200"
+              >
+                <svg
+                  class="w-5 h-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  ></path>
+                </svg>
+                Thiết Lập Thống Kê & Lọc
+              </h3>
+
+              <div
+                      class="flex flex-col lg:flex-row items-start lg:items-center gap-4 mb-6 p-4 border border-slate-200 rounded-xl bg-white shadow-sm"
+              >
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Đơn vị thời gian:</label
+                  >
+                  <select id="unitSelect"
+                          class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner"
+                  >
+                    <option value="DAY">Ngày</option>
+                    <option value="MONTH">Tháng</option>
+                    <option value="YEAR">Năm</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Loại dữ liệu:</label
+                  >
+                  <select id="typeSelect"
+                          class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner"
+                  >
+                    <option value="REVENUE">Doanh Thu</option>
+                    <option value="ORDER">Đơn Hàng</option>
+                    <option value="PRODUCT">Sản phẩm bán</option>
+                  </select>
+                </div>
+              </div>
+
+              <div
+                      class="flex flex-col lg:flex-row items-start lg:items-center gap-4 p-6 bg-gradient-to-r from-sky-50 to-blue-100 rounded-2xl border border-blue-200 shadow-xl"
+              >
+                <h3 class="text-lg font-bold text-blue-800 mb-2 lg:mb-0 mr-4">
+                  Lọc Theo Khoảng Thời Gian:
+                </h3>
+
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Từ ngày:</label
+                  >
+                  <input
+                          type="date"
+                          id="fromDate"
+                          class="px-6 py-3 bg-white border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition shadow-md"
+                  />
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Đến ngày:</label
+                  >
+                  <input
+                          type="date"
+                          id="toDate"
+                          class="px-6 py-3 bg-white border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition shadow-md"
+                  />
+                </div>
+
+                <button
+                        id="filterBtn"
+                        class="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-base rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-xl shadow-blue-500/40 transition transform hover:scale-[1.02] ml-auto"
+                >
+                  <i class="fas fa-filter mr-2"></i> LỌC DỮ LIỆU NGAY
+                </button>
+              </div>
+              <!-- KẾT QUẢ LỘC -->
+              <div class="bg-white rounded-2xl p-6 mt-4">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    KẾT QUẢ THỐNG KÊ
+                  </h3>
+                </div>
+
+                <!-- Bọc chart container với overflow-x-auto -->
+                <div class="overflow-x-auto">
+                  <div class="h-64 flex items-end justify-start gap-2 border-l-2 border-b-2 border-slate-300 pl-4 pb-4 flex-nowrap min-w-max">
+                    <!-- Các chart-bar -->
+                    <div class="chart-bar flex flex-col items-center flex-none group">
+                      <div class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md" style="height: 64px"></div>
+                      <span class="text-xs text-slate-600 mt-2 font-medium">5</span>
+                    </div>
+                    <div class="chart-bar flex flex-col items-center flex-none group">
+                      <div class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md" style="height: 96px"></div>
+                      <span class="text-xs text-slate-600 mt-2 font-medium">8</span>
+                    </div>
+                    <!-- ... các cột khác tương tự -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- dùng script chung -->
+    <div th:replace="fragments/admin-layout :: scripts"></div>
+    <script type="module" src="/pages/admin-dashboard.page.js"></script>
+  </body>
+</html>
