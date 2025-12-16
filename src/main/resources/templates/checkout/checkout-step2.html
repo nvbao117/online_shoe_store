@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -11,11 +11,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/checkout/css/checkout.css}">
+    <link rel="stylesheet" href="/checkout/css/checkout.css">
 </head>
 
 <body>
-
     <div class="checkout-container">
         <!-- Progress Steps -->
         <div class="checkout-progress">
@@ -35,9 +34,16 @@
             </div>
         </div>
 
-        <div class="checkout-content">
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Đang tải...</p>
+        </div>
+
+        <!-- Main Content -->
+        <div id="checkoutContent" class="checkout-content" style="display: none;">
             <!-- Left: Payment Options -->
-            <form class="checkout-form-section" method="post" th:action="@{/checkout/place-order}">
+            <form id="paymentForm" class="checkout-form-section">
                 <!-- Shipping Method -->
                 <div class="section-card">
                     <h2 class="section-title">
@@ -86,10 +92,10 @@
 
                 <!-- Action Buttons -->
                 <div class="form-actions mt-4">
-                    <a th:href="@{/checkout/step1}" class="btn-back">
-                        Quay lại
+                    <a href="/checkout/step1" class="btn-back">
+                        <i class="bi bi-arrow-left"></i> Quay lại
                     </a>
-                    <button type="submit" class="btn btn-primary btn-continue">
+                    <button type="submit" id="submitBtn" class="btn btn-primary btn-continue">
                         Thanh toán
                     </button>
                 </div>
@@ -104,42 +110,8 @@
                     </h2>
 
                     <!-- Product List -->
-                    <div class="order-items">
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="https://via.placeholder.com/60x60/6366f1/fff?text=👟" alt="Product">
-                            </div>
-                            <div class="item-details">
-                                <h4 class="item-name">Dép Thể Thao Bitis Nữ Màu Đen</h4>
-                                <p class="item-variant">BFW007588AC<br>Size: 37 | BFRWG9NA</p>
-                            </div>
-                            <div class="item-qty">1</div>
-                            <div class="item-price">800,000</div>
-                        </div>
-
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="https://via.placeholder.com/60x60/6366f1/fff?text=👟" alt="Product">
-                            </div>
-                            <div class="item-details">
-                                <h4 class="item-name">Dép Thể Thao Bitis Nữ Màu Đen</h4>
-                                <p class="item-variant">BFW007588AC<br>Size: 38 | BFR003758</p>
-                            </div>
-                            <div class="item-qty">1</div>
-                            <div class="item-price">800,000</div>
-                        </div>
-
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="https://via.placeholder.com/60x60/6366f1/fff?text=👟" alt="Product">
-                            </div>
-                            <div class="item-details">
-                                <h4 class="item-name">Dép Thể Thao Bitis Nữ Màu Đen</h4>
-                                <p class="item-variant">BFW007588AC<br>Size: 39 | BFRM025M</p>
-                            </div>
-                            <div class="item-qty">1</div>
-                            <div class="item-price">800,000</div>
-                        </div>
+                    <div id="orderItems" class="order-items">
+                        <!-- Populated by JS -->
                     </div>
 
                     <!-- Coupon Section -->
@@ -149,30 +121,21 @@
                             <input type="text" class="form-control" placeholder="Mã giảm giá">
                             <button class="btn btn-coupon">Sử dụng</button>
                         </div>
-                        <div class="coupon-suggestions">
-                            <span class="coupon-label">Xem thêm mã giảm giá</span>
-                            <button class="coupon-tag">🎁 Giảm 200k</button>
-                            <button class="coupon-tag">🎁 Giảm 200k</button>
-                        </div>
                     </div>
 
                     <!-- Price Summary -->
                     <div class="price-summary">
                         <div class="price-row">
                             <span>Tạm tính</span>
-                            <span class="price-value">600000</span>
-                        </div>
-                        <div class="price-row discount">
-                            <span>Khuyến mãi</span>
-                            <span class="price-value">-60000</span>
+                            <span id="subtotal" class="price-value">0₫</span>
                         </div>
                         <div class="price-row">
                             <span>Phí vận chuyển</span>
-                            <span class="price-value">0</span>
+                            <span class="price-value">Miễn phí</span>
                         </div>
                         <div class="price-row total">
                             <span>Tổng cộng</span>
-                            <span class="price-value">0</span>
+                            <span id="total" class="price-value">0₫</span>
                         </div>
                     </div>
                 </div>
@@ -182,7 +145,107 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/checkout/js/checkout.js}"></script>
+    <script src="/checkout/js/checkout.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if shipping data exists
+            const shippingData = sessionStorage.getItem('checkoutShippingData');
+            if (!shippingData) {
+                window.location.href = '/checkout/step1';
+                return;
+            }
+
+            // Load checkout data
+            loadCheckoutDataStep2();
+
+            // Handle payment form submission
+            document.getElementById('paymentForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+
+                try {
+                    const shippingInfo = JSON.parse(sessionStorage.getItem('checkoutShippingData'));
+                    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+                    const shippingMethod = document.querySelector('input[name="shippingMethod"]:checked').value;
+
+                    const requestData = {
+                        ...shippingInfo,
+                        paymentMethod: paymentMethod,
+                        shippingMethod: shippingMethod
+                    };
+
+                    const response = await fetch('/api/checkout/place-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Clear session storage
+                        sessionStorage.removeItem('checkoutShippingData');
+
+                        if (result.paymentUrl) {
+                            // Redirect to payment gateway
+                            window.location.href = result.paymentUrl;
+                        } else {
+                            // Redirect to success page
+                            window.location.href = '/checkout/success?orderId=' + result.orderId;
+                        }
+                    } else {
+                        throw new Error(result.error || 'Đặt hàng thất bại');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Thanh toán';
+                }
+            });
+        });
+
+        async function loadCheckoutDataStep2() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const checkoutContent = document.getElementById('checkoutContent');
+
+            try {
+                const response = await fetch('/api/checkout/data');
+
+                if (!response.ok) {
+                    throw new Error('Failed to load checkout data');
+                }
+
+                const data = await response.json();
+
+                // Populate cart items
+                populateCartItems(data.cartItems);
+                populatePriceSummary(data.subtotal, data.total);
+
+                // Init method selection
+                initMethodSelection();
+
+                // Show content
+                if (loadingIndicator) loadingIndicator.style.display = 'none';
+                if (checkoutContent) checkoutContent.style.display = 'grid';
+
+            } catch (error) {
+                console.error('Error:', error);
+                if (loadingIndicator) {
+                    loadingIndicator.innerHTML = `
+                        <div class="alert alert-danger">Không thể tải dữ liệu. Vui lòng thử lại.</div>
+                        <a href="/checkout/step1" class="btn btn-outline-primary">Quay lại</a>
+                    `;
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>

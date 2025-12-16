@@ -2,18 +2,23 @@ package com.example.online_shoe_store.Controller;
 
 import com.example.online_shoe_store.Entity.Order;
 import com.example.online_shoe_store.Entity.Payment;
+import com.example.online_shoe_store.Entity.ShipDetail;
 import com.example.online_shoe_store.Entity.User;
 import com.example.online_shoe_store.Repository.OrderRepository;
 import com.example.online_shoe_store.Repository.PaymentRepository;
+import com.example.online_shoe_store.Repository.ShipDetailRepository;
 import com.example.online_shoe_store.Repository.UserRepository;
+import com.example.online_shoe_store.Service.CartService;
 import com.example.online_shoe_store.Service.CheckoutService;
 import com.example.online_shoe_store.Service.PaymentService;
 import com.example.online_shoe_store.Service.VNPayService;
 import com.example.online_shoe_store.dto.request.PaymentCreateRequest;
 import com.example.online_shoe_store.dto.request.CheckoutRequest;
+import com.example.online_shoe_store.dto.response.CartItemResponse;
 import com.example.online_shoe_store.dto.response.PaymentResponse;
 import com.example.online_shoe_store.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -22,7 +27,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -37,30 +44,48 @@ public class CheckoutController {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final VNPayService vnPayService;
+    private final CartService cartService;
+    private final ShipDetailRepository shipDetailRepository;
 
     @GetMapping("/step1")
-    public String step1(Model model) {
+    public String step1(HttpSession session) {
         User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
-        model.addAttribute("user", user);
+        
+        @SuppressWarnings("unchecked")
+        List<String> selectedItems = (List<String>) session.getAttribute("selectedCartItems");
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            return "redirect:/templates/cart";
+        }
+        
+        // Data is now loaded via /api/checkout/data
         return "checkout/checkout-step1";
     }
 
     @GetMapping("/step2")
-    public String step2(Model model) {
+    public String step2(HttpSession session) {
         User user = getCurrentUser();
         if (user == null) {
             return "redirect:/login";
         }
-        model.addAttribute("user", user);
+        
+        @SuppressWarnings("unchecked")
+        List<String> selectedItems = (List<String>) session.getAttribute("selectedCartItems");
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            return "redirect:/templates/cart";
+        }
+        
+        // Data is now loaded via /api/checkout/data
         return "checkout/checkout-step2";
     }
+
 
     @PostMapping("/place-order")
     public String placeOrder(@ModelAttribute CheckoutRequest request,
                              HttpServletRequest httpRequest,
+                             HttpSession session,
                              Model model) {
         User user = getCurrentUser();
         if (user == null) {
@@ -68,8 +93,26 @@ public class CheckoutController {
         }
 
         try {
-            // Tạo order
-            String orderId = checkoutService.placeOrder(user, request);
+            // Merge shipping data from session (step1) with payment data from form (step2)
+            CheckoutRequest savedRequest = (CheckoutRequest) session.getAttribute("checkoutRequest");
+            if (savedRequest != null) {
+                // Copy shipping info from step1
+                request.setFullName(savedRequest.getFullName());
+                request.setEmail(savedRequest.getEmail());
+                request.setPhone(savedRequest.getPhone());
+                request.setAddress(savedRequest.getAddress());
+                request.setCity(savedRequest.getCity());
+                request.setDistrict(savedRequest.getDistrict());
+                request.setWard(savedRequest.getWard());
+                request.setShippingType(savedRequest.getShippingType());
+            }
+            
+            // Get selected cart items from session
+            @SuppressWarnings("unchecked")
+            List<String> selectedCartItems = (List<String>) session.getAttribute("selectedCartItems");
+            
+            // Tạo order (only for selected items)
+            String orderId = checkoutService.placeOrder(user, request, selectedCartItems);
 
             // Tạo Payment qua PaymentService
             String paymentMethod = request.getPaymentMethod();
@@ -97,7 +140,10 @@ public class CheckoutController {
                 return "redirect:" + response.getPaymentUrl();
             }
 
-            // Nếu COD → redirect đến trang thành công với paymentId
+            // Nếu COD → thanh toán thành công ngay → soft delete cart items
+            checkoutService.softDeleteUserCartItems(user, selectedCartItems);
+            
+            // Redirect đến trang thành công với paymentId
             return "redirect:/checkout/success?paymentId=" + response.getPaymentId();
 
         } catch (BusinessException e) {
@@ -108,9 +154,6 @@ public class CheckoutController {
         }
     }
 
-    /**
-     * Trang thành công - hỗ trợ cả paymentId và orderId (legacy)
-     */
     @GetMapping("/success")
     public String checkoutSuccess(
             @RequestParam(required = false) String paymentId,
@@ -145,7 +188,7 @@ public class CheckoutController {
     }
 
     /**
-     * Trang thất bại - hỗ trợ cả paymentId và orderId (legacy)
+     * Trang thất bại - hỗ trợ cả paymentId     và orderId (legacy)
      */
     @GetMapping("/failure")
     public String checkoutFailure(
