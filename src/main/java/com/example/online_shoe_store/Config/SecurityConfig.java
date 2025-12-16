@@ -49,6 +49,7 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/webjars/**",
                                 "/static/**",
+                                "/videos/**",
                                 "/assets/**"
                         ).permitAll()
 
