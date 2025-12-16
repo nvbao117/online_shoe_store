@@ -15,6 +15,7 @@
       <!-- Main Content -->
       <main class="lg:ml-64 p-4 lg:p-8 min-h-screen">
         <div class="space-y-6">
+          <!-- Thời gian bao cáo -->
           <div class="bg-white rounded-2xl p-4 shadow-lg">
             <h3
               class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b pb-2"
@@ -34,9 +35,9 @@
               </svg>
               Chọn Thời Gian Báo Cáo:
             </h3>
-            <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3 mb-6">
               <button
-                class="time-btn active px-4 py-2 rounded-xl text-sm font-medium bg-blue-600 text-white shadow-md"
+                class="time-btn active px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
                 data-value="today"
               >
                 Hôm nay
@@ -59,11 +60,72 @@
               >
                 1 năm
               </button>
-              <div class="text-xs text-slate-500 ml-auto hidden sm:block">
-                (Hoặc sử dụng bộ lọc tùy chỉnh bên dưới)
+              <button
+                class="time-btn px-4 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+                data-value="option-time"
+              >
+                Bộ lọc tùy chỉnh
+              </button>
+            </div>
+            <div id="custom-filter" class="hidden">
+              <h3
+                class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b pb-2"
+              >
+                <svg
+                  class="w-4 h-4 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
+                Bộ Lọc Tùy Chỉnh:
+              </h3>
+              <div class="flex flex-wrap items-end gap-4">
+                <div class="flex flex-col">
+                  <label
+                    for="start-date"
+                    class="text-xs font-medium text-slate-600 mb-1"
+                    >Từ ngày:</label
+                  >
+                  <input
+                    type="date"
+                    id="start-date"
+                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-blue-500 focus:border-blue-500 w-full"
+                  />
+                </div>
+                <div class="flex flex-col">
+                  <label
+                    for="end-date"
+                    class="text-xs font-medium text-slate-600 mb-1"
+                    >Đến ngày:</label
+                  >
+                  <input
+                    type="date"
+                    id="end-date"
+                    class="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-blue-500 focus:border-blue-500 w-full"
+                  />
+                </div>
+                <button
+                  class="px-4 py-2 rounded-xl text-sm font-medium bg-green-600 text-white shadow-md hover:bg-green-700 transition"
+                >
+                  Áp dụng
+                </button>
               </div>
             </div>
           </div>
+          <!-- 4 Card -->
           <div class="space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <!-- LEFT: STAT CARDS -->
@@ -92,11 +154,12 @@
                       />
                     </svg>
                   </div>
-
-                  <div class="text-2xl font-extrabold text-blue-900 mb-2">
-                    200
+                  <div
+                    id="totalOrders"
+                    class="text-2xl font-extrabold text-blue-900 mb-2"
+                  >
+                    0
                   </div>
-
                   <button
                     class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition"
                   >
@@ -129,8 +192,11 @@
                     </svg>
                   </div>
 
-                  <div class="text-2xl font-extrabold text-purple-900 mb-2">
-                    200M
+                  <div
+                    id="totalRevenue"
+                    class="text-2xl font-extrabold text-purple-900 mb-2"
+                  >
+                    0
                   </div>
 
                   <button
@@ -163,8 +229,11 @@
                     </svg>
                   </div>
 
-                  <div class="text-2xl font-extrabold text-green-900 mb-2">
-                    2,000
+                  <div
+                    id="totalProducts"
+                    class="text-2xl font-extrabold text-green-900 mb-2"
+                  >
+                    0
                   </div>
 
                   <button
@@ -214,11 +283,12 @@
                 </div>
               </div>
 
-              <!-- RIGHT: CHART -->
+              <!-- TRẠNG THÁI ĐƠN HÀNG -->
               <div class="lg:col-span-4">
                 <div
                   class="bg-white rounded-xl p-4 shadow-md h-full flex flex-col"
                 >
+                  <!-- TITLE -->
                   <h3
                     class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2"
                   >
@@ -238,12 +308,14 @@
                     Trạng thái đơn hàng
                   </h3>
 
+                  <!-- CHART -->
                   <div class="flex-1 flex items-center justify-center">
                     <div class="relative w-32 h-32">
                       <svg
                         class="w-full h-full -rotate-90"
                         viewBox="0 0 100 100"
                       >
+                        <!-- background -->
                         <circle
                           cx="50"
                           cy="50"
@@ -252,328 +324,142 @@
                           stroke="#f1f5f9"
                           stroke-width="10"
                         />
+
+                        <!-- NEW -->
                         <circle
+                          id="chart-new"
                           cx="50"
                           cy="50"
                           r="40"
                           fill="none"
                           stroke="#3b82f6"
                           stroke-width="10"
-                          stroke-dasharray="100.53 251.32"
                         />
+                        <!-- PROCESSING -->
                         <circle
+                          id="chart-processing"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#f59e0b"
+                          stroke-width="10"
+                        />
+                        <!-- COMPLETED -->
+                        <circle
+                          id="chart-completed"
                           cx="50"
                           cy="50"
                           r="40"
                           fill="none"
                           stroke="#10b981"
                           stroke-width="10"
-                          stroke-dasharray="125.66 251.32"
-                          stroke-dashoffset="-100.53"
                         />
+
+                        <!-- CANCELLED -->
                         <circle
+                          id="chart-cancelled"
                           cx="50"
                           cy="50"
                           r="40"
                           fill="none"
                           stroke="#ef4444"
                           stroke-width="10"
-                          stroke-dasharray="25.13 251.32"
-                          stroke-dashoffset="-226.19"
+                        />
+                        <!-- RETURNED -->
+                        <circle
+                          id="chart-returned"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="#8b5cf6"
+                          stroke-width="10"
                         />
                       </svg>
 
+                      <!-- CENTER TEXT -->
                       <div
                         class="absolute inset-0 flex items-center justify-center"
                       >
                         <div class="text-center">
-                          <div class="text-xl font-extrabold text-blue-600">
-                            40%
+                          <div
+                            id="chart-main-percent"
+                            class="text-xl font-extrabold text-blue-600"
+                          >
+                            --
                           </div>
-                          <div class="text-[11px] text-slate-600">Mới</div>
+                          <div
+                            id="chart-main-label"
+                            class="text-[11px] text-slate-600"
+                          >
+                            --
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
+                  <!-- LEGEND -->
                   <div class="space-y-2 mt-3 text-sm">
                     <div class="flex justify-between">
                       <span class="flex items-center gap-2">
                         <span
                           class="w-2.5 h-2.5 bg-blue-500 rounded-full"
-                        ></span
-                        >Mới
+                        ></span>
+                        Mới
                       </span>
-                      <span class="font-semibold">40%</span>
+                      <span class="font-semibold" id="percent-new">--%</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-orange-500 rounded-full"
+                        ></span>
+                        Đang xử lí
+                      </span>
+                      <span class="font-semibold" id="percent-processing">--%</span
+                      >
                     </div>
                     <div class="flex justify-between">
                       <span class="flex items-center gap-2">
                         <span
                           class="w-2.5 h-2.5 bg-green-500 rounded-full"
-                        ></span
-                        >Đã giao
+                        ></span>
+                        Hoàn thành
                       </span>
-                      <span class="font-semibold">50%</span>
+                      <span class="font-semibold" id="percent-completed"
+                        >--%</span
+                      >
+                    </div>
+
+                    <div class="flex justify-between">
+                      <span class="flex items-center gap-2">
+                        <span
+                          class="w-2.5 h-2.5 bg-red-500 rounded-full"
+                        ></span>
+                        Đã hủy
+                      </span>
+                      <span class="font-semibold" id="percent-cancelled"
+                        >--%</span
+                      >
                     </div>
                     <div class="flex justify-between">
                       <span class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 bg-red-500 rounded-full"></span
-                        >Đã hủy
+                        <span
+                          class="w-2.5 h-2.5 bg-purple-500 rounded-full"
+                        ></span>
+                        Hoàn hàng
                       </span>
-                      <span class="font-semibold">10%</span>
+                      <span class="font-semibold" id="percent-returned"
+                        >--%</span
+                      >
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-              <h3
-                class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 pb-3 border-b border-slate-200"
-              >
-                <svg
-                  class="w-5 h-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                  ></path>
-                </svg>
-                Thiết Lập Thống Kê & Lọc
-              </h3>
-
-              <div
-                class="flex flex-col lg:flex-row items-start lg:items-center gap-4 mb-5"
-              >
-                <div class="flex items-center gap-3">
-                  <label class="text-sm font-medium text-slate-700"
-                    >Đơn vị thời gian:</label
-                  >
-                  <select
-                    class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  >
-                    <option>ngày/tháng/năm</option>
-                    <option>Ngày</option>
-                    <option>Tháng</option>
-                    <option>Năm</option>
-                  </select>
-                </div>
-
-                <div class="flex items-center gap-3">
-                  <label class="text-sm font-medium text-slate-700"
-                    >Loại dữ liệu:</label
-                  >
-                  <select
-                    class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  >
-                    <option>Đơn/Doanh Thu/SP bán</option>
-                    <option>Đơn</option>
-                    <option>Doanh thu</option>
-                    <option>SP bán</option>
-                  </select>
-                </div>
-              </div>
-
-              <div
-                class="flex flex-col lg:flex-row items-start lg:items-center gap-4 p-5 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200"
-              >
-                <div class="flex items-center gap-3">
-                  <label class="text-sm font-medium text-slate-700"
-                    >Từ ngày:</label
-                  >
-                  <input
-                    type="date"
-                    class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  />
-                </div>
-
-                <div class="flex items-center gap-3">
-                  <label class="text-sm font-medium text-slate-700"
-                    >Đến ngày:</label
-                  >
-                  <input
-                    type="date"
-                    class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  />
-                </div>
-
-                <button
-                  class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-sm rounded-xl hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 transition ml-auto"
-                >
-                  Lọc Dữ Liệu
-                </button>
-              </div>
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-              <div class="flex items-center justify-between mb-6">
-                <h3
-                  class="text-lg font-bold text-slate-800 flex items-center gap-2"
-                >
-                  <svg
-                    class="w-5 h-5 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    ></path>
-                  </svg>
-                  Biểu Đồ Thống Kê Người Dùng
-                </h3>
-
-                <div class="flex items-center gap-2">
-                  <button
-                    class="px-4 py-2 text-xs font-semibold bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition"
-                  >
-                    Lượt Truy Cập
-                  </button>
-                  <button
-                    class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 transition"
-                  >
-                    Theo Tháng
-                  </button>
-                  <button
-                    class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 transition"
-                  >
-                    6 Tháng
-                  </button>
-                  <button
-                    class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 transition"
-                  >
-                    Năm
-                  </button>
-                </div>
-              </div>
-
-              <div
-                class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full text-sm font-semibold text-green-700 mb-6"
-              >
-                <div
-                  class="w-3 h-3 bg-green-500 rounded-full animate-pulse"
-                ></div>
-                482 Người Dùng Mới
-              </div>
-
-              <div
-                class="h-64 flex items-end justify-between gap-2 border-l-2 border-b-2 border-slate-300 pl-4 pb-4"
-              >
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md"
-                    style="height: 64px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium">5</span>
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md"
-                    style="height: 96px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium">8</span>
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md"
-                    style="height: 80px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >11</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg shadow-md"
-                    style="height: 128px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >13</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md"
-                    style="height: 96px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >15</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg shadow-md"
-                    style="height: 160px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >17</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md"
-                    style="height: 112px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >19</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg shadow-md"
-                    style="height: 144px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >21</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md"
-                    style="height: 128px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >23</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg shadow-md"
-                    style="height: 192px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >25</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg shadow-md"
-                    style="height: 144px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >27</span
-                  >
-                </div>
-                <div class="chart-bar flex flex-col items-center flex-1 group">
-                  <div
-                    class="w-full bg-gradient-to-t from-blue-600 to-blue-500 rounded-t-lg shadow-md"
-                    style="height: 160px"
-                  ></div>
-                  <span class="text-xs text-slate-600 mt-2 font-medium"
-                    >29</span
-                  >
-                </div>
-              </div>
-            </div>
-
+            <!-- TOP SAN PHAM -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div
@@ -635,71 +521,10 @@
                         </th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
-                      <tr class="hover:bg-green-50/30 transition">
-                        <td class="px-4 py-3 font-semibold text-slate-700">
-                          1
-                        </td>
-                        <td class="px-4 py-3 font-medium text-slate-900">
-                          Nike Air Max
-                        </td>
-                        <td
-                          class="px-4 py-3 text-right font-bold text-green-700"
-                        >
-                          200
-                        </td>
-                        <td class="px-4 py-3 text-right text-slate-600">10</td>
-                        <td class="px-4 py-3 text-center">
-                          <button
-                            class="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                          >
-                            Xem / Cập nhật
-                          </button>
-                        </td>
-                      </tr>
-                      <tr class="hover:bg-green-50/30 transition">
-                        <td class="px-4 py-3 font-semibold text-slate-700">
-                          2
-                        </td>
-                        <td class="px-4 py-3 font-medium text-slate-900">
-                          Adidas UltraBoost
-                        </td>
-                        <td
-                          class="px-4 py-3 text-right font-bold text-green-700"
-                        >
-                          150
-                        </td>
-                        <td class="px-4 py-3 text-right text-slate-600">25</td>
-                        <td class="px-4 py-3 text-center">
-                          <button
-                            class="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                          >
-                            Xem / Cập nhật
-                          </button>
-                        </td>
-                      </tr>
-                      <tr class="hover:bg-green-50/30 transition">
-                        <td class="px-4 py-3 font-semibold text-slate-700">
-                          3
-                        </td>
-                        <td class="px-4 py-3 font-medium text-slate-900">
-                          Yonex 65Z
-                        </td>
-                        <td
-                          class="px-4 py-3 text-right font-bold text-green-700"
-                        >
-                          120
-                        </td>
-                        <td class="px-4 py-3 text-right text-slate-600">5</td>
-                        <td class="px-4 py-3 text-center">
-                          <button
-                            class="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                          >
-                            Xem / Cập nhật
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
+                    <tbody
+                      id="topSellingBody"
+                      class="divide-y divide-slate-100"
+                    ></tbody>
                   </table>
                 </div>
               </div>
@@ -756,68 +581,130 @@
                         </th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
-                      <tr class="hover:bg-red-50/30 transition">
-                        <td class="px-4 py-3 font-semibold text-slate-700">
-                          1
-                        </td>
-                        <td class="px-4 py-3 font-medium text-slate-900">
-                          Giày XYZ old model
-                        </td>
-                        <td class="px-4 py-3 text-right font-bold text-red-700">
-                          2
-                        </td>
-                        <td class="px-4 py-3 text-right text-slate-600">80</td>
-                        <td class="px-4 py-3 text-center">
-                          <button
-                            class="text-red-600 hover:text-red-800 hover:underline font-medium"
-                          >
-                            Giảm giá / Xả kho
-                          </button>
-                        </td>
-                      </tr>
-                      <tr class="hover:bg-red-50/30 transition">
-                        <td class="px-4 py-3 font-semibold text-slate-700">
-                          2
-                        </td>
-                        <td class="px-4 py-3 font-medium text-slate-900">
-                          Giày cổ cao mẫu cũ
-                        </td>
-                        <td class="px-4 py-3 text-right font-bold text-red-700">
-                          5
-                        </td>
-                        <td class="px-4 py-3 text-right text-slate-600">60</td>
-                        <td class="px-4 py-3 text-center">
-                          <button
-                            class="text-red-600 hover:text-red-800 hover:underline font-medium"
-                          >
-                            Combo / Tặng kèm
-                          </button>
-                        </td>
-                      </tr>
-                      <tr class="hover:bg-red-50/30 transition">
-                        <td class="px-4 py-3 font-semibold text-slate-700">
-                          3
-                        </td>
-                        <td class="px-4 py-3 font-medium text-slate-900">
-                          Giày không thương hiệu
-                        </td>
-                        <td class="px-4 py-3 text-right font-bold text-red-700">
-                          0
-                        </td>
-                        <td class="px-4 py-3 text-right text-slate-600">40</td>
-                        <td class="px-4 py-3 text-center">
-                          <button
-                            class="text-red-600 hover:text-red-800 hover:underline font-medium"
-                          >
-                            Xem lại nhập hàng
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
+                    <tbody
+                      id="topSlowBody"
+                      class="divide-y divide-slate-100"
+                    ></tbody>
                   </table>
                 </div>
               </div>
+            </div>
+            <!-- Bộ lộc -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg mt-8">
+              <h3
+                class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 pb-3 border-b border-slate-200"
+              >
+                <svg
+                  class="w-5 h-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                  ></path>
+                </svg>
+                Thiết Lập Thống Kê & Lọc
+              </h3>
+
+              <div
+                      class="flex flex-col lg:flex-row items-start lg:items-center gap-4 mb-6 p-4 border border-slate-200 rounded-xl bg-white shadow-sm"
+              >
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Đơn vị thời gian:</label
+                  >
+                  <select id="unitSelect"
+                          class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner"
+                  >
+                    <option value="DAY">Ngày</option>
+                    <option value="MONTH">Tháng</option>
+                    <option value="YEAR">Năm</option>
+                  </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Loại dữ liệu:</label
+                  >
+                  <select id="typeSelect"
+                          class="px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner"
+                  >
+                    <option value="REVENUE">Doanh Thu</option>
+                    <option value="ORDER">Đơn Hàng</option>
+                    <option value="PRODUCT">Sản phẩm bán</option>
+                  </select>
+                </div>
+              </div>
+
+              <div
+                      class="flex flex-col lg:flex-row items-start lg:items-center gap-4 p-6 bg-gradient-to-r from-sky-50 to-blue-100 rounded-2xl border border-blue-200 shadow-xl"
+              >
+                <h3 class="text-lg font-bold text-blue-800 mb-2 lg:mb-0 mr-4">
+                  Lọc Theo Khoảng Thời Gian:
+                </h3>
+
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Từ ngày:</label
+                  >
+                  <input
+                          type="date"
+                          id="fromDate"
+                          class="px-6 py-3 bg-white border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition shadow-md"
+                  />
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <label class="text-sm font-semibold text-slate-700"
+                  >Đến ngày:</label
+                  >
+                  <input
+                          type="date"
+                          id="toDate"
+                          class="px-6 py-3 bg-white border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition shadow-md"
+                  />
+                </div>
+
+                <button
+                        id="filterBtn"
+                        class="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-base rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-xl shadow-blue-500/40 transition transform hover:scale-[1.02] ml-auto"
+                >
+                  <i class="fas fa-filter mr-2"></i> LỌC DỮ LIỆU NGAY
+                </button>
+              </div>
+              <!-- KẾT QUẢ LỘC -->
+              <div class="bg-white rounded-2xl p-6 mt-4">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    KẾT QUẢ THỐNG KÊ
+                  </h3>
+                </div>
+
+                <!-- Bọc chart container với overflow-x-auto -->
+                <div class="overflow-x-auto">
+                  <div class="h-64 flex items-end justify-start gap-2 border-l-2 border-b-2 border-slate-300 pl-4 pb-4 flex-nowrap min-w-max">
+                    <!-- Các chart-bar -->
+                    <div class="chart-bar flex flex-col items-center flex-none group">
+                      <div class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md" style="height: 64px"></div>
+                      <span class="text-xs text-slate-600 mt-2 font-medium">5</span>
+                    </div>
+                    <div class="chart-bar flex flex-col items-center flex-none group">
+                      <div class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md" style="height: 96px"></div>
+                      <span class="text-xs text-slate-600 mt-2 font-medium">8</span>
+                    </div>
+                    <!-- ... các cột khác tương tự -->
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -826,5 +713,6 @@
 
     <!-- dùng script chung -->
     <div th:replace="fragments/admin-layout :: scripts"></div>
+    <script type="module" src="/pages/admin-dashboard.page.js"></script>
   </body>
 </html>
