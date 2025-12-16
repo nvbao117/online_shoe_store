@@ -7,6 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductVariantRepository extends JpaRepository<ProductVariant, String>{
+public interface ProductVariantRepository extends JpaRepository<ProductVariant, String> {
+
     List<ProductVariant> findByProductProductId(String productId);
+
+    // Kiểm tra xem có biến thể nào của ProductId đó, size đó mà stock > 0 không
+    boolean existsByProduct_ProductIdAndSizeAndStockGreaterThan(String productId, String size, Integer minStock);
 }

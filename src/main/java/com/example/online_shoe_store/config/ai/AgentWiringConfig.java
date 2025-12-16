@@ -11,6 +11,11 @@ import com.example.online_shoe_store.Service.ai.agent.operations.InventoryAgent;
 import com.example.online_shoe_store.Service.ai.agent.marketing.MarketingAgent;
 import com.example.online_shoe_store.Service.ai.agent.system.SummarizerAgent;
 import com.example.online_shoe_store.Service.ai.tool.*;
+// Import thêm cho Product Advisor Agent
+import com.example.online_shoe_store.Service.ai.agent.ProductAdvisorAgent;
+import dev.langchain4j.model.chat.StreamingChatModel; // Import đúng cho Streaming
+import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel;
+
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
@@ -21,17 +26,24 @@ import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value; // Thêm Value để lấy API Key
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 
 @Configuration
 @Slf4j
 public class AgentWiringConfig {
 
+    // Thêm biến lấy API Key (cần thiết để tạo Streaming Model tại chỗ)
+    @Value("${anthropic.api.key}")
+    private String anthropicApiKey;
+
     // ═══════════════════════════════════════════
     // ORCHESTRATION LAYER
     // ═══════════════════════════════════════════
-    
+
     @Bean
     public OrchestratorAgent orchestratorAgent(
             @Qualifier("orchestratorModel") ChatModel model
@@ -55,7 +67,7 @@ public class AgentWiringConfig {
     // ═══════════════════════════════════════════
     // SALES DOMAIN (with Tools)
     // ═══════════════════════════════════════════
-    
+
     @Bean
     public SearchAgent searchAgent(
             @Qualifier("workerModel") ChatModel model,
@@ -109,7 +121,7 @@ public class AgentWiringConfig {
     // ═══════════════════════════════════════════
     // SUPPORT DOMAIN (with Tools + RAG)
     // ═══════════════════════════════════════════
-    
+
     @Bean
     public SupportAgent supportAgent(
             @Qualifier("workerModel") ChatModel model,
@@ -128,7 +140,7 @@ public class AgentWiringConfig {
     // ═══════════════════════════════════════════
     // OPERATIONS DOMAIN (with Tools)
     // ═══════════════════════════════════════════
-    
+
     @Bean
     public LogisticsAgent logisticsAgent(
             @Qualifier("workerModel") ChatModel model,
@@ -156,7 +168,7 @@ public class AgentWiringConfig {
     // ═══════════════════════════════════════════
     // MARKETING DOMAIN (with Tools)
     // ═══════════════════════════════════════════
-    
+
     @Bean
     public MarketingAgent marketingAgent(
             @Qualifier("workerModel") ChatModel model,
@@ -172,7 +184,7 @@ public class AgentWiringConfig {
     // ═══════════════════════════════════════════
     // CONTENT RETRIEVERS (RAG)
     // ═══════════════════════════════════════════
-    
+
     @Bean
     public ContentRetriever faqRetriever(
             @Qualifier("faqEmbeddingStore") EmbeddingStore<TextSegment> store,
@@ -183,6 +195,29 @@ public class AgentWiringConfig {
                 .embeddingModel(embeddingModel)
                 .maxResults(3)
                 .minScore(0.7)
+                .build();
+    }
+
+    // ═══════════════════════════════════════════
+    // PRODUCT ADVISOR AGENT (STREAMING)
+    // ═══════════════════════════════════════════
+
+    @Bean
+    public ProductAdvisorAgent productAdvisorAgent(
+            ProductAdvisorTools advisorTools
+    ) {
+        // Tạo Streaming Model riêng (Sonnet) để tư vấn thông minh hơn Worker Model
+        StreamingChatModel streamingModel = AnthropicStreamingChatModel.builder()
+                .apiKey(anthropicApiKey)
+                .modelName("claude-3-5-sonnet-20240620")
+                .temperature(0.5)
+                .timeout(Duration.ofSeconds(60))
+                .build();
+
+        return AiServices.builder(ProductAdvisorAgent.class)
+                .streamingChatModel(streamingModel) // SỬA: Dùng hàm đúng chuẩn
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(20))
+                .tools(advisorTools)
                 .build();
     }
 }
