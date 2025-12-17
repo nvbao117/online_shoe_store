@@ -70,7 +70,7 @@
             <!-- Logo + Hotline -->
             <div class="d-flex align-items-center header-left">
                 <!-- Logo -->
-                <a th:href="@{/static}" class="header-logo">
+                <a th:href="@{/home}" class="header-logo">
                     <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="5A STORE" class="header-logo-img">
                 </a>
 
@@ -84,17 +84,27 @@
             </div>
 
             <!-- Ô tìm kiếm -->
-            <div class="header-search flex-grow-1 mx-4">
+            <div class="header-search flex-grow-1 mx-4 position-relative">
                 <form th:action="@{/search}" method="get" class="search-form d-flex">
                     <input type="text"
                            class="form-control search-input"
                            name="keyword"
-                           placeholder="Tìm kiếm sản phẩm...">
+                           placeholder="Tìm kiếm sản phẩm..."
+                           autocomplete="off">
                     <button type="submit" class="btn search-btn">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
+                <ul id="search-suggest"
+                    class="list-group position-absolute mt-1 bg-white shadow-xl rounded-xl overflow-hidden d-none"
+                    style="top: 100%;
+           z-index: 1000;
+           width: 60%;
+           left: 50%;
+           transform: translateX(-50%);">
+                </ul>
             </div>
+
 
             <!-- Tài khoản + Giỏ hàng (kiểu giống hình 2) -->
             <div class="header-right d-flex align-items-center">
@@ -108,7 +118,7 @@
                 <!-- ĐÃ đăng nhập -->
                 <a href="/profile"
                    id="userProfile"
-                   class="header-right-item me-3 d-flex align-items-center text-decoration-none text-dark d-none">
+                   class="header-right-item me-3 d-flex align-items-center text-decoration-none text-dark">
 
                     <div class="icon-circle">
                         <i class="bi bi-person"></i>
@@ -157,7 +167,6 @@
             </ul>
         </div>
     </nav>
-
 </header>
 </body>
 </html>

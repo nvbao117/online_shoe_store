@@ -10,7 +10,6 @@ public class ProductDetailPageController {
 
     @GetMapping("/product-detail/{id}")
     public String productDetailPage(@PathVariable String id) {
-        // No server-side data loading - data is fetched via API in frontend
         return "product-detail/product-detail";
     }
 

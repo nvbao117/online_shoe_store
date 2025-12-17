@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,6 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
     Optional<Product> findDetailById(@Param("id") String id);
 
     List<Product> findByCategoryCategoryId(String categoryId);
+
+    List<Product> findByNameContainingIgnoreCase(String name);
 }
