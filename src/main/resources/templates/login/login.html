@@ -22,7 +22,11 @@
 
 <!-- ====================== VIDEO BACKGROUND (DÙNG CHUNG) ====================== -->
 <div class="auth-bg-video-wrapper">
-  <video class="auth-bg-video" id="authBgVideo" autoplay muted playsinline>
+  <video class="auth-bg-video" id="authBgVideo"
+         autoplay muted playsinline
+         preload="metadata"
+         disablepictureinpicture
+         th:poster="@{/images/login-bg-poster.png}">
     Trình duyệt của bạn không hỗ trợ video.
   </video>
 </div>
@@ -117,10 +121,10 @@
 
       <!-- Social buttons -->
       <div class="d-flex justify-content-between gap-2 login-social-row">
-        <button type="button" class="btn login-social-btn flex-fill">
-          <img th:src="@{/images/icon/google-logo.png}" alt="Google" class="social-logo">
-          <span>Google</span>
-        </button>
+          <a th:href="@{/oauth2/authorization/google}" class="btn login-social-btn flex-fill">
+            <img th:src="@{/images/icon/google-logo.png}" alt="Google" class="social-logo">
+            <span>Google</span>
+          </a>
 
         <button type="button" class="btn login-social-btn flex-fill">
           <img th:src="@{/images/icon/facebook-logo.png}" alt="Facebook" class="social-logo">
@@ -149,10 +153,10 @@
 <!-- 1) Khai báo danh sách video cho TRANG LOGIN -->
 <script th:inline="javascript">
   window.AUTH_VIDEO_SOURCES = [
-    "/videos/basketball.mp4",
-    "/videos/football.mp4",
-    "/videos/badminton.mp4",
-    "/videos/pingpong.mp4"
+    /*[[@{/videos/basketball.mp4}]]*/,
+    /*[[@{/videos/football.mp4}]]*/,
+    /*[[@{/videos/badminton.mp4}]]*/,
+    /*[[@{/videos/pingpong.mp4}]]*/
   ];
 </script>
 

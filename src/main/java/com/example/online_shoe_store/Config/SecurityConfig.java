@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.Config;
+package com.example.online_shoe_store.config;
 
 import com.example.online_shoe_store.Security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +11,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import com.example.online_shoe_store.Repository.UserRepository;
+import com.example.online_shoe_store.Security.jwt.AppLogoutSuccessHandler;
+import com.example.online_shoe_store.Security.jwt.JwtCookieAuthFilter;
+import com.example.online_shoe_store.Security.jwt.JwtService;
+import com.example.online_shoe_store.Security.jwt.RefreshTokenService;
+import com.example.online_shoe_store.Security.oauth2.OAuth2LoginFailureHandler;
+import com.example.online_shoe_store.Security.oauth2.OAuth2LoginSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -21,23 +29,28 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public JwtCookieAuthFilter jwtCookieAuthFilter(JwtService jwtService,
+                                                   RefreshTokenService refreshTokenService,
+                                                   UserRepository userRepository) {
+        return new JwtCookieAuthFilter(jwtService, refreshTokenService, customUserDetailsService, userRepository);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           JwtCookieAuthFilter jwtCookieAuthFilter,
+                                           OAuth2LoginSuccessHandler oauth2SuccessHandler,
+                                           OAuth2LoginFailureHandler oauth2FailureHandler,
+                                           AppLogoutSuccessHandler appLogoutSuccessHandler) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ PUBLIC: auth pages
-                        .requestMatchers("/login", "/register").permitAll()
-
-                        // ✅ PUBLIC: web pages
+                        .requestMatchers("/login", "/register", "/forgot-password").permitAll()
+                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/", "/home", "/products", "/sale-off", "/product-detail/**", "/admin/**").permitAll()
-
-                        // ✅ PUBLIC: API cho trang home/detail (nếu bạn muốn public hết API thì giữ /api/**)
                         .requestMatchers("/api/**").permitAll()
-
-                        // ✅ PUBLIC: static resources
                         .requestMatchers(
                                 "/images/**",
                                 "/src/data/images/**",
@@ -49,13 +62,12 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/webjars/**",
                                 "/static/**",
-                                "/assets/**"
+                                "/videos/**",
+                                "/assets/**",
+                                "/error"
                         ).permitAll()
-
-                        // còn lại bắt login
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(login -> login
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -63,15 +75,22 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
-
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .successHandler(oauth2SuccessHandler)
+                        .failureHandler(oauth2FailureHandler)
+                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutSuccessHandler(appLogoutSuccessHandler)
                         .permitAll()
                 );
 
+        http.addFilterBefore(jwtCookieAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
