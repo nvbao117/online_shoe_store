@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.config;
+package com.example.online_shoe_store.Config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
