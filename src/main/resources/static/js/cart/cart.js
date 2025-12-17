@@ -94,14 +94,18 @@ function updateQuantity(id, change) {
 }
 
 function deleteItem(id) {
-    if(!confirm('Xóa sản phẩm này khỏi giỏ hàng?')) return;
-
-    // GỌI API TỪ FILE MỚI
+    // 2. Gọi API xóa
     CartAPI.remove(id)
         .then(res => {
-            if (res.ok) window.location.reload();
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                console.error("Lỗi xóa sản phẩm (Server trả về lỗi):", res.status);
+            }
         })
-        .catch(err => console.error("Lỗi xóa:", err));
+        .catch(err => {
+            console.error("Lỗi kết nối:", err);
+        });
 }
 
 function openVariantModal(name, pid, cid) {

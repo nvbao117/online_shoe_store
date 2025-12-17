@@ -92,10 +92,10 @@ public class CartAPIController {
 
     @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<?> removeItem(@PathVariable String itemId, Principal principal) {
-        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập");
+        //if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập");
         try {
             cartService.deleteCartItem(itemId);
-            return ResponseEntity.ok("Đã xóa sản phẩm khỏi giỏ hàng");
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi xóa sản phẩm");
         }

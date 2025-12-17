@@ -138,7 +138,9 @@ public class CartService {
     public int getCartItemCount(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || user.getCart() == null) return 0;
-        return user.getCart().getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
+        return user.getCart().getCartItems().stream()
+                .filter(item -> Boolean.TRUE.equals(item.getIsActive()))
+                .mapToInt(CartItem::getQuantity).sum();
     }
 
     public String getUserFullName(String username) {
