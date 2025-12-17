@@ -11,4 +11,14 @@ public class AdminViewController {
     public String adminHome() {
         return "/admin/dashboard";
     }
+
+    @GetMapping("/users")
+    public String adminUsers() {
+        return "/admin/users";
+    }
+
+    @GetMapping("/users/{id}")
+    public String adminUserDetail() {
+        return "/admin/user-detail";
+    }
 }
