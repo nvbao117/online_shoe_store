@@ -21,7 +21,7 @@ input.addEventListener("input", () => {
 
     debounceTimer = setTimeout(() => {
         fetchProductsByKeyword(keyword).then(products => {
-            renderSuggest(products);
+            renderSuggest(products, keyword);
         })
     }, 300); // debounce 300ms
 });
