@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class HomeViewController {
 
+    // Redirect root to /home
+    @GetMapping
+    public String root() {
+        return "redirect:/home";
+    }
+
     @GetMapping("/home")
     public String home() {
         return "/home/home";
