@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.Config.ai;
+package com.example.online_shoe_store.config.ai;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;

@@ -14,9 +14,8 @@ public class CheckoutRequest {
     private String ward;
     private String shippingType;
     
-    // From Step 2
     private String paymentMethod;
-    private String shippingMethod; // Freeship etc.
+    private String shippingMethod;
     
     private String note;
 }
