@@ -1,6 +1,5 @@
 // /api/product.api.js
 
-
 import {renderProductGrid} from "../ui/product-list.ui.js"
 export async function fetchProducts() {
     const res = await fetch("/api/products");
