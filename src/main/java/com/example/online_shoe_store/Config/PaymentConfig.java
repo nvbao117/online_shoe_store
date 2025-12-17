@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.config;
+package com.example.online_shoe_store.Config;
 
 import lombok.Getter;
 import lombok.Setter;
