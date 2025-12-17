@@ -262,13 +262,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             // Cập nhật chấm đỏ (Sử dụng biến đã khai báo trong els)
-            if (els.cartBadge) {
-                els.cartBadge.textContent = data.cartCount;
-                els.cartBadge.classList.remove('d-none');
+            const badge = document.getElementById("cart-badge");
+            if (badge && data.cartCount !== undefined) {
+                badge.innerText = data.cartCount;   // Gán số mới
+                badge.classList.remove('d-none');   // Hiện badge nếu đang ẩn
+
+                // Hiệu ứng nháy nhẹ để gây chú ý (Optional)
+                badge.style.transform = "scale(1.5)";
+                setTimeout(() => badge.style.transform = "scale(1)", 200);
             }
 
             if (isBuyNow) {
-                // SỬA: Dùng đường dẫn /templates/cart để khớp với Controller của bạn
                 window.location.href = `/templates/cart?buyNowItem=${productId}&size=${encodeURIComponent(selectedSize)}`;
             } else {
                 alert("✅ " + data.message);

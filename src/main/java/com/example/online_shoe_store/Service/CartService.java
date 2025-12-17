@@ -3,6 +3,7 @@ package com.example.online_shoe_store.Service;
 import com.example.online_shoe_store.Entity.*;
 import com.example.online_shoe_store.Repository.*;
 import com.example.online_shoe_store.dto.response.CartItemResponse;
+import com.example.online_shoe_store.dto.response.ProductVariantDTO; // Import DTO mới
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,45 +24,65 @@ public class CartService {
     private final ProductVariantRepository variantRepository;
     private final CartRepository cartRepository;
 
-    // --- 1. THÊM SẢN PHẨM VÀO GIỎ (Dùng cho Product Detail) ---
+    // --- 1. HÀM XỬ LÝ ẢNH (Fix lỗi ảnh không hiện) ---
+    private String getPublicImageUrl(String raw) {
+        if (raw == null || raw.isEmpty()) return "/images/no-image.png"; // Ảnh mặc định
+        String v = raw.replace("\\", "/").trim();
+
+        if (v.startsWith("http")) return v; // Nếu là link mạng -> giữ nguyên
+
+        // Cắt bỏ phần src/data/... để lấy đúng path public
+        if (v.contains("/images/products/")) {
+            return "/images/products/" + v.substring(v.lastIndexOf("/images/products/") + 17);
+        }
+        if (v.startsWith("src/data/")) return "/images/products/" + v.substring(9); // Ví dụ đơn giản
+
+        // Mặc định thêm prefix
+        return "/images/products/" + v;
+    }
+
+    // --- 2. ADD TO CART (Có hỗ trợ Test User) ---
     @Transactional
     public void addProductToCart(String username, String productId, String size, int quantity) {
-        // 1. Tìm User
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+        // [TEST MODE] Tự tạo user giả nếu "testuser" chưa tồn tại
+        User user = userRepository.findByUsername(username).orElseGet(() -> {
+            if(username.equals("testuser")) {
+                User newUser = new User();
+                newUser.setUsername("testuser");
+                newUser.setName("Khách trải nghiệm");
+                newUser.setPassword("123");
+                newUser.setEmail("test@gmail.com");
+                return userRepository.save(newUser);
+            }
+            throw new RuntimeException("User không tồn tại");
+        });
 
-        // 2. Lấy giỏ hàng (Nếu chưa có thì tạo mới - đề phòng lỗi data cũ)
         Cart cart = user.getCart();
         if (cart == null) {
             cart = new Cart();
             cart.setCartId(UUID.randomUUID().toString());
             cart.setUser(user);
             cart.setCartItems(new ArrayList<>());
-            cartRepository.save(cart); // Lưu giỏ mới
+            cartRepository.save(cart);
         }
 
-        // 3. Tìm ProductVariant dựa trên ProductID và Size
         List<ProductVariant> variants = variantRepository.findByProductProductId(productId);
-
         ProductVariant targetVariant = variants.stream()
                 .filter(v -> v.getSize() != null && v.getSize().equalsIgnoreCase(size))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Size '" + size + "' không tồn tại hoặc đã hết hàng!"));
+                .orElseThrow(() -> new RuntimeException("Size '" + size + "' không tồn tại!"));
 
-        // 4. Kiểm tra xem Variant này đã có trong giỏ chưa
         Optional<CartItem> existingItemOpt = cart.getCartItems().stream()
                 .filter(item -> item.getProductVariant().getVariantId().equals(targetVariant.getVariantId()))
                 .findFirst();
 
         if (existingItemOpt.isPresent()) {
-            // Trường hợp A: Đã có -> Cộng dồn số lượng
             CartItem existingItem = existingItemOpt.get();
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
             cartItemRepository.save(existingItem);
         } else {
-            // Trường hợp B: Chưa có -> Tạo CartItem mới
             CartItem newItem = new CartItem();
-            newItem.setCartItemId(UUID.randomUUID().toString()); // Tự sinh ID string
+            newItem.setCartItemId(UUID.randomUUID().toString());
             newItem.setCart(cart);
             newItem.setProductVariant(targetVariant);
             newItem.setQuantity(quantity);
@@ -68,87 +90,82 @@ public class CartService {
         }
     }
 
-    // --- 2. ĐẾM SỐ LƯỢNG (Dùng cho chấm đỏ Header) ---
-    @Transactional(readOnly = true)
-    public int getCartItemCount(String username) {
-        User user = userRepository.findByUsername(username).orElse(null);
-
-        // Nếu chưa đăng nhập hoặc chưa có giỏ -> 0
-        if (user == null || user.getCart() == null || user.getCart().getCartItems() == null) {
-            return 0;
-        }
-
-        // Cộng tổng số lượng (quantity) của tất cả item trong giỏ
-        return user.getCart().getCartItems().stream()
-                .mapToInt(CartItem::getQuantity)
-                .sum();
-    }
-
-    // --- 3. LẤY DANH SÁCH HIỂN THỊ TRANG CART ---
+    // --- 3. LẤY LIST GIỎ HÀNG (Áp dụng fix ảnh) ---
     @Transactional(readOnly = true)
     public List<CartItemResponse> getCartItemsByUsername(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || user.getCart() == null) return new ArrayList<>();
 
         return user.getCart().getCartItems().stream()
-                .filter(item -> Boolean.TRUE.equals(item.getIsActive())) // Only active items
-                .map(item -> {
-                    ProductVariant pv = item.getProductVariant();
-                    Product p = pv.getProduct();
-                    BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
-                    return CartItemResponse.builder()
-                            .cartItemId(item.getCartItemId())
-                            .productId(p.getProductId())
-                            .productName(p.getName())
-                            .size(pv.getSize())
-                            .color(pv.getColor())
-                            .imageUrl(p.getImageUrl())
-                            .price(price)
-                            .quantity(item.getQuantity())
-                            .totalPrice(price.multiply(BigDecimal.valueOf(item.getQuantity())))
-                            .build();
-                }).toList();
+          .filter(item -> Boolean.TRUE.equals(item.getIsActive())) 
+          .map(item -> {
+            ProductVariant pv = item.getProductVariant();
+            Product p = pv.getProduct();
+
+            // Xử lý ảnh tại đây
+            String finalImg = getPublicImageUrl(pv.getImageUrl() != null ? pv.getImageUrl() : p.getImageUrl());
+            BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
+
+            return CartItemResponse.builder()
+                    .cartItemId(item.getCartItemId())
+                    .productId(p.getProductId())
+                    .productName(p.getName())
+                    .size(pv.getSize())
+                    .color(pv.getColor())
+                    .imageUrl(finalImg) // <-- Ảnh đã sửa
+                    .price(price)
+                    .quantity(item.getQuantity())
+                    .totalPrice(price.multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .build();
+        }).collect(Collectors.toList());
     }
 
-    // --- 4. CÁC HÀM HỖ TRỢ KHÁC ---
+    // --- 4. LẤY VARIANT (Fix lỗi phân loại JSON) ---
+    public List<ProductVariantDTO> getVariantsByProductId(String productId) {
+        // Convert Entity sang DTO để tránh lỗi vòng lặp JSON
+        return variantRepository.findByProductProductId(productId).stream()
+                .map(v -> new ProductVariantDTO(
+                        v.getVariantId(),
+                        v.getSize(),
+                        v.getColor(),
+                        v.getStock()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // --- Các hàm phụ khác giữ nguyên ---
+    @Transactional(readOnly = true)
+    public int getCartItemCount(String username) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || user.getCart() == null) return 0;
+        return user.getCart().getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
+    }
 
     public String getUserFullName(String username) {
-        return userRepository.findByUsername(username).map(User::getName).orElse("Người dùng");
-    }
-
-    public List<ProductVariant> getVariantsByProductId(String productId) {
-        return variantRepository.findByProductProductId(productId);
+        return userRepository.findByUsername(username).map(User::getName).orElse("Khách hàng");
     }
 
     @Transactional
     public void updateItemQuantity(String cartItemId, int qty) {
-        cartItemRepository.findById(cartItemId).ifPresent(i -> {
-            i.setQuantity(qty);
-            cartItemRepository.save(i);
-        });
+        cartItemRepository.findById(cartItemId).ifPresent(i -> { i.setQuantity(qty); cartItemRepository.save(i); });
     }
 
     @Transactional
-    public void deleteCartItem(String cartItemId) {
-        cartItemRepository.deleteById(cartItemId);
-    }
+    public void deleteCartItem(String cartItemId) { cartItemRepository.deleteById(cartItemId); }
 
     @Transactional
     public void updateItemVariant(String cartItemId, String newVariantId) {
         CartItem item = cartItemRepository.findById(cartItemId).orElseThrow();
         ProductVariant newVariant = variantRepository.findById(newVariantId).orElseThrow();
 
-        // Gộp nếu trùng variant trong giỏ
         Optional<CartItem> duplicate = item.getCart().getCartItems().stream()
                 .filter(ci -> ci.getProductVariant().getVariantId().equals(newVariantId) && !ci.getCartItemId().equals(cartItemId))
                 .findFirst();
 
         if (duplicate.isPresent()) {
-            // Nếu trùng -> Cộng dồn vào cái kia và xóa cái hiện tại
             duplicate.get().setQuantity(duplicate.get().getQuantity() + item.getQuantity());
             cartItemRepository.delete(item);
         } else {
-            // Không trùng -> Cập nhật variant cho item hiện tại
             item.setProductVariant(newVariant);
             cartItemRepository.save(item);
         }
