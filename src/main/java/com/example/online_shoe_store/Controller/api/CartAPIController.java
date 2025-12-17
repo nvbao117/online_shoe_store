@@ -6,10 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.online_shoe_store.dto.response.ProductVariantDTO;
+
 
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -38,7 +41,7 @@ public class CartAPIController {
             int newCount = cartService.getCartItemCount(principal.getName());
 
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Thêm vào giỏ hàng thành công!");
+            //response.put("message", "Thêm vào giỏ hàng thành công!");
             response.put("cartCount", newCount);
 
             return ResponseEntity.ok(response);
@@ -61,12 +64,8 @@ public class CartAPIController {
 
     // --- CÁC API CŨ CỦA BẠN (GIỮ NGUYÊN) ---
     @GetMapping("/variants/{productId}")
-    public ResponseEntity<?> getVariants(@PathVariable String productId) {
-        try {
-            return ResponseEntity.ok(cartService.getVariantsByProductId(productId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tải phân loại");
-        }
+    public ResponseEntity<List<ProductVariantDTO>> getVariants(@PathVariable String productId) {
+        return ResponseEntity.ok(cartService.getVariantsByProductId(productId));
     }
 
     @PutMapping("/update-quantity")
