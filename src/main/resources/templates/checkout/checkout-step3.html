@@ -215,52 +215,50 @@
             <!-- Order Info -->
             <div class="order-info-card">
                 <div class="order-id">
-                    Mã đơn hàng: <strong id="orderIdDisplay">#DH...</strong>
+                    Mã đơn hàng: <strong th:text="${orderId ?: '#DH2024120901'}">DH2024120901</strong>
                 </div>
 
                 <div class="order-detail-row">
                     <span class="label">Người nhận</span>
-                    <span class="value" id="customerName">...</span>
+                    <span class="value" th:text="${customerName ?: 'Nguyễn Văn A'}">Nguyễn Văn A</span>
                 </div>
 
                 <div class="order-detail-row">
                     <span class="label">Số điện thoại</span>
-                    <span class="value" id="phone">...</span>
+                    <span class="value" th:text="${phone ?: '0912 345 678'}">0912 345 678</span>
                 </div>
 
                 <div class="order-detail-row">
                     <span class="label">Địa chỉ</span>
-                    <span class="value" id="address">Đang tải...</span>
+                    <span class="value" th:text="${address ?: '123 Đường ABC, Q.XYZ, TP.HCM'}">123 Đường ABC, Q.XYZ,
+                        TP.HCM</span>
                 </div>
 
                 <div class="order-detail-row">
                     <span class="label">Phương thức thanh toán</span>
-                    <span class="value" id="paymentMethod">Đang tải...</span>
+                    <span class="value" th:text="${paymentMethod ?: 'Thanh toán khi nhận hàng'}">Thanh toán khi nhận
+                        hàng</span>
                 </div>
 
                 <div class="order-total-row">
                     <span>Tổng thanh toán</span>
-                    <span class="total-value" id="totalAmount">Đang tải...</span>
+                    <span class="total-value" th:text="${totalAmount ?: '540,000₫'}">540,000₫</span>
                 </div>
             </div>
 
             <!-- Email Notice -->
             <div class="email-notice">
                 <i class="bi bi-envelope-check"></i>
-                <p>Email xác nhận đã được gửi đến <strong id="email">email@example.com</strong>. Vui lòng kiểm tra hộp
-                    thư
+                <p>Email xác nhận đã được gửi đến <strong
+                        th:text="${email ?: 'email@example.com'}">email@example.com</strong>. Vui lòng kiểm tra hộp thư
                     đến.</p>
             </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <a href="#" id="viewOrderJsonBtn" class="btn-outline-custom">
+                <a th:href="@{/orders}" class="btn-outline-custom">
                     <i class="bi bi-box-seam"></i>
-                    Xem đơn hàng (JSON)
-                </a>
-                <a href="/orders" class="btn-outline-custom">
-                    <i class="bi bi-box-seam"></i>
-                    Lịch sử đơn hàng
+                    Xem đơn hàng
                 </a>
                 <a th:href="@{/}" class="btn-primary-custom">
                     <i class="bi bi-bag"></i>
@@ -272,56 +270,6 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const orderId = params.get('orderId');
-
-            if (!orderId) {
-                alert('Không tìm thấy mã đơn hàng!');
-                return;
-            }
-
-            // Update View Order Link to be a simple alert or redirect to JSON for now as immediate request, 
-            // but effectively we are building the real Order Detail page next. 
-            // Let's point the "Xem đơn hàng" to the new detail page we are about to build.
-            // But wait, user asked for RESTful API.
-            // The button "Xem đơn hàng" in step3 should probably go to /orders/{id} which loads the detail page.
-
-            const viewOrderBtn = document.querySelector('a[href="#"]'); // The one with id viewOrderJsonBtn if I used ID selector
-            if (viewOrderBtn) {
-                viewOrderBtn.href = `/orders/${orderId}`;
-                viewOrderBtn.innerHTML = '<i class="bi bi-box-seam"></i> Xem chi tiết đơn hàng';
-            }
-
-            try {
-                const response = await fetch(`/api/orders/${orderId}`);
-                if (!response.ok) throw new Error('Failed to fetch order');
-                const order = await response.json();
-
-                document.getElementById('orderIdDisplay').textContent = order.orderId;
-                document.getElementById('customerName').textContent = order.customerName;
-                document.getElementById('phone').textContent = order.phone;
-                document.getElementById('address').textContent = order.shippingAddress;
-                document.getElementById('paymentMethod').textContent = order.paymentMethod;
-
-                // Format currency
-                const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-                document.getElementById('totalAmount').textContent = formatter.format(order.finalAmount);
-
-                // We don't have email in response yet, let's just leave it or fetch user info separately if needed. 
-                // For now, let's assume email is not critical or was passed in model (which we are moving away from).
-                // Actually, let's fetch user info or add email to OrderResponse to be clean.
-                // Re-checking OrderResponse... I didn't add Email. 
-                // I will update the HTML to generic text or hide email if null.
-                document.getElementById('email').textContent = 'bạn';
-
-            } catch (error) {
-                console.error(error);
-                alert('Có lỗi khi tải thông tin đơn hàng');
-            }
-        });
-    </script>
 </body>
 
 </html>

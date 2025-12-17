@@ -33,10 +33,6 @@ public class CartItem {
     @Column(name = "added_at", nullable = false, updatable = false)
     private LocalDateTime addedAt;
 
-    @Column(name = "is_active", nullable = false)
-    @Builder.Default
-    private Boolean isActive = true;
-
     @PrePersist
     protected void onCreate() {
         if (cartItemId == null) {
@@ -47,9 +43,6 @@ public class CartItem {
         }
         if (quantity == null) {
             quantity = 1;
-        }
-        if (isActive == null) {
-            isActive = true;
         }
     }
 

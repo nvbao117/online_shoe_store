@@ -48,11 +48,4 @@ public class OrderItem {
             orderItemId = UUID.randomUUID().toString();
         }
     }
-
-    public BigDecimal getTotalPrice() {
-        if (price == null || quantity == null) {
-            return BigDecimal.ZERO;
-        }
-        return price.multiply(BigDecimal.valueOf(quantity));
-    }
 }

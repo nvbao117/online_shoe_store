@@ -90,24 +90,23 @@ public class CartService {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || user.getCart() == null) return new ArrayList<>();
 
-        return user.getCart().getCartItems().stream()
-                .filter(item -> Boolean.TRUE.equals(item.getIsActive())) // Only active items
-                .map(item -> {
-                    ProductVariant pv = item.getProductVariant();
-                    Product p = pv.getProduct();
-                    BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
-                    return CartItemResponse.builder()
-                            .cartItemId(item.getCartItemId())
-                            .productId(p.getProductId())
-                            .productName(p.getName())
-                            .size(pv.getSize())
-                            .color(pv.getColor())
-                            .imageUrl(p.getImageUrl())
-                            .price(price)
-                            .quantity(item.getQuantity())
-                            .totalPrice(price.multiply(BigDecimal.valueOf(item.getQuantity())))
-                            .build();
-                }).toList();
+        return user.getCart().getCartItems().stream().map(item -> {
+            ProductVariant pv = item.getProductVariant();
+            Product p = pv.getProduct();
+            BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
+
+            return CartItemResponse.builder()
+                    .cartItemId(item.getCartItemId())
+                    .productId(p.getProductId())
+                    .productName(p.getName())
+                    .size(pv.getSize())
+                    .color(pv.getColor())
+                    .imageUrl(p.getImageUrl()) // Đảm bảo Product entity có getImageUrl
+                    .price(price)
+                    .quantity(item.getQuantity())
+                    .totalPrice(price.multiply(BigDecimal.valueOf(item.getQuantity())))
+                    .build();
+        }).toList();
     }
 
     // --- 4. CÁC HÀM HỖ TRỢ KHÁC ---
@@ -138,7 +137,7 @@ public class CartService {
         CartItem item = cartItemRepository.findById(cartItemId).orElseThrow();
         ProductVariant newVariant = variantRepository.findById(newVariantId).orElseThrow();
 
-        // Gộp nếu trùng variant trong giỏ
+        // Kiểm tra xem đổi sang loại mới có bị trùng với item khác trong giỏ không
         Optional<CartItem> duplicate = item.getCart().getCartItems().stream()
                 .filter(ci -> ci.getProductVariant().getVariantId().equals(newVariantId) && !ci.getCartItemId().equals(cartItemId))
                 .findFirst();
@@ -152,32 +151,5 @@ public class CartService {
             item.setProductVariant(newVariant);
             cartItemRepository.save(item);
         }
-    }
-
-    /**
-     * Lấy cart items theo danh sách cart item IDs (dùng cho checkout)
-     */
-    @Transactional(readOnly = true)
-    public List<CartItemResponse> getCartItemsByIds(List<String> cartItemIds) {
-        if (cartItemIds == null || cartItemIds.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        return cartItemRepository.findAllById(cartItemIds).stream().map(item -> {
-            ProductVariant pv = item.getProductVariant();
-            Product p = pv.getProduct();
-            BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
-            return CartItemResponse.builder()
-                    .cartItemId(item.getCartItemId())
-                    .productId(p.getProductId())
-                    .productName(p.getName())
-                    .size(pv.getSize())
-                    .color(pv.getColor())
-                    .imageUrl(p.getImageUrl())
-                    .price(price)
-                    .quantity(item.getQuantity())
-                    .totalPrice(price.multiply(BigDecimal.valueOf(item.getQuantity())))
-                    .build();
-        }).toList();
     }
 }

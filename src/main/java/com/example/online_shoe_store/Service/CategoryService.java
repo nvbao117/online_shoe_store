@@ -25,4 +25,6 @@ public class CategoryService {
     public List<CategoryResponse> getAllCategoriesResponses() {
         return categoryMapper.toCategoryResponsesList(categoryRepository.findAll());
     }
+
+
 }

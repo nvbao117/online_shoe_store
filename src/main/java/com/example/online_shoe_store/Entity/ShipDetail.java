@@ -39,10 +39,6 @@ public class ShipDetail {
     @Column(name = "phone", nullable = false, length = 15)
     private String phone;
 
-    @Size(max = 100, message = "Email tối đa 100 ký tự")
-    @Column(name = "email", length = 100)
-    private String email;
-
     @NotBlank(message = "Tỉnh/Thành phố không được để trống")
     @Size(max = 100, message = "Tên tỉnh/thành phố tối đa 100 ký tự")
     @Column(name = "province", nullable = false, length = 100)
