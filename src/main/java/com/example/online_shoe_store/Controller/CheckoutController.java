@@ -2,19 +2,15 @@ package com.example.online_shoe_store.Controller;
 
 import com.example.online_shoe_store.Entity.Order;
 import com.example.online_shoe_store.Entity.Payment;
-import com.example.online_shoe_store.Entity.ShipDetail;
 import com.example.online_shoe_store.Entity.User;
 import com.example.online_shoe_store.Repository.OrderRepository;
 import com.example.online_shoe_store.Repository.PaymentRepository;
-import com.example.online_shoe_store.Repository.ShipDetailRepository;
 import com.example.online_shoe_store.Repository.UserRepository;
-import com.example.online_shoe_store.Service.CartService;
 import com.example.online_shoe_store.Service.CheckoutService;
 import com.example.online_shoe_store.Service.PaymentService;
 import com.example.online_shoe_store.Service.VNPayService;
 import com.example.online_shoe_store.dto.request.PaymentCreateRequest;
 import com.example.online_shoe_store.dto.request.CheckoutRequest;
-import com.example.online_shoe_store.dto.response.CartItemResponse;
 import com.example.online_shoe_store.dto.response.PaymentResponse;
 import com.example.online_shoe_store.exception.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -44,8 +39,6 @@ public class CheckoutController {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final VNPayService vnPayService;
-    private final CartService cartService;
-    private final ShipDetailRepository shipDetailRepository;
 
     @GetMapping("/step1")
     public String step1(HttpSession session) {
@@ -185,6 +178,18 @@ public class CheckoutController {
         populateOrderSuccessModel(model, order, payment);
 
         return "checkout/checkout-step3";
+    }
+
+    /**
+     * Legacy alias for the success page. Some flows still redirect to /checkout/step3,
+     * so forward the request into the same success handler to avoid 404 static resource errors.
+     */
+    @GetMapping("/step3")
+    public String step3(
+            @RequestParam(required = false) String orderId,
+            @RequestParam(required = false) String paymentId,
+            Model model) {
+        return checkoutSuccess(paymentId, orderId, model);
     }
 
     /**

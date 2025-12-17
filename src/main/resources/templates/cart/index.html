@@ -73,7 +73,13 @@
         <div th:each="item : ${cartItems}" th:id="'row-' + ${item.cartItemId}" class="bg-white rounded shadow-sm border border-gray-100 p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-center hover:bg-blue-50/20 transition relative">
             <div class="md:col-span-5 flex items-center gap-4 w-full">
                 <input type="checkbox" class="item-checkbox w-5 h-5 rounded text-blue-600 cursor-pointer"
-                       th:data-id="${item.cartItemId}" th:data-price="${item.price}" th:data-qty="${item.quantity}" onchange="calculateTotal()">
+                       th:data-id="${item.cartItemId}"
+                       th:data-price="${item.price}"
+                       th:data-qty="${item.quantity}"
+                       th:data-pid="${item.productId}"
+                       th:data-size="${item.size}"
+                       onchange="calculateTotal()">
+
                 <div class="flex gap-4 flex-1">
                     <img th:src="${item.imageUrl}" class="w-24 h-24 object-cover border border-gray-200 rounded-md">
                     <div class="flex flex-col justify-between py-1">
@@ -140,93 +146,8 @@
     </div>
 </div>
 
-<script>
-    let curCartItemId = null, selVariantId = null;
-    const formatMoney = (a) => a.toLocaleString('vi-VN') + '₫';
+<script src="/api/cart.api.js"></script>
+<script src="/js/cart/cart.js"></script>
 
-    function toggleSelectAll(src) {
-        const isChecked = src.checked;
-        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = isChecked);
-        document.getElementById('selectAllTop').checked = isChecked;
-        document.getElementById('selectAllBottom').checked = isChecked;
-        calculateTotal();
-    }
-
-    function calculateTotal() {
-        let totalMoney = 0, totalQty = 0;
-        document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
-            const price = parseFloat(cb.getAttribute('data-price'));
-            const qty = parseInt(cb.getAttribute('data-qty'));
-            totalMoney += (price * qty);
-            totalQty += qty;
-        });
-        document.getElementById('grandTotalDisplay').innerText = formatMoney(totalMoney);
-        document.getElementById('countDisplay').innerText = totalQty;
-    }
-
-    function updateQuantity(id, change) {
-        const inp = document.getElementById('qty-' + id);
-        let newQty = parseInt(inp.value) + change;
-        if (newQty < 1) return;
-        fetch(`/api/cart/update-quantity?itemId=${id}&quantity=${newQty}`, { method: 'PUT' }).then(res => {
-            if (res.ok) {
-                inp.value = newQty;
-                const cb = document.querySelector(`.item-checkbox[data-id="${id}"]`);
-                cb.setAttribute('data-qty', newQty);
-                document.getElementById('total-' + id).innerText = formatMoney(parseFloat(cb.getAttribute('data-price')) * newQty);
-                calculateTotal();
-            }
-        });
-    }
-
-    function deleteItem(id) {
-        if(!confirm('Xóa sản phẩm này khỏi giỏ hàng?')) return;
-        fetch(`/api/cart/remove/${id}`, { method: 'DELETE' }).then(res => { if (res.ok) window.location.reload(); });
-    }
-
-    function openVariantModal(name, pid, cid) {
-        curCartItemId = cid; selVariantId = null;
-        document.getElementById('variantModal').classList.remove('hidden');
-        document.getElementById('variantModal').classList.add('flex');
-        document.getElementById('modalProductName').innerText = name;
-        const container = document.getElementById('variantOptions');
-        container.innerHTML = '<p class="text-gray-400 text-xs italic">Đang tải phân loại...</p>';
-        fetch(`/api/cart/variants/${pid}`).then(res => res.json()).then(data => {
-            container.innerHTML = '';
-            data.forEach(v => {
-                const b = document.createElement('button');
-                b.className = 'v-btn px-3 py-1.5 border rounded hover:border-blue-500 transition text-sm font-medium';
-                b.innerText = `Size ${v.size} - ${v.color}`;
-                b.onclick = () => {
-                    document.querySelectorAll('.v-btn').forEach(x => x.classList.remove('bg-blue-50', 'border-blue-600', 'text-blue-600'));
-                    b.classList.add('bg-blue-50', 'border-blue-600', 'text-blue-600');
-                    selVariantId = v.variantId;
-                };
-                container.appendChild(b);
-            });
-        });
-    }
-
-    function confirmChangeVariant() {
-        if (!selVariantId) return alert("Vui lòng chọn 1 phân loại mới!");
-        fetch(`/api/cart/update-variant?itemId=${curCartItemId}&variantId=${selVariantId}`, { method: 'PATCH' }).then(res => { if (res.ok) window.location.reload(); });
-    }
-
-    function closeVariantModal() { document.getElementById('variantModal').classList.add('hidden'); }
-
-    function submitCheckout() {
-        const checked = document.querySelectorAll('.item-checkbox:checked');
-        if (checked.length === 0) return alert("Vui lòng chọn ít nhất 1 sản phẩm!");
-        const container = document.getElementById('hiddenIdContainer');
-        container.innerHTML = '';
-        checked.forEach(cb => {
-            const inp = document.createElement('input');
-            inp.type = 'hidden'; inp.name = 'selectedItems'; inp.value = cb.getAttribute('data-id');
-            container.appendChild(inp);
-        });
-        document.getElementById('checkoutForm').submit();
-    }
-    calculateTotal();
-</script>
 </body>
 </html>

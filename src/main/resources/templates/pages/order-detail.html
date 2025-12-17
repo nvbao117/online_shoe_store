@@ -96,7 +96,8 @@
 
     <div class="container">
         <div class="d-flex align-items-center mb-4">
-            <a href="/orders" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Quay lại</a>
+            <a href="#" id="backBtn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Quay
+                lại</a>
             <h1 class="h3 mb-0">Chi tiết đơn hàng <span id="headerOrderId" class="text-primary"></span></h1>
         </div>
 
@@ -178,6 +179,9 @@
                 window.location.href = '/orders';
                 return;
             }
+
+            // Set back button to go to checkout success page
+            document.getElementById('backBtn').href = `/checkout/success?orderId=${orderId}`;
 
             try {
                 const response = await fetch(`/api/orders/${orderId}`);
