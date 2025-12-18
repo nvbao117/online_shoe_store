@@ -1,102 +1,22 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: head('Tạo Voucher', '/css/admin/voucher.css')}">
     <title>Tạo Voucher</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- CSS dùng chung cho các trang voucher -->
-    <!-- Nếu dùng Thymeleaf -->
-    <link rel="stylesheet" th:href="@{/css/admin/voucher.css}">
-    <!-- Nếu không dùng Thymeleaf -->
-    <!-- <link rel="stylesheet" href="/css/admin/voucher.css"> -->
 </head>
 <body>
-<div class="layout-wrapper">
-    <!-- ===== SIDEBAR TRÁI (giống voucher-status) ===== -->
-    <aside class="sidebar">
-        <div>
-            <div class="sidebar-avatar"></div>
-
-            <div class="sidebar-menu-title">Menu</div>
-            <ul class="sidebar-menu">
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-speedometer2 sidebar-icon"></i>
-                        <span>Dashboard</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-bag-check sidebar-icon"></i>
-                        <span>Sản phẩm</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-box-seam sidebar-icon"></i>
-                        <span>Kho hàng</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-receipt-cutoff sidebar-icon"></i>
-                        <span>Đơn hàng</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link active">
-                        <i class="bi bi-ticket-perforated-fill sidebar-icon"></i>
-                        <span>Voucher</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-people sidebar-icon"></i>
-                        <span>Khách hàng</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-graph-up sidebar-icon"></i>
-                        <span>Báo cáo</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-gear sidebar-icon"></i>
-                        <span>Cài đặt</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="sidebar-user">
-            <div class="sidebar-user-avatar"></div>
-            <div class="sidebar-user-info">
-                <span>Nguyễn Vũ Bảo</span>
-                <span class="sidebar-user-role">admin</span>
-            </div>
-        </div>
-    </aside>
+<div class="min-h-screen">
+    <!-- Sidebar dùng layout chung -->
+    <aside th:replace="~{fragments/admin-layout :: sidebar}"></aside>
 
     <!-- ===== NỘI DUNG CHÍNH ===== -->
-    <main class="content-wrapper">
-        <div class="page-title">Quản lý Voucher</div>
+    <main class="lg:ml-64 p-4 lg:p-8 min-h-screen bg-gray-50">
+        <div class="page-title mb-4 text-2xl font-bold text-slate-800">Quản lý Voucher</div>
 
         <div class="voucher-card">
             <!-- Header: Logo + Title -->
             <div class="voucher-card-header">
                 <div class="voucher-logo">
-                    <!-- Thay logo của bạn -->
-                    <!-- <img th:src="@{/images/admin/voucher/voucher-logo.png}" alt="logo voucher"> -->
-                    <img src="/images/logo-shop/logo-sneaker.png" alt="logo-sneaker">
+                    <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="logo-sneaker">
                 </div>
 
                 <div class="voucher-title">
@@ -105,16 +25,16 @@
             </div>
 
             <!-- FORM TẠO VOUCHER -->
-            <form class="voucher-form" id="voucherCreateForm">
+            <form class="voucher-form" id="voucherCreateForm" novalidate>
                 <!-- Dòng 1: Voucher name + Description -->
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label voucher-form-label">Voucher Name</label>
-                        <input type="text" class="form-control voucher-input" placeholder="">
+                        <input type="text" class="form-control voucher-input" name="name" id="voucherNameInput" required>
                     </div>
                     <div class="col-md-8">
                         <label class="form-label voucher-form-label">Description</label>
-                        <input type="text" class="form-control voucher-input" placeholder="">
+                        <input type="text" class="form-control voucher-input" name="description" id="voucherDescriptionInput" placeholder="Optional">
                     </div>
                 </div>
 
@@ -122,15 +42,15 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label voucher-form-label">Voucher Code</label>
-                        <input type="text" class="form-control voucher-input" placeholder="">
+                        <input type="text" class="form-control voucher-input" name="code" id="voucherCodeInput" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label voucher-form-label">Start Date</label>
-                        <input type="date" class="form-control voucher-input" id="startDateInput">
+                        <input type="date" class="form-control voucher-input" id="startDateInput" name="startDate" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label voucher-form-label">End Date</label>
-                        <input type="date" class="form-control voucher-input" id="endDateInput">
+                        <input type="date" class="form-control voucher-input" id="endDateInput" name="endDate" required>
                     </div>
                 </div>
 
@@ -142,13 +62,13 @@
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="discountType"
-                                       id="discountPercent" checked>
+                                       id="discountPercent" value="PERCENTAGE" checked>
                                 <label class="form-check-label" for="discountPercent">%</label>
                             </div>
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="discountType"
-                                       id="discountAmount">
+                                       id="discountAmount" value="FIXED_AMOUNT">
                                 <label class="form-check-label" for="discountAmount">Amount</label>
                             </div>
                         </div>
@@ -159,6 +79,7 @@
                         <input type="number"
                                class="form-control voucher-input"
                                id="discountValueInput"
+                               name="discountValue"
                                min="1"
                                step="1">
                     </div>
@@ -167,7 +88,8 @@
                         <input type="number"
                                class="form-control voucher-input"
                                id="minOrderValueInput"
-                               min="1"
+                               name="minOrderValue"
+                               min="0"
                                step="1">
                     </div>
                 </div>
@@ -180,13 +102,13 @@
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="customerType"
-                                       id="customerAll" checked>
+                                       id="customerAll" value="all" checked>
                                 <label class="form-check-label" for="customerAll">All</label>
                             </div>
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="customerType"
-                                       id="customerVip">
+                                       id="customerVip" value="vip">
                                 <label class="form-check-label" for="customerVip">VIP</label>
                             </div>
                         </div>
@@ -198,13 +120,13 @@
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="statusVoucher"
-                                       id="statusActive" checked>
+                                       id="statusActive" value="active" checked>
                                 <label class="form-check-label" for="statusActive">Active</label>
                             </div>
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="statusVoucher"
-                                       id="statusInactive">
+                                       id="statusInactive" value="inactive">
                                 <label class="form-check-label" for="statusInactive">Inactive</label>
                             </div>
                         </div>
@@ -219,25 +141,25 @@
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="scopeVoucher"
-                                       id="scopeAll" checked>
+                                       id="scopeAll" value="ALL" checked>
                                 <label class="form-check-label" for="scopeAll">All Products</label>
                             </div>
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="scopeVoucher"
-                                       id="scopeCategory">
+                                       id="scopeCategory" value="CATEGORY">
                                 <label class="form-check-label" for="scopeCategory">By Category</label>
                             </div>
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="scopeVoucher"
-                                       id="scopeBrand">
+                                       id="scopeBrand" value="BRAND">
                                 <label class="form-check-label" for="scopeBrand">By Brand</label>
                             </div>
 
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="scopeVoucher"
-                                       id="scopeProduct">
+                                       id="scopeProduct" value="PRODUCT">
                                 <label class="form-check-label" for="scopeProduct">By Specific Products</label>
                             </div>
                         </div>
@@ -250,18 +172,18 @@
 
                     <div class="row g-3 voucher-detail-row">
                         <div class="col-md-4">
-                            <select class="form-select voucher-input" id="categorySelect">
-                                <option selected>Name of Category</option>
+                            <select class="form-select voucher-input" id="categorySelect" name="categoryId">
+                                <option value="" selected>Name of Category</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <select class="form-select voucher-input" id="brandSelect">
-                                <option selected>Name of Brand</option>
+                            <select class="form-select voucher-input" id="brandSelect" name="brandId">
+                                <option value="" selected>Name of Brand</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <select class="form-select voucher-input" id="productSelect">
-                                <option selected>Name of Product</option>
+                            <select class="form-select voucher-input" id="productSelect" name="productId">
+                                <option value="" selected>Name of Product</option>
                             </select>
                         </div>
                     </div>
@@ -269,16 +191,14 @@
 
                 <!-- Nút Create -->
                 <div class="voucher-actions mt-3">
-                    <button type="submit" class="voucher-primary-btn">Create</button>
+                    <button type="submit" class="voucher-primary-btn" id="btnSubmitCreateVoucher">Create</button>
                 </div>
             </form>
         </div>
     </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- JS dùng chung cho voucher -->
+<div th:replace="~{fragments/admin-layout :: scripts}"></div>
 <script th:src="@{/js/admin/voucher.js}"></script>
 
 </body>

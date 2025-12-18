@@ -64,6 +64,18 @@ public class Voucher {
     @Column(name = "applies_to_type", length = 50)
     private String appliesToType; // all, category, product
 
+    @Size(max = 36, message = "Danh mục áp dụng tối đa 36 ký tự")
+    @Column(name = "applies_to_category_id", length = 36)
+    private String appliesToCategoryId;
+
+    @Size(max = 36, message = "Thương hiệu áp dụng tối đa 36 ký tự")
+    @Column(name = "applies_to_brand_id", length = 36)
+    private String appliesToBrandId;
+
+    @Size(max = 36, message = "Sản phẩm áp dụng tối đa 36 ký tự")
+    @Column(name = "applies_to_product_id", length = 36)
+    private String appliesToProductId;
+
     @Size(max = 50, message = "Loại khách hàng tối đa 50 ký tự")
     @Column(name = "customer_type", length = 50)
     private String customerType; // all, new, vip
