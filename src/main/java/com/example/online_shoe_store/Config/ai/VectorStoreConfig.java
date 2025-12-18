@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.config.ai;
+package com.example.online_shoe_store.Config.ai;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;

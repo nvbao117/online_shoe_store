@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.config;
+package com.example.online_shoe_store.Config;
 
 import com.example.online_shoe_store.Security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +17,6 @@ import com.example.online_shoe_store.Security.jwt.AppLogoutSuccessHandler;
 import com.example.online_shoe_store.Security.jwt.JwtCookieAuthFilter;
 import com.example.online_shoe_store.Security.jwt.JwtService;
 import com.example.online_shoe_store.Security.jwt.RefreshTokenService;
-import com.example.online_shoe_store.Security.oauth2.OAuth2LoginFailureHandler;
-import com.example.online_shoe_store.Security.oauth2.OAuth2LoginSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration

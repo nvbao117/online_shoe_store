@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.config.ai;
+package com.example.online_shoe_store.Config.ai;
 
 import com.example.online_shoe_store.Service.ai.agent.OrchestratorAgent;
 import com.example.online_shoe_store.Service.ai.agent.SearchAgent;
