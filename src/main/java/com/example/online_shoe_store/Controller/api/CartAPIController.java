@@ -25,7 +25,9 @@ public class CartAPIController {
     @PostMapping("/add")
     public ResponseEntity<?> addToCart(@RequestBody AddToCartRequest request, Principal principal) {
         if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập để mua hàng");
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Vui lòng đăng nhập để mua hàng");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
 
         try {
@@ -46,7 +48,9 @@ public class CartAPIController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Lỗi: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
         }
     }
 
@@ -65,7 +69,11 @@ public class CartAPIController {
     // --- 3. API LẤY LIST ITEM (Mới) ---
     @GetMapping
     public ResponseEntity<?> getCartItems(Principal principal) {
-        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        if (principal == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Vui lòng đăng nhập để xem giỏ hàng");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
         return ResponseEntity.ok(cartService.getCartItemsByUsername(principal.getName()));
     }
 
@@ -77,35 +85,57 @@ public class CartAPIController {
 
     @PutMapping("/update-quantity")
     public ResponseEntity<?> updateQuantity(@RequestParam String itemId, @RequestParam int quantity, Principal principal) {
-        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập");
+        if (principal == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Vui lòng đăng nhập");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
         try {
             cartService.updateItemQuantity(itemId, quantity);
-            return ResponseEntity.ok("Cập nhật số lượng thành công");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Cập nhật số lượng thành công");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Không thể cập nhật số lượng");
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Không thể cập nhật số lượng");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
     @PatchMapping("/update-variant")
     public ResponseEntity<?> updateVariant(@RequestParam String itemId, @RequestParam String variantId, Principal principal) {
-        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập");
+        if (principal == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Vui lòng đăng nhập");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
         try {
             cartService.updateItemVariant(itemId, variantId);
-            return ResponseEntity.ok("Đổi phân loại thành công");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Đổi phân loại thành công");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lỗi khi đổi phân loại");
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Lỗi khi đổi phân loại");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
     @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<?> removeItem(@PathVariable String itemId, Principal principal) {
-        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập");
+        if (principal == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Vui lòng đăng nhập");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
         try {
             cartService.deleteCartItem(itemId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("loi");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi xóa sản phẩm");
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Lỗi khi xóa sản phẩm");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
