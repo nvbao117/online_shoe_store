@@ -1,6 +1,6 @@
 package com.example.online_shoe_store.Controller.admin;
 
-import com.example.online_shoe_store.Controller.StatisticService;
+import com.example.online_shoe_store.Service.StatisticService;
 import com.example.online_shoe_store.Service.DashboardService;
 import com.example.online_shoe_store.dto.request.StatisticFilterRequest;
 import com.example.online_shoe_store.dto.response.DashboardResponse;
