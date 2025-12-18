@@ -75,6 +75,8 @@ public class SecurityConfig {
                                 "/videos/**",
                                 "/api/chat/**",
                                 "/favicon.ico"
+                                "/images/**",
+                                "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -92,6 +94,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
 
     @Bean

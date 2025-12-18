@@ -240,7 +240,8 @@
                   Yêu cầu Trả hàng/Hoàn tiền
                 </button>
 
-                <button class="flex-1 md:flex-none px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition shadow-lg shadow-blue-100">
+                <button onclick="openReviewModal('Sản phẩm Samsung Galaxy S23', 'Phantom Black', 'img_url.jpg')"
+                        class="flex-1 md:flex-none px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                   Đánh Giá
                 </button>
 
@@ -281,6 +282,84 @@
   </div>
 </div>
 
+<!--form đánh giá sản phẩm-->
+<div id="reviewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-fade-in">
+
+    <div class="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
+      <h3 class="text-xl font-bold text-gray-800">✍️ Viết đánh giá</h3>
+      <button onclick="closeReviewModal()" class="p-2 hover:bg-gray-100 rounded-full text-gray-400">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <div class="p-6">
+      <div id="alertContainer" class="mb-4"></div>
+
+      <div class="flex gap-4 p-3 bg-blue-50 rounded-xl mb-6 border border-blue-100">
+        <img id="modalProductImg" src="https://via.placeholder.com/60" class="w-16 h-16 object-cover rounded-lg border bg-white">
+        <div>
+          <h4 id="modalProductName" class="font-bold text-gray-800 text-sm line-clamp-1">Tên sản phẩm</h4>
+          <p id="modalProductVariant" class="text-xs text-gray-500">Phân loại: ...</p>
+        </div>
+      </div>
+
+      <form id="reviewForm" class="space-y-6">
+        <div class="text-center">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn:</label>
+          <div class="flex flex-row-reverse justify-center gap-1 group">
+            <input type="radio" name="rating" value="5" id="star5" class="hidden peer" required>
+            <label for="star5" class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
+
+            <input type="radio" name="rating" value="4" id="star4" class="hidden peer">
+            <label for="star4" class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
+
+            <input type="radio" name="rating" value="3" id="star3" class="hidden peer">
+            <label for="star3" class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
+
+            <input type="radio" name="rating" value="2" id="star2" class="hidden peer">
+            <label for="star2" class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
+
+            <input type="radio" name="rating" value="1" id="star1" class="hidden peer">
+            <label for="star1" class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cảm nghĩ của bạn:</label>
+          <textarea id="comment" name="comment" rows="4" class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Thêm hình ảnh (tối đa 5 ảnh):</label>
+          <div onclick="document.getElementById('imageInput').click()" class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-blue-400 cursor-pointer transition">
+            <div class="text-gray-400">📷</div>
+            <p class="text-xs text-gray-400 mt-2">Nhấn để chọn ảnh</p>
+          </div>
+          <input type="file" id="imageInput" name="images" multiple accept="image/*" class="hidden">
+          <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeReviewModal()" class="flex-1 py-3 border border-gray-300 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">Hủy</button>
+          <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 shadow-lg shadow-blue-100 transition">Gửi Đánh Giá</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!--<style>-->
+<!--  /* Hiệu ứng chọn sao lan tỏa ngược lại */-->
+<!--  .peer:hover ~ label, .peer:checked ~ label {-->
+<!--    color: #facc15; /* yellow-400 */-->
+<!--  }-->
+<!--  .animate-fade-in { animation: fadeIn 0.3s ease-out; }-->
+<!--  @keyframes fadeIn {-->
+<!--    from { opacity: 0; transform: translateY(20px); }-->
+<!--    to { opacity: 1; transform: translateY(0); }-->
+<!--  }-->
+<!--</style>-->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -335,6 +414,56 @@
       passwordView.classList.add('hidden');
     }
   }
+
+
+
+
+
+//   dánh giá
+  function openReviewModal(name, variant, img) {
+    const modal = document.getElementById('reviewModal');
+
+    // Gán thông tin sản phẩm vào modal
+    document.getElementById('modalProductName').innerText = name;
+    document.getElementById('modalProductVariant').innerText = 'Phân loại: ' + variant;
+    document.getElementById('modalProductImg').src = img;
+
+    // Hiện modal
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
+  }
+
+  function closeReviewModal() {
+    const modal = document.getElementById('reviewModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto'; // Mở lại cuộn trang
+  }
+
+  // Xử lý xem trước ảnh khi upload
+  document.getElementById('imageInput').addEventListener('change', function(e) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    [...this.files].forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = "w-16 h-16 object-cover rounded-lg border";
+        preview.appendChild(img);
+      }
+      reader.readAsDataURL(file);
+    });
+  });
+
+  // Đóng modal khi click ra ngoài vùng trắng
+  window.onclick = function(event) {
+    const modal = document.getElementById('reviewModal');
+    if (event.target == modal) {
+      closeReviewModal();
+    }
+  }
+
+
 </script>
 
 </body>

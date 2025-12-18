@@ -1,4 +1,4 @@
-package com.example.online_shoe_store.Controller;
+package com.example.online_shoe_store.Service;
 
 import com.example.online_shoe_store.Entity.enums.StatisticType;
 import com.example.online_shoe_store.Repository.DashboardRepository;
