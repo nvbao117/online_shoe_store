@@ -39,61 +39,56 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           JwtCookieAuthFilter jwtCookieAuthFilter,
-                                           OAuth2LoginSuccessHandler oauth2SuccessHandler,
-                                           OAuth2LoginFailureHandler oauth2FailureHandler,
-                                           AppLogoutSuccessHandler appLogoutSuccessHandler) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JwtCookieAuthFilter jwtCookieAuthFilter,
+            AppLogoutSuccessHandler appLogoutSuccessHandler
+    ) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
 
+                // 🔥 TẮT HOÀN TOÀN SESSION
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                // ❌ KHÔNG formLogin
+                .formLogin(form -> form.disable())
+
+                // ❌ KHÔNG httpBasic
+                .httpBasic(basic -> basic.disable())
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/forgot-password").permitAll()
-                        .requestMatchers("/register/send-otp").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/", "/home", "/products", "/sale-off", "/product-detail/**", "/admin/**", "/test").permitAll()
-                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers(
-                                "/images/**",
-                                "/src/data/images/**",
+                                "/login",
+                                "/register",
+                                "/forgot-password",
+                                "/register/send-otp",
+                                "/oauth2/**",
+                                "/login/oauth2/**",
+                                "/",
+                                "/home",
+                                "/products",
+                                "/product-detail/**",
                                 "/css/**",
                                 "/js/**",
-                                "/pages/**",
-                                "/home/**",
-                                "/ui/**",
-                                "/favicon.ico",
-                                "/webjars/**",
-                                "/static/**",
-                                "/videos/**",
-                                "/assets/**",
-                                "/error"
+                                "/images/**",
+                                "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .successHandler(oauth2SuccessHandler)
-                        .failureHandler(oauth2FailureHandler)
-                )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler(appLogoutSuccessHandler)
-                        .permitAll()
                 );
 
-        http.addFilterBefore(jwtCookieAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        // ✅ JWT FILTER LÀ NGUỒN AUTH DUY NHẤT
+        http.addFilterBefore(
+                jwtCookieAuthFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }

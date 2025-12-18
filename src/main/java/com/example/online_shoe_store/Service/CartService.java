@@ -87,6 +87,9 @@ public class CartService {
             newItem.setProductVariant(targetVariant);
             newItem.setQuantity(quantity);
             cartItemRepository.save(newItem);
+            
+            // Cập nhật list in-memory để tính toán lại số lượng chính xác ngay lập tức (do OSIV)
+            cart.getCartItems().add(newItem);
         }
     }
 
@@ -138,7 +141,9 @@ public class CartService {
     public int getCartItemCount(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null || user.getCart() == null) return 0;
-        return user.getCart().getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
+        return user.getCart().getCartItems().stream()
+                .filter(item -> Boolean.TRUE.equals(item.getIsActive()))
+                .mapToInt(CartItem::getQuantity).sum();
     }
 
     public String getUserFullName(String username) {
@@ -151,7 +156,12 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteCartItem(String cartItemId) { cartItemRepository.deleteById(cartItemId); }
+    public void deleteCartItem(String cartItemId) {
+        cartItemRepository.findById(cartItemId).ifPresent(item -> {
+            item.setIsActive(false);
+            cartItemRepository.save(item);
+        });
+    }
 
     @Transactional
     public void updateItemVariant(String cartItemId, String newVariantId) {
