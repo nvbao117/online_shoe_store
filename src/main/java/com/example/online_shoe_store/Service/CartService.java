@@ -87,6 +87,9 @@ public class CartService {
             newItem.setProductVariant(targetVariant);
             newItem.setQuantity(quantity);
             cartItemRepository.save(newItem);
+            
+            // Cập nhật list in-memory để tính toán lại số lượng chính xác ngay lập tức (do OSIV)
+            cart.getCartItems().add(newItem);
         }
     }
 
