@@ -97,6 +97,7 @@ public class CartAPIController {
             cartService.deleteCartItem(itemId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            System.out.println("loi");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi xóa sản phẩm");
         }
     }
