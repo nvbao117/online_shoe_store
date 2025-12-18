@@ -1,114 +1,219 @@
-// JS cho trang quản lý voucher
-// Ở đây mình làm vài chức năng đơn giản để bạn dễ mở rộng sau này:
-// - Lọc voucher theo ô search
-// - Console log khi nhấn Create / Save
+// JS quản lý Voucher: danh sách + form tạo mới
 
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("voucherSearchInput");
-    const voucherTable = document.getElementById("voucherTable");
-    const btnCreate = document.getElementById("btnCreateVoucher");
-    const btnSave = document.getElementById("btnSaveVoucher");
+document.addEventListener("DOMContentLoaded", () => {
+    const tableBody = document.getElementById("voucherTableBody");
+    const createForm = document.getElementById("voucherCreateForm");
 
-    /* ========== LỌC VOUCHER THEO TÊN / CODE ========== */
-    if (searchInput && voucherTable) {
-        searchInput.addEventListener("keyup", function () {
-            const filter = searchInput.value.toLowerCase();
-            const rows = voucherTable.querySelectorAll("tbody tr");
-
-            rows.forEach(row => {
-                const name = row.cells[0].textContent.toLowerCase(); // Voucher Name
-                const code = row.cells[1].textContent.toLowerCase(); // Code
-
-                if (name.includes(filter) || code.includes(filter)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        });
-    }
-
-    /* ========== CLICK NÚT SAVE ========== */
-    if (btnSave) {
-        btnSave.addEventListener("click", function () {
-            // TODO: sau này call API để lưu trạng thái voucher
-            console.log("Save voucher clicked");
-        });
-    }
-
-    /* ========== CLICK ĐỔI TRẠNG THÁI ACTIVE <-> INACTIVE ========== */
-    const statusButtons = document.querySelectorAll(".status-badge");
-
-    statusButtons.forEach(button => {
-        // bỏ qua nút Expired (đã bị chặn click bằng CSS, nhưng vẫn check cho chắc)
-        if (button.classList.contains("status-expired")) {
-            return;
+        if (tableBody) {
+            initVoucherStatusPage();
         }
 
-        button.addEventListener("click", function () {
-            // nếu đang Active -> chuyển sang Inactive
-            if (button.classList.contains("status-active")) {
-                button.classList.remove("status-active");
-                button.classList.add("status-inactive");
-                button.textContent = "Inactive";
-            }
-            // nếu đang Inactive -> chuyển sang Active
-            else if (button.classList.contains("status-inactive")) {
-                button.classList.remove("status-inactive");
-                button.classList.add("status-active");
-                button.textContent = "Active";
-            }
-
-            // TODO: sau này bạn có thể gửi AJAX về backend để lưu trạng thái mới
-        });
+        if (createForm) {
+            initVoucherCreatePage();
+        }
     });
 
-    /* ========== SUBMIT FORM TẠO VOUCHER (voucher-create) ========== */
-    const voucherCreateForm = document.getElementById("voucherCreateForm");
+    /* ================== COMMON HELPERS ================== */
+    let voucherToast;
+    let toastTimer;
 
-    if (voucherCreateForm) {
-        const discountInput = document.getElementById("discountValueInput");
-        const minOrderInput = document.getElementById("minOrderValueInput");
-        const startDateInput = document.getElementById("startDateInput");
-        const endDateInput = document.getElementById("endDateInput");
-
-        voucherCreateForm.addEventListener("submit", function (e) {
-            // ----- VALIDATE NGÀY -----
-            const startValue = startDateInput.value;
-            const endValue = endDateInput.value;
-
-            if (!startValue || !endValue) {
-                e.preventDefault();
-                alert("Vui lòng chọn Start Date và End Date.");
-                return;
-            }
-
-            const startDate = new Date(startValue);
-            const endDate = new Date(endValue);
-
-            if (endDate < startDate) {
-                e.preventDefault();
-                alert("End Date phải lớn hơn hoặc bằng Start Date.");
-                return;
-            }
-
-            // ----- VALIDATE SỐ GIẢM GIÁ / MIN ORDER > 0 -----
-            const discount = Number(discountInput.value);
-            const minOrder = Number(minOrderInput.value);
-
-            if (discount <= 0 || minOrder <= 0 || isNaN(discount) || isNaN(minOrder)) {
-                e.preventDefault();
-                alert("Discount value và Minimum order value phải là số lớn hơn 0.");
-                return;
-            }
-
-            // TODO: submit form lên backend
-            console.log("Submit form tạo voucher");
-            e.preventDefault(); // tạm chặn submit thật
-        });
+    function getToastElement() {
+        if (!voucherToast) {
+            voucherToast = document.createElement("div");
+            voucherToast.className = "voucher-toast";
+            document.body.appendChild(voucherToast);
+        }
+        return voucherToast;
     }
 
-    /* ========== BẬT / TẮT CÁC Ô DETAIL THEO SCOPE OF VOUCHER ========== */
+    function showToast(message) {
+        const toast = getToastElement();
+        toast.textContent = message;
+        toast.style.display = "block";
+
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toast.style.display = "none";
+        }, 2800);
+    }
+
+    function formatStatusLabel(status) {
+        switch (status) {
+            case "ACTIVE":
+                return "Active";
+            case "INACTIVE":
+                return "Inactive";
+            case "EXPIRED":
+                return "Expired";
+            default:
+                return status;
+        }
+    }
+
+    function getStatusClass(status) {
+        if (status === "EXPIRED") return "status-expired";
+        if (status === "ACTIVE") return "status-active";
+        return "status-inactive";
+    }
+
+    /* ================== VOUCHER STATUS PAGE ================== */
+    function initVoucherStatusPage() {
+        const searchInput = document.getElementById("voucherSearchInput");
+        const voucherTable = document.getElementById("voucherTable");
+        const tableBody = document.getElementById("voucherTableBody");
+        const saveButton = document.getElementById("btnSaveVoucher");
+        const emptyState = document.getElementById("voucherEmptyState");
+
+        let vouchers = [];
+        const pendingChanges = {};
+
+        const refreshEmptyState = () => {
+            if (!emptyState) return;
+            const isEmpty = vouchers.length === 0;
+            emptyState.hidden = !isEmpty;
+            voucherTable.style.display = isEmpty ? "none" : "table";
+        };
+
+        const updateSaveButtonState = () => {
+            const hasChanges = Object.keys(pendingChanges).length > 0;
+            saveButton.disabled = !hasChanges;
+        };
+
+        const handleSearch = () => {
+            const filter = searchInput.value.trim().toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+            rows.forEach(row => {
+                const name = row.dataset.name;
+                const code = row.dataset.code;
+                row.style.display = name.includes(filter) || code.includes(filter) ? "" : "none";
+            });
+        };
+
+        const renderRows = () => {
+            tableBody.innerHTML = "";
+            vouchers.forEach(voucher => {
+                const row = document.createElement("tr");
+                row.dataset.name = voucher.name.toLowerCase();
+                row.dataset.code = voucher.code.toLowerCase();
+
+                const nameCell = document.createElement("td");
+                nameCell.textContent = voucher.name;
+
+                const codeCell = document.createElement("td");
+                codeCell.textContent = voucher.code;
+
+                const discountCell = document.createElement("td");
+                discountCell.textContent = voucher.discountLabel;
+
+                const statusCell = document.createElement("td");
+                statusCell.classList.add("text-center");
+                const statusButton = document.createElement("button");
+                const status = voucher.status;
+                statusButton.className = `status-badge ${getStatusClass(status)}`;
+                statusButton.dataset.originalStatus = status;
+                statusButton.dataset.status = status;
+                statusButton.dataset.voucherId = voucher.voucherId;
+                statusButton.textContent = formatStatusLabel(status);
+
+
+                statusButton.addEventListener("click", () => {
+                    if (statusButton.dataset.status === "EXPIRED") {
+                        onDeleteExpired(voucher.voucherId, voucher.code);
+                        return;
+                    }
+                    const nextStatus = statusButton.dataset.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+                    statusButton.dataset.status = nextStatus;
+                    statusButton.textContent = formatStatusLabel(nextStatus);
+                    statusButton.className = `status-badge ${getStatusClass(nextStatus)}`;
+
+                    if (nextStatus === statusButton.dataset.originalStatus) {
+                        delete pendingChanges[voucher.voucherId];
+                        statusButton.classList.remove("status-dirty");
+                    } else {
+                        pendingChanges[voucher.voucherId] = nextStatus;
+                        statusButton.classList.add("status-dirty");
+                    }
+                    updateSaveButtonState();
+                });
+
+                statusCell.appendChild(statusButton);
+
+                [nameCell, codeCell, discountCell, statusCell].forEach(cell => row.appendChild(cell));
+                tableBody.appendChild(row);
+            });
+        };
+
+        const loadVouchers = async () => {
+            tableBody.innerHTML = "";
+            saveButton.disabled = true;
+            vouchers = [];
+            Object.keys(pendingChanges).forEach(key => delete pendingChanges[key]);
+            try {
+                const res = await fetch("/api/vouchers");
+                if (!res.ok) throw new Error("Không thể tải danh sách voucher");
+                vouchers = await res.json();
+                renderRows();
+                refreshEmptyState();
+                if (searchInput) handleSearch();
+                updateSaveButtonState();
+            } catch (err) {
+                showToast(err.message || "Lỗi tải voucher");
+                refreshEmptyState();
+            }
+        };
+
+        const onDeleteExpired = async (voucherId, code) => {
+            const confirmed = confirm(`Voucher ${code} đã hết hạn. Xóa voucher này?`);
+            if (!confirmed) return;
+            try {
+                const res = await fetch(`/api/vouchers/${voucherId}`, {method: "DELETE"});
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(body.message || "Không thể xóa voucher");
+                showToast(body.message || "Đã xóa voucher");
+                await loadVouchers();
+            } catch (err) {
+                showToast(err.message || "Không thể xóa voucher");
+            }
+        };
+
+        const onSaveChanges = async () => {
+            const updates = Object.entries(pendingChanges).map(([voucherId, status]) => ({ voucherId, status }));
+            if (updates.length === 0) return;
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+
+            try {
+                const res = await fetch("/api/vouchers/status", {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(updates)
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(body.message || "Không thể lưu thay đổi");
+                showToast(body.message || "Đã cập nhật trạng thái");
+                Object.keys(pendingChanges).forEach(key => delete pendingChanges[key]);
+                await loadVouchers();
+            } catch (err) {
+                showToast(err.message || "Có lỗi xảy ra khi lưu");
+            } finally {
+                saveButton.textContent = "Save";
+                updateSaveButtonState();
+            }
+        };
+
+        if (searchInput) {
+            searchInput.addEventListener("keyup", handleSearch);
+        }
+        if (saveButton) {
+            saveButton.addEventListener("click", onSaveChanges);
+        }
+
+        loadVouchers();
+    }
+
+    /* ================== CREATE VOUCHER PAGE ================== */
+function initVoucherCreatePage() {
     const scopeAllRadio = document.getElementById("scopeAll");
     const scopeCategoryRadio = document.getElementById("scopeCategory");
     const scopeBrandRadio = document.getElementById("scopeBrand");
@@ -118,42 +223,185 @@ document.addEventListener("DOMContentLoaded", function () {
     const brandSelect = document.getElementById("brandSelect");
     const productSelect = document.getElementById("productSelect");
 
-    function updateDetailFields() {
-        if (!categorySelect || !brandSelect || !productSelect) return;
+    const discountInput = document.getElementById("discountValueInput");
+    const minOrderInput = document.getElementById("minOrderValueInput");
+    const startDateInput = document.getElementById("startDateInput");
+    const endDateInput = document.getElementById("endDateInput");
+    const nameInput = document.getElementById("voucherNameInput");
+    const codeInput = document.getElementById("voucherCodeInput");
+    const descriptionInput = document.getElementById("voucherDescriptionInput");
+    const form = document.getElementById("voucherCreateForm");
 
-        // 1. All Products: khóa hết 3 ô
-        if (scopeAllRadio && scopeAllRadio.checked) {
-            categorySelect.disabled = true;
-            brandSelect.disabled = true;
-            productSelect.disabled = true;
-        }
-        // 2. By Category: chỉ mở Category
-        else if (scopeCategoryRadio && scopeCategoryRadio.checked) {
-            categorySelect.disabled = false;
-            brandSelect.disabled = true;
-            productSelect.disabled = true;
-        }
-        // 3. By Brand: mở Category + Brand
-        else if (scopeBrandRadio && scopeBrandRadio.checked) {
-            categorySelect.disabled = false;
-            brandSelect.disabled = false;
-            productSelect.disabled = true;
-        }
-        // 4. By Specific Products: mở cả 3
-        else if (scopeProductRadio && scopeProductRadio.checked) {
-            categorySelect.disabled = false;
-            brandSelect.disabled = false;
-            productSelect.disabled = false;
-        }
-    }
+    let metadata = {categories: [], brands: [], products: []};
 
-    // Gắn sự kiện change cho các radio
-    [scopeAllRadio, scopeCategoryRadio, scopeBrandRadio, scopeProductRadio].forEach(r => {
-        if (r) {
-            r.addEventListener("change", updateDetailFields);
+    const populateSelect = (select, items, placeholder) => {
+        if (!select) return;
+        select.innerHTML = "";
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = placeholder;
+        select.appendChild(defaultOption);
+
+        items.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = item.name;
+            option.dataset.parentId = item.parentId || "";
+            select.appendChild(option);
+        });
+    };
+
+    const filterBrandsByCategory = (categoryId) => {
+        if (!brandSelect) return;
+        const filtered = categoryId ? metadata.brands.filter(b => b.parentId === categoryId) : metadata.brands;
+        populateSelect(brandSelect, filtered, "Name of Brand");
+    };
+
+    const filterProductsByBrand = (brandId) => {
+        if (!productSelect) return;
+        const filtered = brandId ? metadata.products.filter(p => p.parentId === brandId) : metadata.products;
+        populateSelect(productSelect, filtered, "Name of Product");
+    };
+
+    const updateDetailFields = () => {
+        const scopeAll = scopeAllRadio && scopeAllRadio.checked;
+        const scopeCategory = scopeCategoryRadio && scopeCategoryRadio.checked;
+        const scopeBrand = scopeBrandRadio && scopeBrandRadio.checked;
+        const scopeProduct = scopeProductRadio && scopeProductRadio.checked;
+
+        if (categorySelect) categorySelect.disabled = scopeAll;
+        if (brandSelect) brandSelect.disabled = scopeAll || scopeCategory;
+        if (productSelect) productSelect.disabled = !(scopeProduct);
+
+        if (scopeAll) {
+            categorySelect.value = "";
+            brandSelect.value = "";
+            productSelect.value = "";
+        } else if (scopeCategory) {
+            brandSelect.value = "";
+            productSelect.value = "";
+        } else if (scopeBrand) {
+            productSelect.value = "";
         }
+    };
+
+    const loadMetadata = async () => {
+        try {
+            const res = await fetch("/api/vouchers/metadata");
+            if (!res.ok) throw new Error("Không thể tải dữ liệu danh mục/brand");
+            metadata = await res.json();
+            populateSelect(categorySelect, metadata.categories, "Name of Category");
+            populateSelect(brandSelect, metadata.brands, "Name of Brand");
+            populateSelect(productSelect, metadata.products, "Name of Product");
+            updateDetailFields();
+        } catch (err) {
+            showToast(err.message || "Không thể tải dữ liệu");
+        }
+    };
+
+    const validateForm = (payload) => {
+        if (!payload.name || !payload.code) {
+            showToast("Vui lòng nhập tên và mã voucher");
+            return false;
+        }
+        if (!payload.startDate || !payload.endDate) {
+            showToast("Vui lòng chọn ngày bắt đầu và kết thúc");
+            return false;
+        }
+        if (!payload.discountValue || payload.discountValue <= 0) {
+            showToast("Giá trị giảm phải lớn hơn 0");
+            return false;
+        }
+
+        const start = new Date(payload.startDate);
+        const end = new Date(payload.endDate);
+        if (end < start) {
+            showToast("End Date phải lớn hơn hoặc bằng Start Date");
+            return false;
+        }
+
+        if (payload.scope === "CATEGORY" && !payload.categoryId) {
+            showToast("Vui lòng chọn danh mục áp dụng");
+            return false;
+        }
+        if (payload.scope === "BRAND" && (!payload.categoryId || !payload.brandId)) {
+            showToast("Vui lòng chọn danh mục và thương hiệu");
+            return false;
+        }
+        if (payload.scope === "PRODUCT" && !payload.productId) {
+            showToast("Vui lòng chọn sản phẩm áp dụng");
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const scopeValue = document.querySelector('input[name="scopeVoucher"]:checked')?.value || "ALL";
+        const payload = {
+            name: nameInput.value.trim(),
+            code: codeInput.value.trim(),
+            description: descriptionInput.value.trim(),
+            startDate: startDateInput.value,
+            endDate: endDateInput.value,
+            discountType: document.querySelector('input[name="discountType"]:checked')?.value || "PERCENTAGE",
+            discountValue: Number(discountInput.value),
+            minOrderValue: minOrderInput.value ? Number(minOrderInput.value) : 0,
+            customerType: document.querySelector('input[name="customerType"]:checked')?.value || "all",
+            status: document.querySelector('input[name="statusVoucher"]:checked')?.value || "active",
+            scope: scopeValue,
+            categoryId: categorySelect.value,
+            brandId: brandSelect.value,
+            productId: productSelect.value
+        };
+
+        if (!validateForm(payload)) return;
+
+        const submitButton = document.getElementById("btnSubmitCreateVoucher");
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating...";
+
+        try {
+            const res = await fetch("/api/vouchers", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body.message || "Không thể tạo voucher");
+            showToast(body.message || "Tạo voucher thành công");
+            setTimeout(() => window.location.href = "/admin/vouchers", 800);
+        } catch (err) {
+            showToast(err.message || "Có lỗi khi tạo voucher");
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Create";
+        }
+    };
+
+    [scopeAllRadio, scopeCategoryRadio, scopeBrandRadio, scopeProductRadio].forEach(radio => {
+        if (radio) radio.addEventListener("change", () => {
+            updateDetailFields();
+        });
     });
 
-    // Gọi 1 lần khi load trang để set trạng thái ban đầu
+    if (categorySelect) {
+        categorySelect.addEventListener("change", (event) => {
+            filterBrandsByCategory(event.target.value);
+            filterProductsByBrand("");
+        });
+    }
+
+    if (brandSelect) {
+        brandSelect.addEventListener("change", (event) => {
+            filterProductsByBrand(event.target.value);
+        });
+    }
+
+    if (form) {
+        form.addEventListener("submit", handleSubmit);
+    }
+
+    loadMetadata();
     updateDetailFields();
-});
+}

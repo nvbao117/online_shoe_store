@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher, String> {
+    boolean existsByCodeIgnoreCase(String code);
 }
