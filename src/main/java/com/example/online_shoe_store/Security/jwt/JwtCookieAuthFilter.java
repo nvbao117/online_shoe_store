@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.Duration;
 
 public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
@@ -21,8 +20,6 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     private final RefreshTokenService refreshTokenService;
     private final CustomUserDetailsService userDetailsService;
     private final UserRepository userRepository;
-
-    private final Duration accessTtl = Duration.ofMinutes(15);
 
     public JwtCookieAuthFilter(JwtService jwtService,
                                RefreshTokenService refreshTokenService,
@@ -46,8 +43,9 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         boolean isRegister = uri.startsWith("/register");
         boolean isLogin = uri.equals("/login");    // ✅ bỏ qua cả GET và POST
         boolean isError = uri.equals("/error");
+        boolean isOauth2 = uri.startsWith("/oauth2") || uri.startsWith("/login/oauth2");
 
-        if (isStatic || isRegister || isLogin || isError) {
+        if (isStatic || isRegister || isLogin || isError || isOauth2) {
             chain.doFilter(req, res);
             return;
         }
@@ -72,7 +70,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
                 String newAccess = jwtService.createAccessToken(username);
 
-                CookieUtil.setAccessCookie(res, newAccess, accessTtl);
+                CookieUtil.setAccessCookie(res, newAccess, jwtService.getAccessTtl());
                 CookieUtil.setRefreshCookie(res, rotated.raw(), rotated.ttl());
 
                 setAuth(username);

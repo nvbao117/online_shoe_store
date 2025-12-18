@@ -47,6 +47,10 @@ public class ProductService {
        return productMapper.toProductResponsesList(productRepository.findByCategoryCategoryId(categoryId).stream().toList());
    }
 
+   public List<ProductResponse> searchProductsByName(String name) {
+       return productMapper.toProductResponsesList(productRepository.findByNameContainingIgnoreCase(name).stream().toList());
+   }
+
 //    public List<BrandResponse> getBrandByCategoryId(String categoryId) {
 //        return brandMapper.toBrandResponse(productRepository.findByCategoryCategoryId(categoryId)
 //                .stream()
@@ -126,4 +130,5 @@ public class ProductService {
                 .variants(variants)
                 .build();
     }
+
 }

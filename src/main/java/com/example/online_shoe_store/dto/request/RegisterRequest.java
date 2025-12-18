@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
     private String fullName; //Map sang User.name
-    private String dateOfBirth; //Chua luu DB
+    private String dateOfBirth;
     private String email;
     private String mobileNumber;
-    private String otp; //Chua xu ly'
-    private String gender; //Chua luu DB
+    private String otp;
+    private String gender;
     private String username;
     private String password;
     private String confirmPassword;

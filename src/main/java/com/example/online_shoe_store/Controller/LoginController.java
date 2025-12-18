@@ -55,7 +55,7 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    // ======== LOGIN (form thôi, xử lý sau) ========
+    // ======== LOGIN ========
 
     @GetMapping("/login")
     public String showLoginForm(Authentication authentication) {
@@ -67,4 +67,15 @@ public class LoginController {
 
         return "login/login";
     }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm(Authentication authentication) {
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/home";
+        }
+        return "login/forgot-password";
+    }
+
 }

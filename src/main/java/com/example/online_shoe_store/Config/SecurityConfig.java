@@ -8,9 +8,18 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import com.example.online_shoe_store.Repository.UserRepository;
+import com.example.online_shoe_store.Security.jwt.AppLogoutSuccessHandler;
+import com.example.online_shoe_store.Security.jwt.JwtCookieAuthFilter;
+import com.example.online_shoe_store.Security.jwt.JwtService;
+import com.example.online_shoe_store.Security.jwt.RefreshTokenService;
+import com.example.online_shoe_store.Security.oauth2.OAuth2LoginFailureHandler;
+import com.example.online_shoe_store.Security.oauth2.OAuth2LoginSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -21,57 +30,71 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public JwtCookieAuthFilter jwtCookieAuthFilter(JwtService jwtService,
+                                                   RefreshTokenService refreshTokenService,
+                                                   UserRepository userRepository) {
+        return new JwtCookieAuthFilter(jwtService, refreshTokenService, customUserDetailsService, userRepository);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            JwtCookieAuthFilter jwtCookieAuthFilter,
+            AppLogoutSuccessHandler appLogoutSuccessHandler
+    ) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
 
-                .authorizeHttpRequests(auth -> auth
-                        // ✅ PUBLIC: auth pages
-                        .requestMatchers("/login", "/register").permitAll()
-
-                        // ✅ PUBLIC: web pages
-                        .requestMatchers("/", "/home", "/products", "/sale-off", "/product-detail/**", "/admin/**").permitAll()
-
-                        // ✅ PUBLIC: API cho trang home/detail (nếu bạn muốn public hết API thì giữ /api/**)
-                        .requestMatchers("/api/**").permitAll()
-
-                        // ✅ PUBLIC: static resources
-                        .requestMatchers(
-                                "/images/**",
-                                "/src/data/images/**",
-                                "/css/**",
-                                "/js/**",
-                                "/pages/**",
-                                "/home/**",
-                                "/ui/**",
-                                "/favicon.ico",
-                                "/webjars/**",
-                                "/static/**",
-                                "/assets/**"
-                        ).permitAll()
-
-                        // còn lại bắt login
-                        .anyRequest().authenticated()
+                // 🔥 TẮT HOÀN TOÀN SESSION
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
+                // ❌ KHÔNG formLogin
+                .formLogin(form -> form.disable())
+
+                // ❌ KHÔNG httpBasic
+                .httpBasic(basic -> basic.disable())
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/login",
+                                "/register",
+                                "/forgot-password",
+                                "/register/send-otp",
+                                "/oauth2/**",
+                                "/login/oauth2/**",
+                                "/",
+                                "/home",
+                                "/products",
+                                "/product-detail/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/videos/**",
+                                "/api/chat/**",
+                                "/favicon.ico"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll()
+                        .logoutSuccessHandler(appLogoutSuccessHandler)
                 );
+
+        // ✅ JWT FILTER LÀ NGUỒN AUTH DUY NHẤT
+        http.addFilterBefore(
+                jwtCookieAuthFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

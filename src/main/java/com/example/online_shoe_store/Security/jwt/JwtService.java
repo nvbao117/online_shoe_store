@@ -50,4 +50,8 @@ public class JwtService {
                 .getPayload()
                 .getSubject();
     }
+
+    public Duration getAccessTtl() {
+        return accessTtl;
+    }
 }

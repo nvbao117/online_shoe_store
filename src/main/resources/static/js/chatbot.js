@@ -101,8 +101,6 @@ class ShoeStoreChatbot {
             .then(response => response.json())
             .then(data => {
                 this.hideTyping();
-
-                // Lưu sessionId từ response
                 if (data.sessionId) {
                     this.sessionId = data.sessionId;  // ← LƯU sessionId
                 }

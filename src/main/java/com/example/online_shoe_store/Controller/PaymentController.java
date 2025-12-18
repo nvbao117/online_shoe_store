@@ -66,12 +66,16 @@ public class PaymentController {
         try {
             PaymentResponse response = paymentService.processVNPayCallback(params);
 
-            // Extract orderId from payment
+            // Extract paymentId and get orderId from payment
             String paymentId = params.get("vnp_TxnRef");
+            
+            // Get orderId from payment details
+            PaymentDetailResponse paymentDetails = paymentService.getPaymentDetails(paymentId);
+            String orderId = paymentDetails.getOrderId();
 
             String redirectUrl = response.isSuccess()
-                    ? "/checkout/success?paymentId=" + paymentId
-                    : "/checkout/failure?paymentId=" + paymentId + "&code=" + params.get("vnp_ResponseCode");
+                    ? "/checkout/success?orderId=" + orderId
+                    : "/checkout/failure?orderId=" + orderId + "&code=" + params.get("vnp_ResponseCode");
 
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(redirectUrl))

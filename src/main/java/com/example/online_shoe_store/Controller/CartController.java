@@ -1,11 +1,14 @@
 package com.example.online_shoe_store.Controller;
 
 import com.example.online_shoe_store.Service.CartService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/templates/cart")
@@ -22,17 +25,21 @@ public class CartController {
         String loginUsername = principal.getName();
 
         model.addAttribute("username", cartService.getUserFullName(loginUsername));
-        model.addAttribute("cartItems", cartService.getCartItemsByUsername(loginUsername));
-        return "cart/index"; // Vẫn trả về file tại src/main/resources/templates/cart/index.html
+        // model.addAttribute("cartItems", cartService.getCartItemsByUsername(loginUsername));
+        // model.addAttribute("cartItemCount", cartService.getCartItemCount(loginUsername));
+
+        return "cart/index";
     }
 
-    // Xử lý nút Mua hàng (POST)
+    // Xử lý nút Mua hàng (POST) - redirect đến checkout step1
     @PostMapping("/checkout")
-    public String processCheckout(@RequestParam("selectedItems") java.util.List<String> selectedItems, Model model) {
+    public String processCheckout(@RequestParam("selectedItems") List<String> selectedItems,
+                                  HttpSession session) {
         if (selectedItems == null || selectedItems.isEmpty()) {
             return "redirect:/templates/cart";
         }
-        model.addAttribute("items", selectedItems);
-        return "checkout/index";
+        // Lưu selected items vào session để checkout có thể đọc
+        session.setAttribute("selectedCartItems", selectedItems);
+        return "redirect:/checkout/step1";
     }
 }
