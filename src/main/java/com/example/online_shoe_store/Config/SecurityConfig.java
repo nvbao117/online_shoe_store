@@ -74,7 +74,7 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/videos/**",
                                 "/api/chat/**",
-                                "/favicon.ico"
+                                "/favicon.ico",
                                 "/images/**",
                                 "/favicon.ico"
                         ).permitAll()
