@@ -82,14 +82,16 @@ public class CartService {
             cartItemRepository.save(existingItem);
         } else {
             CartItem newItem = new CartItem();
-            newItem.setCartItemId(UUID.randomUUID().toString());
+            // newItem.setCartItemId(UUID.randomUUID().toString()); // Để JPA tự gen ID để tránh lỗi detach
             newItem.setCart(cart);
             newItem.setProductVariant(targetVariant);
             newItem.setQuantity(quantity);
-            cartItemRepository.save(newItem);
+            
+            // Fix: Sử dụng instance đã save (managed) để add vào list
+            CartItem savedItem = cartItemRepository.save(newItem);
             
             // Cập nhật list in-memory để tính toán lại số lượng chính xác ngay lập tức (do OSIV)
-            cart.getCartItems().add(newItem);
+            cart.getCartItems().add(savedItem);
         }
     }
 
@@ -104,7 +106,7 @@ public class CartService {
           .map(item -> {
             ProductVariant pv = item.getProductVariant();
             Product p = pv.getProduct();
-
+            
             // Xử lý ảnh tại đây
             String finalImg = getPublicImageUrl(pv.getImageUrl() != null ? pv.getImageUrl() : p.getImageUrl());
             BigDecimal price = p.getPrice() != null ? p.getPrice() : BigDecimal.ZERO;
