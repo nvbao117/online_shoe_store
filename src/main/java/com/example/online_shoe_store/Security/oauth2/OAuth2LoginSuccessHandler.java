@@ -9,7 +9,6 @@ import com.example.online_shoe_store.Security.jwt.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -17,7 +16,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.UUID;
 
 @Component
@@ -28,18 +26,15 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    private final long accessMinutes;
-
     public OAuth2LoginSuccessHandler(UserRepository userRepository,
                                      PasswordEncoder passwordEncoder,
                                      JwtService jwtService,
-                                     RefreshTokenService refreshTokenService,
-                                     @Value("${jwt.access-minutes:15}") long accessMinutes) {
+                                     RefreshTokenService refreshTokenService)
+    {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
-        this.accessMinutes = accessMinutes;
     }
 
     @Override
@@ -80,7 +75,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtService.createAccessToken(user.getUsername());
         var refresh = refreshTokenService.create(user.getUserId(), false);
 
-        CookieUtil.setAccessCookie(response, accessToken, Duration.ofMinutes(accessMinutes));
+        CookieUtil.setAccessCookie(response, accessToken, jwtService.getAccessTtl());
         CookieUtil.setRefreshCookie(response, refresh.raw(), refresh.ttl());
 
         response.sendRedirect("/home");

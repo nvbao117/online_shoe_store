@@ -4,6 +4,7 @@ import com.example.online_shoe_store.Repository.UserRepository;
 import com.example.online_shoe_store.Security.jwt.CookieUtil;
 import com.example.online_shoe_store.Security.jwt.JwtService;
 import com.example.online_shoe_store.Security.jwt.RefreshTokenService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
-import java.time.Duration;
 
 @Controller
 public class AuthWebController {
@@ -22,7 +22,6 @@ public class AuthWebController {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
 
-    private final Duration accessTtl = Duration.ofMinutes(15);
 
     public AuthWebController(AuthenticationManager authenticationManager,
                              JwtService jwtService,
@@ -50,7 +49,7 @@ public class AuthWebController {
             String userId = userRepository.findByUsername(username).orElseThrow().getUserId();
             var refresh = refreshTokenService.create(userId, rememberMe);
 
-            CookieUtil.setAccessCookie(res, access, accessTtl);
+            CookieUtil.setAccessCookie(res, access, jwtService.getAccessTtl());
             CookieUtil.setRefreshCookie(res, refresh.raw(), refresh.ttl());
 
             res.sendRedirect("/home");
