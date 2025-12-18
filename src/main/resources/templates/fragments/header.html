@@ -114,18 +114,35 @@
                     <a href="/login" class="btn btn-outline-primary btn-sm me-2">Đăng nhập</a>
                     <a href="/register" class="btn btn-primary btn-sm">Đăng ký</a>
                 </div>
+                <div id="userProfile" class="relative inline-block group overflow-visible d-none">
+                    <a class="flex items-center me-3 text-dark no-underline">
 
-                <!-- ĐÃ đăng nhập -->
-                <a href="/profile"
-                   id="userProfile"
-                   class="header-right-item me-3 d-flex align-items-center text-decoration-none text-dark d-none">
+                        <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
+                            <i class="bi bi-person"></i>
+                        </div>
 
-                    <div class="icon-circle">
-                        <i class="bi bi-person"></i>
+                        <span id="username" class="ml-2 font-semibold hidden md:inline"></span>
+                    </a>
+
+                    <div class="absolute right-0 top-full pt-2 w-44 bg-white rounded-lg shadow-lg
+                hidden group-hover:block z-50">
+                        <a th:href="@{/profile}" class="block px-4 py-2 hover:bg-gray-100">
+                                                        Thông tin của tôi
+                                                    </a>
+
+                                                    <a href="/orders"
+                                                       class="block px-4 py-2 hover:bg-gray-100">
+                                                        Đơn hàng
+                                                    </a>
+
+                                                    <button id="logoutBtn"
+                                                            class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                                                        Đăng xuất
+                                                    </button>
                     </div>
+                </div>
 
-                    <span id="username" class="ms-2 fw-semibold d-none d-md-inline"></span>
-                </a>
+
 
 
                 <!-- Giỏ hàng -->
@@ -168,5 +185,6 @@
         </div>
     </nav>
 </header>
+
 </body>
 </html>
