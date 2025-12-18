@@ -41,7 +41,7 @@ public class CartAPIController {
             int newCount = cartService.getCartItemCount(principal.getName());
 
             Map<String, Object> response = new HashMap<>();
-            //response.put("message", "Thêm vào giỏ hàng thành công!");
+            response.put("message", "Thêm vào giỏ hàng thành công!");
             response.put("cartCount", newCount);
 
             return ResponseEntity.ok(response);
@@ -60,6 +60,13 @@ public class CartAPIController {
         Map<String, Integer> response = new HashMap<>();
         response.put("count", count);
         return ResponseEntity.ok(response);
+    }
+
+    // --- 3. API LẤY LIST ITEM (Mới) ---
+    @GetMapping
+    public ResponseEntity<?> getCartItems(Principal principal) {
+        if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        return ResponseEntity.ok(cartService.getCartItemsByUsername(principal.getName()));
     }
 
     // --- CÁC API CŨ CỦA BẠN (GIỮ NGUYÊN) ---
@@ -95,8 +102,9 @@ public class CartAPIController {
         if (principal == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Vui lòng đăng nhập");
         try {
             cartService.deleteCartItem(itemId);
-            return ResponseEntity.ok("Đã xóa sản phẩm khỏi giỏ hàng");
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
+            System.out.println("loi");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi xóa sản phẩm");
         }
     }

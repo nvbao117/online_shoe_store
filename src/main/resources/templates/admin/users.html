@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: head('Quản lý người dùng', null)}"></head>
+<body class="bg-slate-50">
+<div class="flex">
+    <aside th:replace="~{fragments/admin-layout :: sidebar}"></aside>
+
+    <main class="flex-1 min-h-screen ml-64 bg-slate-50">
+
+        <div class="p-6">
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-slate-500">Admin / Users</p>
+                    <h1 class="text-2xl font-semibold text-slate-800">Quản lý người dùng</h1>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
+                <div class="p-4 flex flex-wrap items-center gap-3">
+                    <div class="relative w-64">
+                        <input id="user-search" type="text" placeholder="Tìm username, email, phone" class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span class="absolute right-3 top-2.5 text-slate-400"><i class="bi bi-search"></i></span>
+                    </div>
+                    <select id="filter-role" class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Tất cả vai trò</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="USER">User</option>
+                    </select>
+                    <select id="filter-active" class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                    <select id="filter-sort" class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="createdAt:desc">Mới nhất</option>
+                        <option value="createdAt:asc">Cũ nhất</option>
+                        <option value="username:asc">Username A-Z</option>
+                        <option value="username:desc">Username Z-A</option>
+                        <option value="email:asc">Email A-Z</option>
+                        <option value="email:desc">Email Z-A</option>
+                    </select>
+                    <span id="user-count" class="text-sm text-slate-500"></span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm text-left">
+                        <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
+                        <tr>
+                            <th class="px-4 py-3">Username</th>
+                            <th class="px-4 py-3">Email</th>
+                            <th class="px-4 py-3">Phone</th>
+                            <th class="px-4 py-3">Role</th>
+                            <th class="px-4 py-3">Active</th>
+                            <th class="px-4 py-3">Created</th>
+                            <th class="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="user-rows" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/admin/users.js"></script>
+</body>
+</html>
