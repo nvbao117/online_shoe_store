@@ -101,8 +101,6 @@ class ShoeStoreChatbot {
             .then(response => response.json())
             .then(data => {
                 this.hideTyping();
-
-                // Lưu sessionId từ response
                 if (data.sessionId) {
                     this.sessionId = data.sessionId;  // ← LƯU sessionId
                 }
@@ -118,9 +116,55 @@ class ShoeStoreChatbot {
     addMessage(text, type) {
         const div = document.createElement('div');
         div.className = `message ${type}-message`;
-        div.innerHTML = text;
+
+        if (type === 'bot') {
+            // Parse markdown-like formatting
+            div.innerHTML = this.formatBotMessage(text);
+        } else {
+            div.textContent = text;
+        }
+
         this.messagesContainer.appendChild(div);
         this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    /**
+     * Format bot message with rich formatting
+     */
+    formatBotMessage(text) {
+        let formatted = text
+            // Bold: **text** or __text__
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/__(.*?)__/g, '<strong>$1</strong>')
+
+            // Italic: *text* or _text_
+            .replace(/\*(?!\*)(.*?)\*/g, '<em>$1</em>')
+            .replace(/_(?!_)(.*?)_/g, '<em>$1</em>')
+
+            // Bullet points: - text or • text
+            .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
+
+            // Numbered list: 1. text
+            .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+
+            // Price formatting: xxx,xxxđ or xxx.xxxđ
+            .replace(/(\d{1,3}(?:[,.\s]?\d{3})*)\s*đ/g, '<span class="price">$1đ</span>')
+
+            // Product name highlight: 【text】or [text]
+            .replace(/【(.+?)】/g, '<span class="product-name">$1</span>')
+
+            // Emoji spacing
+            .replace(/(👟|💰|🏷️|📦|✨|⭐|🔥|💯|🎉)/g, '<span class="emoji">$1</span>')
+
+            // Line breaks
+            .replace(/\n/g, '<br>');
+
+        // Wrap list items in ul
+        if (formatted.includes('<li>')) {
+            formatted = formatted.replace(/(<li>.*?<\/li>)+/g, '<ul class="bot-list">$&</ul>');
+        }
+
+        return formatted;
     }
 
     showTyping() {

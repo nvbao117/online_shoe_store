@@ -15,6 +15,12 @@ const CartAPI = {
         });
     },
 
+    // Lấy toàn bộ giỏ hàng
+    getAll() {
+        return fetch('/api/cart')
+            .then(res => res.json());
+    },
+
     // Lấy danh sách biến thể (Size/Color)
     getVariants(productId) {
         return fetch(`/api/cart/variants/${productId}`)

@@ -1,8 +1,10 @@
 package com.example.online_shoe_store.Service;
 
-import com.example.online_shoe_store.Service.ai.agent.FaqAgent;
+import com.example.online_shoe_store.Service.ai.execution.AgentExecutor;
+import com.example.online_shoe_store.dto.orchestrator.SupervisorResponse;
 import com.example.online_shoe_store.dto.request.ChatRequest;
 import com.example.online_shoe_store.dto.response.ChatResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -10,29 +12,36 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChatBotService {
 
-    private final FaqAgent faqAgent;
-
-    public ChatBotService(FaqAgent faqAgent) {
-        this.faqAgent = faqAgent;
-    }
+    private final AgentExecutor agentExecutor;
 
     public ChatResponse processMessage(ChatRequest request) {
         try {
-            // Generate sessionId nếu chưa có
             String sessionId = request.getSessionId() != null
                     ? request.getSessionId()
                     : UUID.randomUUID().toString();
 
             log.info("Processing message for sessionId: {}", sessionId);
-            String aiResponse = faqAgent.answer(sessionId, request.getMessage());
-            log.info("Successfully got response from FaqAgent");
+            
+            SupervisorResponse result = agentExecutor.process(sessionId, request.getMessage());
+            
+            log.info("AgentExecutor completed: agents={}, time={}ms",
+                result.getAgentsUsed(),
+                result.getProcessingTimeMs());
 
             return ChatResponse.builder()
-                    .response(aiResponse)
-                    .type("bot")
-                    .sessionId(sessionId)  // Trả về sessionId
+                    .response(result.getResponse())
+                    .type(result.isError() ? "error" : "bot")
+                    .sessionId(sessionId)
+                    .intent(result.getIntent() != null ? result.getIntent().name() : null)
+                    .subIntent(result.getSubIntent())
+                    .confidence(result.getConfidence())
+                    .urgency(result.getUrgency() != null ? result.getUrgency().name() : null)
+                    .suggestedActions(result.getSuggestedActions())
+                    .escalationTriggered(result.isEscalationTriggered())
+                    .processingTimeMs(result.getProcessingTimeMs())
                     .build();
 
         } catch (Exception e) {

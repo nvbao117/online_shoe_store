@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             img.className = "img-thumbnail thumb-item" + (idx === 0 ? " active" : "");
             img.style.cursor = "pointer";
             img.onclick = () => {
-                if(els.mainImg) els.mainImg.src = url;
+                if (els.mainImg) els.mainImg.src = url;
                 document.querySelectorAll(".thumb-item").forEach(t => t.classList.remove("active"));
                 img.classList.add("active");
             };
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
             renderSizes();
         } else if (p.imageUrl) {
             // Trường hợp không có màu
-            if(els.mainImg) els.mainImg.src = toImageUrl(p.imageUrl);
+            if (els.mainImg) els.mainImg.src = toImageUrl(p.imageUrl);
         }
     }
 
@@ -261,13 +261,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await res.json();
 
-            // Cập nhật chấm đỏ (Sử dụng biến đã khai báo trong els)
-            const badge = document.getElementById("cart-badge");
+            // Cập nhật chấm đỏ
+            const badge = els.cartBadge || document.getElementById("cart-badge");
             if (badge && data.cartCount !== undefined) {
-                badge.innerText = data.cartCount;   // Gán số mới
-                badge.classList.remove('d-none');   // Hiện badge nếu đang ẩn
+                badge.innerText = data.cartCount;
+                badge.classList.remove('d-none');
 
-                // Hiệu ứng nháy nhẹ để gây chú ý (Optional)
+                // Anim
+                badge.style.transition = "transform 0.2s";
                 badge.style.transform = "scale(1.5)";
                 setTimeout(() => badge.style.transform = "scale(1)", 200);
             }
@@ -304,9 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch('/api/cart/count')
         .then(res => res.json())
         .then(data => {
-            if(els.cartBadge && data.count > 0) {
+            if (els.cartBadge && data.count > 0) {
                 els.cartBadge.textContent = data.count;
                 els.cartBadge.classList.remove('d-none');
             }
-        }).catch(e => {});
+        }).catch(e => { });
 });

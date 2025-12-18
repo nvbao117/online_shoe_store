@@ -1,6 +1,7 @@
 package com.example.online_shoe_store.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,6 +13,16 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * Ignore ClientAbortException - xảy ra khi client đóng connection
+     * (chuyển trang, đóng tab, v.v.) - đây là lỗi bình thường
+     */
+    @ExceptionHandler(ClientAbortException.class)
+    public void handleClientAbort(ClientAbortException ex) {
+        // Client đóng connection - ignore silently
+        log.debug("Client disconnected: {}", ex.getMessage());
+    }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Map<String, Object>> handleBusinessException(BusinessException ex) {
@@ -28,6 +39,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        // Ignore IO exceptions khi client disconnect
+        if (ex.getCause() instanceof java.io.IOException) {
+            log.debug("IO Exception (client likely disconnected): {}", ex.getMessage());
+            return null;
+        }
+        
         log.error("Unhandled exception: {}", ex.getMessage(), ex);
 
         Map<String, Object> errorResponse = new HashMap<>();
