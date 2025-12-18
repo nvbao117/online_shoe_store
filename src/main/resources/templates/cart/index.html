@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,147 +8,158 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
         input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        @keyframes scaleUp { from { transform: translate(-50%, -50%) scale(0.95); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-        .animate-scale-up { animation: scaleUp 0.2s ease-out forwards; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: translate(-50%, -50%) scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-scale-up {
+            animation: scaleUp 0.2s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
+
 <body class="flex flex-col min-h-screen">
 
-<header class="sticky top-0 z-50">
-    <div class="bg-sky-50 w-full border-b border-gray-200 py-3">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-            <span class="text-blue-600 font-semibold flex items-center gap-2"><i class="fa-solid fa-phone"></i> Hotline: 081895333355</span>
-            <div class="flex items-center gap-2">
-                <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center border border-gray-300">
-                    <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
-                </div>
-                <span class="font-medium text-gray-700" th:text="${username}">hoàng thiện</span>
-            </div>
-        </div>
-    </div>
-    <div class="bg-white shadow-sm py-6">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <a href="/home" class="flex items-end gap-4 group">
+    <header class="sticky top-0 z-50">
+        <div class="bg-sky-50 w-full border-b border-gray-200 py-3">
+            <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+                <span class="text-blue-600 font-semibold flex items-center gap-2"><i class="fa-solid fa-phone"></i>
+                    Hotline: 081895333355</span>
                 <div class="flex items-center gap-2">
-                    <img src="/home/image/logo-Photoroom.png" alt="5A Store" class="h-10 w-auto">
-                    <span class="text-blue-600 font-bold text-xl hidden sm:block">5A Store</span>
-                </div>
-                <div class="h-8 w-px bg-blue-600 mb-1 hidden sm:block opacity-60"></div>
-                <span class="text-xl text-blue-600 mb-0.5 font-normal">Giỏ hàng</span>
-            </a>
-            <div class="w-full md:w-1/2 relative border-2 border-blue-600 rounded-sm flex overflow-hidden">
-                <input type="text" placeholder="Tìm kiếm sản phẩm..." class="flex-1 px-4 py-2 outline-none text-sm">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 transition"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
-        </div>
-    </div>
-</header>
-
-<main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 pb-32">
-    <div class="mb-4">
-        <a href="/home" class="inline-flex items-center gap-2 text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 px-4 py-2 rounded shadow-sm transition font-medium">
-            <i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm
-        </a>
-    </div>
-
-    <div class="bg-white rounded shadow-sm mb-3 overflow-hidden text-sm text-gray-500 border border-gray-100 hidden md:block sticky top-[138px] z-40 shadow-md">
-        <div class="p-4 grid grid-cols-12 gap-4 items-center">
-            <div class="col-span-5 flex items-center gap-3">
-                <input type="checkbox" id="selectAllTop" onchange="toggleSelectAll(this)" class="w-4 h-4 rounded text-blue-600 cursor-pointer">
-                <label for="selectAllTop" class="text-gray-800 font-medium cursor-pointer">Sản phẩm</label>
-            </div>
-            <div class="col-span-2 text-center">Đơn giá</div>
-            <div class="col-span-2 text-center">Số lượng</div>
-            <div class="col-span-2 text-center">Số tiền</div>
-            <div class="col-span-1 text-center">Thao tác</div>
-        </div>
-    </div>
-
-    <div class="space-y-3">
-        <div th:each="item : ${cartItems}" th:id="'row-' + ${item.cartItemId}" class="bg-white rounded shadow-sm border border-gray-100 p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-center hover:bg-blue-50/20 transition relative">
-            <div class="md:col-span-5 flex items-center gap-4 w-full">
-                <input type="checkbox" class="item-checkbox w-5 h-5 rounded text-blue-600 cursor-pointer"
-                       th:data-id="${item.cartItemId}"
-                       th:data-price="${item.price}"
-                       th:data-qty="${item.quantity}"
-                       th:data-pid="${item.productId}"
-                       th:data-size="${item.size}"
-                       onchange="calculateTotal()">
-
-                <div class="flex gap-4 flex-1">
-                    <img th:src="${item.imageUrl}" class="w-24 h-24 object-cover border border-gray-200 rounded-md">
-                    <div class="flex flex-col justify-between py-1">
-                        <h3 class="text-gray-800 font-medium line-clamp-2 text-base" th:text="${item.productName}">Sản phẩm</h3>
-                        <div class="relative group cursor-pointer w-fit" th:data-name="${item.productName}" th:data-pid="${item.productId}" th:data-cid="${item.cartItemId}"
-                             onclick="openVariantModal(this.getAttribute('data-name'), this.getAttribute('data-pid'), this.getAttribute('data-cid'))">
-                            <div class="flex items-center gap-1 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 border border-transparent hover:border-gray-300 transition">
-                                <span>Phân loại: <b th:text="'Size ' + ${item.size} + ', ' + ${item.color}">Size</b></span>
-                                <i class="fa-solid fa-caret-down text-xs"></i>
-                            </div>
-                        </div>
+                    <div
+                        class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center border border-gray-300">
+                        <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
                     </div>
+                    <span class="font-medium text-gray-700" th:text="${username}">hoàng thiện</span>
                 </div>
             </div>
-            <div class="md:col-span-2 text-center text-gray-600 font-medium">
-                <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
-            </div>
-            <div class="md:col-span-2 flex justify-center">
-                <div class="flex items-center border border-gray-300 rounded-md bg-white">
-                    <button th:data-id="${item.cartItemId}" onclick="updateQuantity(this.getAttribute('data-id'), -1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-r text-gray-600">-</button>
-                    <input type="number" th:id="'qty-' + ${item.cartItemId}" th:value="${item.quantity}" class="w-12 text-center text-sm h-8 font-semibold outline-none" readonly>
-                    <button th:data-id="${item.cartItemId}" onclick="updateQuantity(this.getAttribute('data-id'), 1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-l text-gray-600">+</button>
+        </div>
+        <div class="bg-white shadow-sm py-6">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <a href="/home" class="flex items-end gap-4 group">
+                    <div class="flex items-center gap-2">
+                        <img src="/home/image/logo-Photoroom.png" alt="5A Store" class="h-10 w-auto">
+                        <span class="text-blue-600 font-bold text-xl hidden sm:block">5A Store</span>
+                    </div>
+                    <div class="h-8 w-px bg-blue-600 mb-1 hidden sm:block opacity-60"></div>
+                    <span class="text-xl text-blue-600 mb-0.5 font-normal">Giỏ hàng</span>
+                </a>
+                <div class="w-full md:w-1/2 relative border-2 border-blue-600 rounded-sm flex overflow-hidden">
+                    <input type="text" id="searchInput" oninput="searchCart()" placeholder="Tìm kiếm sản phẩm..."
+                        class="flex-1 px-4 py-2 outline-none text-sm">
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 transition"><i
+                            class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
             </div>
-            <div class="md:col-span-2 text-center">
-                <span class="text-blue-600 font-bold text-lg" th:id="'total-' + ${item.cartItemId}" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 pb-32">
+        <div class="mb-4">
+            <a href="/home"
+                class="inline-flex items-center gap-2 text-blue-600 bg-white border border-blue-600 hover:bg-blue-50 px-4 py-2 rounded shadow-sm transition font-medium">
+                <i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+
+        <div
+            class="bg-white rounded shadow-sm mb-3 overflow-hidden text-sm text-gray-500 border border-gray-100 hidden md:block sticky top-[138px] z-40 shadow-md">
+            <div class="p-4 grid grid-cols-12 gap-4 items-center">
+                <div class="col-span-5 flex items-center gap-3">
+                    <input type="checkbox" id="selectAllTop" onchange="toggleSelectAll(this)"
+                        class="w-4 h-4 rounded text-blue-600 cursor-pointer">
+                    <label for="selectAllTop" class="text-gray-800 font-medium cursor-pointer">Sản phẩm</label>
+                </div>
+                <div class="col-span-2 text-center">Đơn giá</div>
+                <div class="col-span-2 text-center">Số lượng</div>
+                <div class="col-span-2 text-center">Số tiền</div>
+                <div class="col-span-1 text-center">Thao tác</div>
             </div>
-            <div class="md:col-span-1 text-center">
-                <button th:data-id="${item.cartItemId}" onclick="deleteItem(this.getAttribute('data-id'))" class="text-gray-400 hover:text-red-600 transition p-2 hover:bg-red-50 rounded-full"><i class="fa-regular fa-trash-can"></i></button>
+        </div>
+
+        <div class="space-y-3" id="cartItemsContainer">
+            <!-- Rendered by JS -->
+            <p class="text-center text-gray-400 py-8">Đang tải giỏ hàng...</p>
+        </div>
+    </main>
+
+    <div
+        class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="selectAllBottom" onchange="toggleSelectAll(this)"
+                    class="w-5 h-5 rounded text-blue-600 cursor-pointer">
+                <label for="selectAllBottom" class="text-gray-700 font-medium cursor-pointer">Chọn tất cả</label>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <span class="text-gray-600">Tổng thanh toán (<span id="countDisplay">0</span> sản phẩm):</span>
+                    <span class="text-2xl font-bold text-blue-600 ml-2" id="grandTotalDisplay">0₫</span>
+                </div>
+                <form id="checkoutForm" th:action="@{/templates/cart/checkout}" method="POST">
+                    <div id="hiddenIdContainer"></div>
+                    <button type="button" onclick="submitCheckout()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded shadow-lg transition transform hover:-translate-y-0.5">MUA
+                        HÀNG</button>
+                </form>
             </div>
         </div>
     </div>
-</main>
 
-<div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-            <input type="checkbox" id="selectAllBottom" onchange="toggleSelectAll(this)" class="w-5 h-5 rounded text-blue-600 cursor-pointer">
-            <label for="selectAllBottom" class="text-gray-700 font-medium cursor-pointer">Chọn tất cả</label>
-        </div>
-        <div class="flex items-center gap-6">
-            <div class="text-right">
-                <span class="text-gray-600">Tổng thanh toán (<span id="countDisplay">0</span> sản phẩm):</span>
-                <span class="text-2xl font-bold text-blue-600 ml-2" id="grandTotalDisplay">0₫</span>
+    <div id="variantModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onclick="closeVariantModal()"></div>
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 z-10 animate-scale-up relative">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Đổi phân loại hàng</h3>
+            <p id="modalProductName" class="mb-4 font-medium text-blue-600 text-sm"></p>
+            <div id="variantOptions" class="flex flex-wrap gap-2 mb-6"></div>
+            <div class="flex gap-2">
+                <button onclick="closeVariantModal()"
+                    class="flex-1 py-2 border rounded hover:bg-gray-50 transition">Hủy</button>
+                <button onclick="confirmChangeVariant()"
+                    class="flex-1 py-2 bg-blue-600 text-white rounded font-bold shadow hover:bg-blue-700 transition">Xác
+                    nhận</button>
             </div>
-            <form id="checkoutForm" th:action="@{/templates/cart/checkout}" method="POST">
-                <div id="hiddenIdContainer"></div>
-                <button type="button" onclick="submitCheckout()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-12 rounded shadow-lg transition transform hover:-translate-y-0.5">MUA HÀNG</button>
-            </form>
         </div>
     </div>
-</div>
 
-<div id="variantModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
-    <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" onclick="closeVariantModal()"></div>
-    <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 z-10 animate-scale-up relative">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">Đổi phân loại hàng</h3>
-        <p id="modalProductName" class="mb-4 font-medium text-blue-600 text-sm"></p>
-        <div id="variantOptions" class="flex flex-wrap gap-2 mb-6"></div>
-        <div class="flex gap-2">
-            <button onclick="closeVariantModal()" class="flex-1 py-2 border rounded hover:bg-gray-50 transition">Hủy</button>
-            <button onclick="confirmChangeVariant()" class="flex-1 py-2 bg-blue-600 text-white rounded font-bold shadow hover:bg-blue-700 transition">Xác nhận</button>
-        </div>
-    </div>
-</div>
-
-<script src="/api/cart.api.js"></script>
-<script src="/js/cart/cart.js"></script>
+    <script src="/api/cart.api.js"></script>
+    <script src="/js/cart/cart.js"></script>
 
 </body>
+
 </html>

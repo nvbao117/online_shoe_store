@@ -25,10 +25,8 @@ public class CartController {
         String loginUsername = principal.getName();
 
         model.addAttribute("username", cartService.getUserFullName(loginUsername));
-        model.addAttribute("cartItems", cartService.getCartItemsByUsername(loginUsername));
-
-        int count = cartService.getCartItemCount(loginUsername);
-        model.addAttribute("cartItemCount", count);
+        // model.addAttribute("cartItems", cartService.getCartItemsByUsername(loginUsername));
+        // model.addAttribute("cartItemCount", cartService.getCartItemCount(loginUsername));
 
         return "cart/index";
     }

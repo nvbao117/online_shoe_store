@@ -153,7 +153,12 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteCartItem(String cartItemId) { cartItemRepository.deleteById(cartItemId); }
+    public void deleteCartItem(String cartItemId) {
+        cartItemRepository.findById(cartItemId).ifPresent(item -> {
+            item.setIsActive(false);
+            cartItemRepository.save(item);
+        });
+    }
 
     @Transactional
     public void updateItemVariant(String cartItemId, String newVariantId) {
