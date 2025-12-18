@@ -41,4 +41,10 @@ public class ProductController {
     }
 
 
+    @GetMapping("/search")
+    public List<ProductResponse> searchProductsByName(@RequestParam String keyword) {
+        return productService.searchProductsByName(keyword);
+    }
+
+
 }

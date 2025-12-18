@@ -1,5 +1,6 @@
 export function createProductCard(p) {
     return `
+    <a href="/product-detail/${p.productId}"
         <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col product-card" data-product-id="${p.productId || ''}">
             <div class="relative">
                 <img src="/${p.imageUrl}" class="w-full h-40 sm:h-44 object-cover product-card-img" data-product-id="${p.productId || ''}" />
@@ -10,7 +11,7 @@ export function createProductCard(p) {
 
             <div class="p-2 sm:p-3 flex flex-col justify-between min-h-[120px]">
                 <h4 class="font-medium text-gray-800 text-sm sm:text-base line-clamp-2 min-h-[40px]">
-                    ${p.name}
+                    ${p.name} TTTTT
                 </h4>
 
                 <div>
@@ -25,5 +26,6 @@ export function createProductCard(p) {
                 </div>
             </div>
         </div>
+    </a>
     `;
 }
