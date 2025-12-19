@@ -16,6 +16,8 @@ export function renderSummary(data) {
     document.getElementById("totalRevenue").textContent =
         formatCurrency(data.summary.revenue);
 
+
+
     // ===== TOP SELLING =====
     const topSellingBody = document.getElementById("topSellingBody");
     topSellingBody.innerHTML = "";
@@ -52,6 +54,18 @@ export function renderSummary(data) {
                       </tr>
         `;
         });
+    }
+    // Kiểm tra nếu danh sách `topSelling` tồn tại và không rỗng
+    if (data.topSelling && data.topSelling.length > 0) {
+        // Lấy sản phẩm đầu tiên (bán chạy nhất)
+        const topProduct = data.topSelling[0];
+        // Gán giá trị sản phẩm đầu danh sách và số lượng
+        document.getElementById("top1Product").textContent = topProduct.productName;
+        document.getElementById("slTop1Product").textContent = `SL: ${topProduct.totalSold}`;
+    } else {
+        // Khi không có dữ liệu
+        document.getElementById("top1Product").textContent = "Không có dữ liệu";
+        document.getElementById("slTop1Product").textContent = "SL: Không có";
     }
 
     // ===== TOP SLOW =====

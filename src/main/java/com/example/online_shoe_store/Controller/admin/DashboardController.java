@@ -6,12 +6,14 @@ import com.example.online_shoe_store.dto.request.StatisticFilterRequest;
 import com.example.online_shoe_store.dto.response.DashboardResponse;
 import com.example.online_shoe_store.dto.response.StatisticResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/dashboard")
+@Slf4j
 @RequiredArgsConstructor
 public class DashboardController {
 
@@ -23,6 +25,7 @@ public class DashboardController {
             @RequestParam LocalDate from,
             @RequestParam LocalDate to
     ) {
+        log.info("Get dashboard summary from {} to {}", from, to);
         return service.getDashboard(from, to);
     }
 
