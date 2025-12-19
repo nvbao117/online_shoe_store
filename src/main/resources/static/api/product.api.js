@@ -2,7 +2,9 @@
 
 import {renderProductGrid} from "../ui/product-list.ui.js"
 export async function fetchProducts() {
-    const res = await fetch("/api/products");
+    const res = await fetch("/api/products", {
+        credentials: "include"
+    });
     if (!res.ok) throw new Error("Failed to fetch products");
     return res.json();
 }
@@ -13,7 +15,9 @@ export async function fetchProductsByCategory(categoryId) {
             ? `/api/products?categoryId=${categoryId}`
             : "/api/products";
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+        credentials: "include"
+    });
     if (!res.ok) throw new Error("Failed to fetch products by category");
     return res.json();
 }
@@ -37,7 +41,8 @@ export async function fetchFilteredProducts(options = {}) {
     const res = await fetch("/api/products/filter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(filters)
+        body: JSON.stringify(filters),
+        credentials: "include"
     });
 
     if (!res.ok) throw new Error("Filter failed");

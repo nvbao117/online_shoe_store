@@ -29,7 +29,7 @@ public class AppLogoutSuccessHandler implements LogoutSuccessHandler {
         }
 
         CookieUtil.clearAuthCookies(response);
-        response.sendRedirect("/login?logout=true");
+        response.sendRedirect("/home");
     }
 
     private String readCookie(HttpServletRequest req, String name) {

@@ -26,7 +26,8 @@ public class ProductController {
     @GetMapping
     public List<ProductResponse> getProductsByCategory(
            @RequestParam(required = false) String categoryId) {
-        if (categoryId.equals("21112005")) {
+        // ✅ Nếu không có categoryId hoặc là "21112005" (tất cả), return top 20
+        if (categoryId == null || categoryId.isEmpty() || categoryId.equals("21112005")) {
             return productService.getTop20Products();
         }
         return productService.getProductsByCategory(categoryId);

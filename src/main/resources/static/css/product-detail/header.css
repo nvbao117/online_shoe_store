@@ -128,6 +128,70 @@
     background-color: #ef4444; /* đỏ badge */
 }
 
+/* ================== USER PROFILE DROPDOWN ================== */
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+}
+
+.user-avatar i {
+    font-size: 18px;
+}
+
+.user-profile-link {
+    cursor: pointer;
+}
+
+.user-profile-link:hover {
+    text-decoration: none;
+}
+
+.user-dropdown {
+    min-width: 176px;
+    z-index: 1000;
+    border: 1px solid #e5e7eb;
+    padding: 4px 0;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 8px 16px;
+    color: #1f2937;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+.logout-btn {
+    color: #dc2626 !important;
+}
+
+.logout-btn:hover {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+/* Show dropdown on hover */
+#userProfile:hover .user-dropdown {
+    display: block !important;
+}
+
 /* ================== THANH MENU DƯỚI ================== */
 
 .header-nav {
