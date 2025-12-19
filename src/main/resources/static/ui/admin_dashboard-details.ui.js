@@ -1,30 +1,32 @@
 export function renderChart(res) {
-    const container = document.querySelector(".h-64.flex.items-end");
-    container.innerHTML = ""; // xóa cũ
+    const container = document.getElementById("chartContainer");
+    container.innerHTML = "";
 
-    const { labels, values } = res; // lấy dữ liệu từ res
-    const max = Math.max(...values, 1); // tránh chia cho 0
+    const { labels, values } = res;
+    const max = Math.max(...values, 1);
+
+    const MAX_BAR_HEIGHT = 260; // < container - padding
 
     values.forEach((val, index) => {
         const bar = document.createElement("div");
-        bar.classList.add("chart-bar", "flex", "flex-col", "items-center", "flex-1", "group");
+        bar.className = "chart-bar ml-5 flex flex-col items-center flex-none w-10";
 
-        // Giá trị phía trên cột
+        // số phía trên
         const valueLabel = document.createElement("span");
-        valueLabel.className = "text-xs text-slate-600 mb-1 font-medium";
+        valueLabel.className = "text-xs text-slate-700 mb-2 font-semibold";
         valueLabel.innerText = val;
 
-        // Cột
+        // cột
         const inner = document.createElement("div");
-        inner.style.height = (val / max * 200) + "px";
-        inner.className = "w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md";
+        inner.style.height = (val / max * MAX_BAR_HEIGHT) + "px";
+        inner.className =
+            "w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg shadow-md transition-all duration-300";
 
-        // Ngày phía dưới cột
+        // nhãn dưới
         const dateLabel = document.createElement("span");
-        dateLabel.className = "text-xs text-slate-600 mt-1 font-medium";
+        dateLabel.className = "text-[11px] text-slate-600 mt-2 font-medium";
         dateLabel.innerText = labels[index];
 
-        // Thêm vào bar theo thứ tự: value -> cột -> ngày
         bar.appendChild(valueLabel);
         bar.appendChild(inner);
         bar.appendChild(dateLabel);
@@ -32,5 +34,3 @@ export function renderChart(res) {
         container.appendChild(bar);
     });
 }
-
-
