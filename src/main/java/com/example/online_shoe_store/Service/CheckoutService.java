@@ -4,8 +4,10 @@ import com.example.online_shoe_store.Entity.*;
 import com.example.online_shoe_store.Entity.enums.OrderStatus;
 import com.example.online_shoe_store.Repository.*;
 import com.example.online_shoe_store.dto.request.CheckoutRequest;
+import com.example.online_shoe_store.dto.response.OrderWSMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,6 +24,7 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ShipDetailRepository shipDetailRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public String placeOrder(User user, CheckoutRequest request, List<String> selectedCartItemIds){
@@ -51,6 +54,17 @@ public class CheckoutService {
                 .totalAmount(BigDecimal.ZERO)
                 .build();
         order = orderRepository.save(order);
+
+        // gửi cho admin
+//        messagingTemplate.convertAndSend(
+//                "/topic/admin/orders",
+//                new OrderWSMessage(
+//                        order.getOrderId(),
+//                        OrderStatus.PENDING,
+//                        "Có đơn hàng mới chờ xác nhận"
+//                )
+//        );
+
 
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;

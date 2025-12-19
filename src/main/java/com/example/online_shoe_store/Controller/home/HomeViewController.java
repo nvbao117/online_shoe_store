@@ -27,11 +27,15 @@ public class HomeViewController {
         return "/products/product-list";
     }
 
-    @GetMapping("/sale-off")
-    public String saleOff() {
-        return "/products/saleOf-list";
+    @GetMapping("/about")
+    public String about() {
+        return "/about_contact/about";
     }
 
+    @GetMapping("/contact")
+    public String contact() {
+        return "/about_contact/contact";
+    }
     // gio hang duoc lay ben cart controller
 
 
