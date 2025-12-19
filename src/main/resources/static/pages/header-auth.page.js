@@ -16,11 +16,13 @@ async function loadHeaderAuth() {
 
         usernameSpan.textContent = user.name;
         usernameSpan.classList.remove("d-none");
+        console.log("User profile loaded:", user);
 
     } catch (e) {
         // CHƯA đăng nhập
         authButtons.classList.remove("d-none");
         userProfile.classList.add("d-none");
+        console.log("User not authenticated");
     }
 }
 

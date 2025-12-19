@@ -133,7 +133,7 @@ public class PaymentService {
                     payment.setPaymentDate(LocalDateTime.now());
                     paymentRepository.save(payment);
 
-                    order.setStatus(OrderStatus.CONFIRMED);
+                    order.setStatus(OrderStatus.PENDING);
                     order.setConfirmedAt(LocalDateTime.now());
                     orderRepository.save(order);
 

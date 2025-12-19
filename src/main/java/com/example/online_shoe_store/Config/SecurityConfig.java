@@ -83,7 +83,9 @@ public class SecurityConfig {
                                 "/ui/**",
                                 "/src/data/images/products/**",
                                 "/home/image/**",
-                                "/src/data/images/categories/**"
+                                "/src/data/images/categories/**",
+                                "/about",
+                                "/contact"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
