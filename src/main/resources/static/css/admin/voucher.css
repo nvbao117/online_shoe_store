@@ -17,7 +17,8 @@ body {
     min-height: 100vh;
 }
 
-/* ================== SIDEBAR BÊN TRÁI ================== */
+/* ================== SIDEBAR BÊN TRÁI (ĐÃ XÓA) ================== */
+/*
 .sidebar {
     width: 230px;
     background: #003b73;

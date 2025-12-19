@@ -69,9 +69,13 @@ public class AuthWebController {
                 if ("refresh_token".equals(c.getName())) refresh = c.getValue();
             }
         }
-        if (refresh != null) refreshTokenService.revoke(refresh);
+        if (refresh != null) {
+            try {
+                refreshTokenService.revoke(refresh);
+            } catch (Exception ignored) {}
+        }
 
         CookieUtil.clearAuthCookies(res);
-        res.sendRedirect("/login?logout=true");
+        res.sendRedirect("/home");
     }
 }

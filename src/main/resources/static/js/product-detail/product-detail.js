@@ -238,19 +238,39 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
+    // Kiểm tra authentication trước khi thực hiện hành động
+    async function checkAuth() {
+        try {
+            const res = await fetch("/api/me", {
+                credentials: "include"
+            });
+            return res.ok;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async function handleCartAction(isBuyNow) {
         const payload = getOrderPayload();
         if (!payload) return;
+
+        // ✅ Kiểm tra đăng nhập trước khi gọi API
+        const isAuthenticated = await checkAuth();
+        if (!isAuthenticated) {
+            alert("Vui lòng đăng nhập trước khi mua hàng");
+            return;
+        }
 
         try {
             const res = await fetch("/api/cart/add", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                credentials: "include"
             });
 
             if (res.status === 401) {
-                if (confirm("Bạn cần đăng nhập. Đăng nhập ngay?")) window.location.href = "/login";
+                alert("Vui lòng đăng nhập trước khi mua hàng");
                 return;
             }
 
@@ -302,12 +322,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // Load lại số lượng giỏ hàng để cập nhật badge nếu user F5 trang
-    fetch('/api/cart/count')
-        .then(res => res.json())
+    fetch('/api/cart/count', {
+        credentials: "include"
+    })
+        .then(res => {
+            if (!res.ok) return null;
+            return res.json();
+        })
         .then(data => {
-            if (els.cartBadge && data.count > 0) {
+            if (data && els.cartBadge && data.count > 0) {
                 els.cartBadge.textContent = data.count;
                 els.cartBadge.classList.remove('d-none');
             }
-        }).catch(e => { });
+        }).catch(e => { 
+            // Ignore error - user chưa đăng nhập hoặc có lỗi
+        });
 });

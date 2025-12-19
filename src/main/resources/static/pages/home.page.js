@@ -6,31 +6,40 @@ import { renderCategoryCards } from "../ui/category-card.ui.js";
 const tabContainer = document.getElementById("categorytab-container");
 const productContainer = document.getElementById("productsContainer");
 const categoryGrid = document.getElementById("sportGrid");
+
 async function initHome() {
 
-    // category mặc định
-    const DEFAULT_CATEGORY_ID = "21112005";
+    try {
+        // category mặc định
+        const DEFAULT_CATEGORY_ID = "21112005";
 
-    const categories = [
-        { categoryId: DEFAULT_CATEGORY_ID, name: "Tất cả" },
-        ...(await getCategories())
-    ];
-    // 1️⃣ Render CATEGORY CARD
-    const categorieCard = await getCategories();
-    renderCategoryCards(categoryGrid, categorieCard);
+        const categories = [
+            { categoryId: DEFAULT_CATEGORY_ID, name: "Tất cả" },
+            ...(await getCategories())
+        ];
+        // 1️⃣ Render CATEGORY CARD
+        const categorieCard = await getCategories();
+        renderCategoryCards(categoryGrid, categorieCard);
 
 
-    // ✅ categoryId chỉ xuất hiện ở đây
-    initCategoryTabs(tabContainer, categories, async (categoryId) => {
-        const products = await fetchProductsByCategory(categoryId);
-        renderProductSlider(productContainer, products.slice(0, 10));
-    },
-        DEFAULT_CATEGORY_ID  // 👉 tab mặc định khi vừa vào trang
-    );
+        // ✅ categoryId chỉ xuất hiện ở đây
+        initCategoryTabs(tabContainer, categories, async (categoryId) => {
+            const products = await fetchProductsByCategory(categoryId);
+            renderProductSlider(productContainer, products.slice(0, 10));
+        },
+            DEFAULT_CATEGORY_ID  // 👉 tab mặc định khi vừa vào trang
+        );
 
-    // 👉 load mặc định khi vừa vào trang
-    const defaultProducts = await fetchProductsByCategory(DEFAULT_CATEGORY_ID);
-    renderProductSlider(productContainer, defaultProducts.slice(0, 10));
+        // 👉 load mặc định khi vừa vào trang
+        const defaultProducts = await fetchProductsByCategory(DEFAULT_CATEGORY_ID);
+        renderProductSlider(productContainer, defaultProducts.slice(0, 10));
+    } catch (error) {
+        console.error("Error loading home page:", error);
+        // ✅ Fallback: Hiển thị error message thay vì crash
+        if (productContainer) {
+            productContainer.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Lỗi tải sản phẩm. Vui lòng refresh trang.</p>';
+        }
+    }
 }
 
 initHome();
