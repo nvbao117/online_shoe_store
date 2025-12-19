@@ -52,7 +52,7 @@
     position: absolute;
 }
 
-.chatbot-icon.hidden {
+.chatbot-icon.cb-hidden {
     opacity: 0;
     transform: rotate(90deg) scale(0.5);
 }
@@ -192,7 +192,7 @@
     background: #f9fafb;
 }
 
-.conversation-view.hidden {
+.conversation-view.cb-hidden {
     display: none;
 }
 
@@ -365,7 +365,7 @@
     }
 }
 
-.hidden {
+.cb-hidden {
     display: none !important;
 }
 

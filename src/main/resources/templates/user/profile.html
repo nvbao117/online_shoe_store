@@ -1,574 +1,953 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-  <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
-  <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .tab-active {
+        background-color: #3b82f6;
+        color: white;
+      }
 
-  <style>
-    .tab-active {
-      background-color: #3b82f6;
-      color: white;
-    }
+      .sport-card:hover img {
+        transform: scale(1.05);
+      }
 
-    .sport-card:hover img {
-      transform: scale(1.05);
-    }
+      /* Ẩn thanh scroll ngang cho slider */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
 
-    /* Ẩn thanh scroll ngang cho slider */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
 
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+      .slide-enter {
+        opacity: 0;
+        transform: translateX(30px);
+      }
 
-    .slide-enter {
-      opacity: 0;
-      transform: translateX(30px);
-    }
+      .slide-enter-active {
+        opacity: 1;
+        transform: translateX(0);
+        transition: all 0.35s ease;
+      }
 
-    .slide-enter-active {
-      opacity: 1;
-      transform: translateX(0);
-      transition: all 0.35s ease;
-    }
+      .slide-exit {
+        opacity: 1;
+        transform: translateX(0);
+      }
 
-    .slide-exit {
-      opacity: 1;
-      transform: translateX(0);
-    }
+      .slide-exit-active {
+        opacity: 0;
+        transform: translateX(-30px);
+        transition: all 0.35s ease;
+      }
+    </style>
+  </head>
 
-    .slide-exit-active {
-      opacity: 0;
-      transform: translateX(-30px);
-      transition: all 0.35s ease;
-    }
-  </style>
-</head>
+  <body class="bg-gray-50">
+    <div th:replace="fragments/header :: mainHeader"></div>
 
-<body class="bg-gray-50">
-<div th:replace="fragments/header :: mainHeader"></div>
-
-
-<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
-
-
-    <!--    thanh bên để chọn-->
-    <aside class="w-full md:w-1/4 space-y-2">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 flex items-center gap-3">
-        <div
-                class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl uppercase">
-          N</div>
-        <div>
-          <p class="text-xs text-gray-500 uppercase tracking-wider">Tài khoản của</p>
-          <p class="font-bold text-gray-800">Nguyễn Văn A</p>
-        </div>
-      </div>
-
-      <nav id="sidebar-nav" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <button data-tab="account"
-                class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-blue-600 bg-blue-50 border-l-4 border-blue-600 transition-all font-medium">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-          </svg>
-          Hồ Sơ Của Tôi
-        </button>
-        <button data-tab="notifications"
-                class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-            </path>
-          </svg>
-          Thông Báo
-        </button>
-        <button data-tab="orders"
-                class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-            </path>
-          </svg>
-          Đơn Mua
-        </button>
-        <button data-tab="reviews"
-                class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-            </path>
-          </svg>
-          Đánh giá
-        </button>
-      </nav>
-    </aside>
-
-    <div class="flex-1">
-      <!--      Hồ sơ người dùng-->
-      <section id="content-account" class="tab-content bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div id="profile-main-view">
-          <div class="border-b pb-4 mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Hồ Sơ Của Tôi</h2>
-            <p class="text-sm text-gray-500">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+    <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
+        <!--    thanh bên để chọn-->
+        <aside class="w-full md:w-1/4 space-y-2">
+          <div
+            class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 flex items-center gap-3"
+          >
+            <div
+              class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl uppercase"
+            >
+              N
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">
+                Tài khoản của
+              </p>
+              <p class="font-bold text-gray-800">Nguyễn Văn A</p>
+            </div>
           </div>
 
-          <div class="max-w-2xl space-y-6">
-            <div class="grid grid-cols-4 items-center">
-              <label class="text-gray-500 text-sm italic">Tên đăng nhập</label>
-              <div class="col-span-3 font-medium text-gray-700">nguyenvana123</div>
-            </div>
+          <nav
+            id="sidebar-nav"
+            class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <button
+              data-tab="account"
+              class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-blue-600 bg-blue-50 border-l-4 border-blue-600 transition-all font-medium"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                ></path>
+              </svg>
+              Hồ Sơ Của Tôi
+            </button>
+            <button
+              data-tab="notifications"
+              class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                ></path>
+              </svg>
+              Thông Báo
+            </button>
+            <button
+              data-tab="orders"
+              class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                ></path>
+              </svg>
+              Đơn Mua
+            </button>
+            <button
+              data-tab="reviews"
+              class="tab-btn w-full flex items-center gap-3 px-4 py-4 text-gray-600 hover:bg-gray-50 transition-all border-l-4 border-transparent"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                ></path>
+              </svg>
+              Đánh giá
+            </button>
+          </nav>
+        </aside>
 
-            <div class="grid grid-cols-4 items-center">
-              <label class="text-gray-500 text-sm italic">Tên</label>
-              <input type="text"
-                     class="col-span-3 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
-                     value="Nguyễn Văn A">
-            </div>
+        <div class="flex-1">
+          <!--      Hồ sơ người dùng-->
+          <section
+            id="content-account"
+            class="tab-content bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          >
+            <div id="profile-main-view">
+              <div class="border-b pb-4 mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Hồ Sơ Của Tôi</h2>
+                <p class="text-sm text-gray-500">
+                  Quản lý thông tin hồ sơ để bảo mật tài khoản
+                </p>
+              </div>
 
-            <div class="grid grid-cols-4 items-center">
-              <label class="text-gray-500 text-sm italic">Email</label>
-              <div class="col-span-3 text-gray-700">
-                van***@gmail.com
-                <button class="text-blue-600 text-sm underline ml-2 hover:text-blue-800">Thay đổi</button>
+              <div class="max-w-2xl space-y-6">
+                <div class="grid grid-cols-4 items-center">
+                  <label class="text-gray-500 text-sm italic"
+                    >Tên đăng nhập</label
+                  >
+                  <div class="col-span-3 font-medium text-gray-700">
+                    nguyenvana123
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-4 items-center">
+                  <label class="text-gray-500 text-sm italic">Tên</label>
+                  <input
+                    type="text"
+                    class="col-span-3 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
+                    value="Nguyễn Văn A"
+                  />
+                </div>
+
+                <div class="grid grid-cols-4 items-center">
+                  <label class="text-gray-500 text-sm italic">Email</label>
+                  <div class="col-span-3 text-gray-700">
+                    van***@gmail.com
+                    <button
+                      class="text-blue-600 text-sm underline ml-2 hover:text-blue-800"
+                    >
+                      Thay đổi
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-4 items-center">
+                  <label class="text-gray-500 text-sm italic"
+                    >Số điện thoại</label
+                  >
+                  <div class="col-span-3 text-gray-700">
+                    *******890
+                    <button
+                      class="text-blue-600 text-sm underline ml-2 hover:text-blue-800"
+                    >
+                      Thay đổi
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-4 items-center">
+                  <label class="text-gray-500 text-sm italic">Mật khẩu</label>
+                  <div class="col-span-3 text-gray-700">
+                    ●●●●●●●●
+                    <button
+                      onclick="togglePasswordView(true)"
+                      class="text-blue-600 text-sm underline ml-2 hover:text-blue-800"
+                    >
+                      Đổi mật khẩu
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pt-4">
+                  <button
+                    class="bg-blue-600 text-white px-10 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-md shadow-blue-100 font-medium"
+                  >
+                    Lưu thay đổi
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-4 items-center">
-              <label class="text-gray-500 text-sm italic">Số điện thoại</label>
-              <div class="col-span-3 text-gray-700">
-                *******890
-                <button class="text-blue-600 text-sm underline ml-2 hover:text-blue-800">Thay đổi</button>
+            <div id="password-change-view" class="hidden animate-fade-in">
+              <div class="border-b pb-4 mb-6 flex items-center gap-4">
+                <button
+                  onclick="togglePasswordView(false)"
+                  class="p-2 hover:bg-gray-100 rounded-full transition"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                    ></path>
+                  </svg>
+                </button>
+                <div>
+                  <h2 class="text-xl font-bold text-gray-800">Đổi Mật Khẩu</h2>
+                  <p class="text-sm text-gray-500">
+                    Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho
+                    người khác
+                  </p>
+                </div>
+              </div>
+
+              <div class="max-w-md space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Mật khẩu hiện tại</label
+                  >
+                  <input
+                    type="password"
+                    class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
+                    placeholder="Nhập mật khẩu cũ"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Mật khẩu mới</label
+                  >
+                  <input
+                    type="password"
+                    class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
+                    placeholder="Nhập mật khẩu mới"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Xác nhận mật khẩu</label
+                  >
+                  <input
+                    type="password"
+                    class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
+                    placeholder="Nhập lại mật khẩu mới"
+                  />
+                </div>
+                <div class="pt-4 flex gap-3">
+                  <button
+                    class="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+                  >
+                    Xác nhận
+                  </button>
+                  <button
+                    onclick="togglePasswordView(false)"
+                    class="px-8 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
+                  >
+                    Hủy
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div class="grid grid-cols-4 items-center">
-              <label class="text-gray-500 text-sm italic">Mật khẩu</label>
-              <div class="col-span-3 text-gray-700">
-                ●●●●●●●●
-                <button onclick="togglePasswordView(true)"
-                        class="text-blue-600 text-sm underline ml-2 hover:text-blue-800">Đổi mật khẩu</button>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <button
-                      class="bg-blue-600 text-white px-10 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-md shadow-blue-100 font-medium">
-                Lưu thay đổi
+          </section>
+          <!--thông báo-->
+          <section
+            id="content-notifications"
+            class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <div class="p-4 bg-gray-50 border-b text-right">
+              <button class="text-sm text-blue-600 font-medium">
+                Đánh dấu tất cả đã đọc
               </button>
             </div>
-          </div>
+            <div class="divide-y divide-gray-100">
+              <div
+                class="p-4 flex gap-4 hover:bg-blue-50/50 transition bg-blue-50/30"
+              >
+                <div
+                  class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  🚚
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-bold text-gray-800">Cập nhật đơn hàng</h4>
+                  <p class="text-sm text-gray-600">
+                    Đơn hàng #DH12345 đã được giao thành công cho khách hàng.
+                  </p>
+                  <span class="text-xs text-gray-400 mt-1 block"
+                    >15:30 15/12/2023</span
+                  >
+                </div>
+              </div>
+              <div class="p-4 flex gap-4 hover:bg-gray-50 transition">
+                <div
+                  class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  🎁
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-bold text-gray-800">Ưu đãi độc quyền</h4>
+                  <p class="text-sm text-gray-600">
+                    Giảm giá 50k cho đơn hàng từ 500k khi nhập mã "HELLO".
+                  </p>
+                  <span class="text-xs text-gray-400 mt-1 block"
+                    >08:00 14/12/2023</span
+                  >
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!--đơn mua-->
+          <section
+            id="content-orders"
+            class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <!-- TAB BUTTONS -->
+            <div class="flex overflow-x-auto border-b bg-white sticky top-0">
+              <button
+                class="order-subtab active px-6 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap"
+                data-tab="all"
+              >
+                Tất cả
+              </button>
+
+              <button id="btnPending"
+                class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap"
+                data-tab="pending"
+              >
+                Chờ xác nhận
+              </button>
+
+              <button
+                class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap"
+                data-tab="shipping"
+              >
+                Vận chuyển
+              </button>
+
+              <button
+                class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap"
+                data-tab="completed"
+              >
+                Hoàn thành
+              </button>
+
+              <button
+                class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap"
+                data-tab="cancelled"
+              >
+                Đã hủy
+              </button>
+            </div>
+
+            <!-- TAB CONTENT -->
+            <div class="p-4 space-y-4">
+              <!-- TẤT CẢ -->
+              <div class="order-tab-content" data-content="all">
+                <!-- có thể include tất cả đơn -->
+              </div>
+
+              <!-- CHỜ XÁC NHẬN -->
+              <div
+                class="order-tab-content hidden space-y-4"
+                data-content="pending"
+              >
+                <!-- ĐƠN HÀNG -->
+                <div
+                  class="order-item border rounded-xl p-4 md:p-6 hover:shadow-md transition-shadow"
+                >
+                  <!-- HEADER -->
+                  <div
+                    class="flex items-center justify-between pb-3 border-b border-gray-100"
+                  >
+                    <div class="text-sm text-gray-500">
+                      Mã đơn:
+                      <span class="font-medium text-gray-800">#ORDER001</span>
+                    </div>
+                    <span
+                      class="text-yellow-600 font-semibold text-sm uppercase"
+                      >Chờ xác nhận</span
+                    >
+                  </div>
+
+                  <!-- SẢN PHẨM -->
+                  <div class="flex gap-4 mt-4">
+                    <div class="w-20 h-20 flex-shrink-0">
+                      <img
+                        src="https://via.placeholder.com/80"
+                        class="w-full h-full object-cover rounded-lg border"
+                        alt="Giày thể thao"
+                      />
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-medium text-gray-800 truncate">
+                        Giày Thể Thao Nike Air Force 1 '07
+                      </h4>
+                      <p class="text-xs text-gray-400 mt-1">
+                        Phân loại: Trắng · Size 42
+                      </p>
+                      <p class="text-xs text-gray-400 mt-1">Số lượng: x1</p>
+                    </div>
+
+                    <div class="text-right">
+                      <p class="text-blue-600 font-bold">2.350.000đ</p>
+                    </div>
+                  </div>
+
+                  <!-- FOOTER -->
+                  <div
+                    class="flex flex-col md:flex-row items-center justify-between gap-4 mt-5 pt-4 border-t border-gray-100"
+                  >
+                    <div class="text-sm text-gray-500">
+                      Tổng thanh toán:
+                      <span class="text-lg font-bold text-blue-600 ml-1">
+                        2.350.000đ
+                      </span>
+                    </div>
+
+                    <div class="flex gap-2 w-full md:w-auto">
+                      <button
+                        class="flex-1 md:flex-none px-5 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 text-sm font-medium transition"
+                      >
+                        Hủy đơn
+                      </button>
+
+                      <button
+                        class="flex-1 md:flex-none px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition"
+                      >
+                        Liên hệ shop
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VẬN CHUYỂN -->
+              <div class="order-tab-content hidden" data-content="shipping">
+                <div class="order-item border rounded-xl p-4">
+                  <span class="text-orange-600 font-medium">Vận chuyển</span>
+                  <p>Mã đơn: #ORDER002</p>
+                </div>
+              </div>
+
+              <!-- HOÀN THÀNH -->
+              <div class="order-tab-content hidden" data-content="completed">
+                <div class="order-item border rounded-xl p-4">
+                  <span class="text-green-600 font-medium">Hoàn thành</span>
+                  <p>Mã đơn: #ORDER003</p>
+                </div>
+              </div>
+
+              <!-- ĐÃ HỦY -->
+              <div class="order-tab-content hidden" data-content="cancelled">
+                <div class="order-item border rounded-xl p-4">
+                  <span class="text-red-600 font-medium">Đã hủy</span>
+                  <p>Mã đơn: #ORDER004</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!--đánh giá -->
+          <section
+            id="content-reviews"
+            class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+          >
+            <!-- Sub-tabs for review sections -->
+            <div class="flex overflow-x-auto border-b bg-white sticky top-0">
+              <button
+                id="review-tab-pending"
+                class="review-subtab active px-6 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap"
+              >
+                Chờ đánh giá
+                <span
+                  id="pending-count"
+                  class="ml-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full hidden"
+                  >0</span
+                >
+              </button>
+              <button
+                id="review-tab-completed"
+                class="review-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap border-b-2 border-transparent"
+              >
+                Đã đánh giá
+              </button>
+            </div>
+
+            <!-- Pending Reviews Content -->
+            <div id="pending-reviews-content" class="p-4">
+              <!-- Loading State -->
+              <div
+                id="pending-loading"
+                class="flex items-center justify-center py-12"
+              >
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+                ></div>
+                <span class="ml-3 text-gray-500">Đang tải...</span>
+              </div>
+              <!-- Empty State -->
+              <div id="pending-empty" class="hidden text-center py-12">
+                <div class="text-5xl mb-4">✨</div>
+                <h4 class="font-bold text-gray-700 mb-2">
+                  Không có sản phẩm chờ đánh giá
+                </h4>
+                <p class="text-sm text-gray-500">
+                  Bạn đã đánh giá tất cả sản phẩm đã mua!
+                </p>
+              </div>
+              <!-- Items Container -->
+              <div id="pending-items" class="space-y-4 hidden"></div>
+            </div>
+
+            <!-- Completed Reviews Content -->
+            <div id="completed-reviews-content" class="p-4 hidden">
+              <!-- Loading State -->
+              <div
+                id="completed-loading"
+                class="flex items-center justify-center py-12"
+              >
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+                ></div>
+                <span class="ml-3 text-gray-500">Đang tải...</span>
+              </div>
+              <!-- Empty State -->
+              <div id="completed-empty" class="hidden text-center py-12">
+                <div class="text-5xl mb-4">📝</div>
+                <h4 class="font-bold text-gray-700 mb-2">
+                  Chưa có đánh giá nào
+                </h4>
+                <p class="text-sm text-gray-500">
+                  Hãy đánh giá sản phẩm để chia sẻ trải nghiệm của bạn!
+                </p>
+              </div>
+              <!-- Items Container -->
+              <div id="completed-items" class="space-y-4 hidden"></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!--form đánh giá sản phẩm-->
+    <div
+      id="reviewModal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-fade-in"
+      >
+        <div
+          class="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10"
+        >
+          <h3 class="text-xl font-bold text-gray-800">✍️ Viết đánh giá</h3>
+          <button
+            onclick="closeReviewModal()"
+            class="p-2 hover:bg-gray-100 rounded-full text-gray-400"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
         </div>
 
-        <div id="password-change-view" class="hidden animate-fade-in">
-          <div class="border-b pb-4 mb-6 flex items-center gap-4">
-            <button onclick="togglePasswordView(false)" class="p-2 hover:bg-gray-100 rounded-full transition">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
-                </path>
-              </svg>
-            </button>
+        <div class="p-6">
+          <div id="alertContainer" class="mb-4"></div>
+
+          <div
+            class="flex gap-4 p-3 bg-blue-50 rounded-xl mb-6 border border-blue-100"
+          >
+            <img
+              id="modalProductImg"
+              src="https://via.placeholder.com/60"
+              class="w-16 h-16 object-cover rounded-lg border bg-white"
+            />
             <div>
-              <h2 class="text-xl font-bold text-gray-800">Đổi Mật Khẩu</h2>
-              <p class="text-sm text-gray-500">Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác
+              <h4
+                id="modalProductName"
+                class="font-bold text-gray-800 text-sm line-clamp-1"
+              >
+                Tên sản phẩm
+              </h4>
+              <p id="modalProductVariant" class="text-xs text-gray-500">
+                Phân loại: ...
               </p>
             </div>
           </div>
 
-          <div class="max-w-md space-y-4">
+          <form id="reviewForm" class="space-y-6">
+            <div class="text-center">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Đánh giá của bạn:</label
+              >
+              <div class="flex flex-row-reverse justify-center gap-1 group">
+                <input
+                  type="radio"
+                  name="rating"
+                  value="5"
+                  id="star5"
+                  class="hidden peer"
+                  required
+                />
+                <label
+                  for="star5"
+                  class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors"
+                  >★</label
+                >
+
+                <input
+                  type="radio"
+                  name="rating"
+                  value="4"
+                  id="star4"
+                  class="hidden peer"
+                />
+                <label
+                  for="star4"
+                  class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors"
+                  >★</label
+                >
+
+                <input
+                  type="radio"
+                  name="rating"
+                  value="3"
+                  id="star3"
+                  class="hidden peer"
+                />
+                <label
+                  for="star3"
+                  class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors"
+                  >★</label
+                >
+
+                <input
+                  type="radio"
+                  name="rating"
+                  value="2"
+                  id="star2"
+                  class="hidden peer"
+                />
+                <label
+                  for="star2"
+                  class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors"
+                  >★</label
+                >
+
+                <input
+                  type="radio"
+                  name="rating"
+                  value="1"
+                  id="star1"
+                  class="hidden peer"
+                />
+                <label
+                  for="star1"
+                  class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors"
+                  >★</label
+                >
+              </div>
+            </div>
+
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
-              <input type="password"
-                     class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
-                     placeholder="Nhập mật khẩu cũ">
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Cảm nghĩ của bạn:</label
+              >
+              <textarea
+                id="comment"
+                name="comment"
+                rows="4"
+                class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
+                placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+              ></textarea>
             </div>
+
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
-              <input type="password"
-                     class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
-                     placeholder="Nhập mật khẩu mới">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu</label>
-              <input type="password"
-                     class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
-                     placeholder="Nhập lại mật khẩu mới">
-            </div>
-            <div class="pt-4 flex gap-3">
-              <button class="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition font-medium">Xác
-                nhận</button>
-              <button onclick="togglePasswordView(false)"
-                      class="px-8 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition">Hủy</button>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!--thông báo-->
-      <section id="content-notifications"
-               class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-4 bg-gray-50 border-b text-right">
-          <button class="text-sm text-blue-600 font-medium">Đánh dấu tất cả đã đọc</button>
-        </div>
-        <div class="divide-y divide-gray-100">
-          <div class="p-4 flex gap-4 hover:bg-blue-50/50 transition bg-blue-50/30">
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">🚚</div>
-            <div class="flex-1">
-              <h4 class="font-bold text-gray-800">Cập nhật đơn hàng</h4>
-              <p class="text-sm text-gray-600">Đơn hàng #DH12345 đã được giao thành công cho khách hàng.</p>
-              <span class="text-xs text-gray-400 mt-1 block">15:30 15/12/2023</span>
-            </div>
-          </div>
-          <div class="p-4 flex gap-4 hover:bg-gray-50 transition">
-            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">🎁</div>
-            <div class="flex-1">
-              <h4 class="font-bold text-gray-800">Ưu đãi độc quyền</h4>
-              <p class="text-sm text-gray-600">Giảm giá 50k cho đơn hàng từ 500k khi nhập mã "HELLO".</p>
-              <span class="text-xs text-gray-400 mt-1 block">08:00 14/12/2023</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!--đơn mua-->
-      <section id="content-orders"
-               class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="flex overflow-x-auto border-b bg-white sticky top-0">
-          <button
-                  class="order-subtab active px-6 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap">Tất
-            cả</button>
-          <button
-                  class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap">Chờ
-            xác nhận</button>
-          <button
-                  class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap">Vận
-            chuyển</button>
-          <button
-                  class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap">Hoàn
-            thành</button>
-          <button
-                  class="order-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap">Đã
-            hủy</button>
-        </div>
-
-        <div class="p-4 space-y-4">
-          <div class="border rounded-xl p-4 md:p-6 hover:shadow-md transition-shadow">
-            <div
-                    class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-gray-50 mb-4 gap-2">
-              <div class="flex items-center gap-2 text-sm">
-                <span class="text-gray-400 border-r pr-2 italic">Mã đơn: #SAMSUNG9921</span>
-                <span class="text-blue-600 font-medium uppercase">Hoàn thành</span>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Thêm hình ảnh (tối đa 5 ảnh):</label
+              >
+              <div
+                onclick="document.getElementById('imageInput').click()"
+                class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-blue-400 cursor-pointer transition"
+              >
+                <div class="text-gray-400">📷</div>
+                <p class="text-xs text-gray-400 mt-2">Nhấn để chọn ảnh</p>
               </div>
+              <input
+                type="file"
+                id="imageInput"
+                name="images"
+                multiple
+                accept="image/*"
+                class="hidden"
+              />
+              <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
             </div>
 
-            <div class="flex gap-4">
-              <div class="relative w-20 h-20 flex-shrink-0">
-                <img src="https://via.placeholder.com/80" alt="product"
-                     class="w-full h-full object-cover rounded-lg border">
-                <span
-                        class="absolute -top-2 -right-2 bg-gray-800 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">1</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h4 class="text-gray-800 font-medium truncate">Điện thoại Samsung Galaxy S23 Ultra - 256GB - Hàng
-                  Chính Hãng</h4>
-                <p class="text-xs text-gray-400 mt-1">Phân loại: Phantom Black</p>
-                <div class="flex items-center gap-2 mt-2">
-                  <span class="text-xs border border-blue-200 text-blue-500 px-1 rounded">7 ngày trả hàng</span>
-                </div>
-              </div>
-              <div class="text-right">
-                <p class="text-blue-600 font-bold">23.450.000đ</p>
-              </div>
+            <div class="flex gap-3 pt-4">
+              <button
+                type="button"
+                onclick="closeReviewModal()"
+                class="flex-1 py-3 border border-gray-300 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 shadow-lg shadow-blue-100 transition"
+              >
+                Gửi Đánh Giá
+              </button>
             </div>
-
-            <div class="mt-6 pt-4 border-t border-gray-50">
-              <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="text-sm text-gray-500">
-                  Tổng số tiền: <span class="text-xl font-bold text-blue-600 ml-1">23.450.000đ</span>
-                </div>
-
-                <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                  <button
-                          class="flex-1 md:flex-none px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
-                    Yêu cầu Trả hàng/Hoàn tiền
-                  </button>
-
-                  <button onclick="openReviewModal('Sản phẩm Samsung Galaxy S23', 'Phantom Black', 'img_url.jpg')"
-                          class="flex-1 md:flex-none px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Đánh Giá
-                  </button>
-
-                  <button
-                          class="flex-1 md:flex-none px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium transition">
-                    Mua Lại
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!--đánh giá -->
-      <section id="content-reviews"
-               class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <!-- Sub-tabs for review sections -->
-        <div class="flex overflow-x-auto border-b bg-white sticky top-0">
-          <button id="review-tab-pending"
-                  class="review-subtab active px-6 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap">
-            Chờ đánh giá
-            <span id="pending-count"
-                  class="ml-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
-          </button>
-          <button id="review-tab-completed"
-                  class="review-subtab px-6 py-4 text-sm font-medium text-gray-500 hover:text-blue-600 whitespace-nowrap border-b-2 border-transparent">
-            Đã đánh giá
-          </button>
-        </div>
-
-        <!-- Pending Reviews Content -->
-        <div id="pending-reviews-content" class="p-4">
-          <!-- Loading State -->
-          <div id="pending-loading" class="flex items-center justify-center py-12">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span class="ml-3 text-gray-500">Đang tải...</span>
-          </div>
-          <!-- Empty State -->
-          <div id="pending-empty" class="hidden text-center py-12">
-            <div class="text-5xl mb-4">✨</div>
-            <h4 class="font-bold text-gray-700 mb-2">Không có sản phẩm chờ đánh giá</h4>
-            <p class="text-sm text-gray-500">Bạn đã đánh giá tất cả sản phẩm đã mua!</p>
-          </div>
-          <!-- Items Container -->
-          <div id="pending-items" class="space-y-4 hidden"></div>
-        </div>
-
-        <!-- Completed Reviews Content -->
-        <div id="completed-reviews-content" class="p-4 hidden">
-          <!-- Loading State -->
-          <div id="completed-loading" class="flex items-center justify-center py-12">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span class="ml-3 text-gray-500">Đang tải...</span>
-          </div>
-          <!-- Empty State -->
-          <div id="completed-empty" class="hidden text-center py-12">
-            <div class="text-5xl mb-4">📝</div>
-            <h4 class="font-bold text-gray-700 mb-2">Chưa có đánh giá nào</h4>
-            <p class="text-sm text-gray-500">Hãy đánh giá sản phẩm để chia sẻ trải nghiệm của bạn!</p>
-          </div>
-          <!-- Items Container -->
-          <div id="completed-items" class="space-y-4 hidden"></div>
-        </div>
-      </section>
-    </div>
-  </div>
-</div>
-
-<!--form đánh giá sản phẩm-->
-<div id="reviewModal"
-     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto">
-  <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-fade-in">
-
-    <div class="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
-      <h3 class="text-xl font-bold text-gray-800">✍️ Viết đánh giá</h3>
-      <button onclick="closeReviewModal()" class="p-2 hover:bg-gray-100 rounded-full text-gray-400">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-
-    <div class="p-6">
-      <div id="alertContainer" class="mb-4"></div>
-
-      <div class="flex gap-4 p-3 bg-blue-50 rounded-xl mb-6 border border-blue-100">
-        <img id="modalProductImg" src="https://via.placeholder.com/60"
-             class="w-16 h-16 object-cover rounded-lg border bg-white">
-        <div>
-          <h4 id="modalProductName" class="font-bold text-gray-800 text-sm line-clamp-1">Tên sản phẩm</h4>
-          <p id="modalProductVariant" class="text-xs text-gray-500">Phân loại: ...</p>
+          </form>
         </div>
       </div>
-
-      <form id="reviewForm" class="space-y-6">
-        <div class="text-center">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn:</label>
-          <div class="flex flex-row-reverse justify-center gap-1 group">
-            <input type="radio" name="rating" value="5" id="star5" class="hidden peer" required>
-            <label for="star5"
-                   class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
-
-            <input type="radio" name="rating" value="4" id="star4" class="hidden peer">
-            <label for="star4"
-                   class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
-
-            <input type="radio" name="rating" value="3" id="star3" class="hidden peer">
-            <label for="star3"
-                   class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
-
-            <input type="radio" name="rating" value="2" id="star2" class="hidden peer">
-            <label for="star2"
-                   class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
-
-            <input type="radio" name="rating" value="1" id="star1" class="hidden peer">
-            <label for="star1"
-                   class="text-3xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors">★</label>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Cảm nghĩ của bạn:</label>
-          <textarea id="comment" name="comment" rows="4"
-                    class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
-                    placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Thêm hình ảnh (tối đa 5 ảnh):</label>
-          <div onclick="document.getElementById('imageInput').click()"
-               class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-blue-400 cursor-pointer transition">
-            <div class="text-gray-400">📷</div>
-            <p class="text-xs text-gray-400 mt-2">Nhấn để chọn ảnh</p>
-          </div>
-          <input type="file" id="imageInput" name="images" multiple accept="image/*" class="hidden">
-          <div id="imagePreview" class="flex flex-wrap gap-2 mt-3"></div>
-        </div>
-
-        <div class="flex gap-3 pt-4">
-          <button type="button" onclick="closeReviewModal()"
-                  class="flex-1 py-3 border border-gray-300 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">Hủy</button>
-          <button type="submit"
-                  class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 shadow-lg shadow-blue-100 transition">Gửi
-            Đánh Giá</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
 
-<!--<style>-->
-<!--  /* Hiệu ứng chọn sao lan tỏa ngược lại */-->
-<!--  .peer:hover ~ label, .peer:checked ~ label {-->
-<!--    color: #facc15; /* yellow-400 */-->
-<!--  }-->
-<!--  .animate-fade-in { animation: fadeIn 0.3s ease-out; }-->
-<!--  @keyframes fadeIn {-->
-<!--    from { opacity: 0; transform: translateY(20px); }-->
-<!--    to { opacity: 1; transform: translateY(0); }-->
-<!--  }-->
-<!--</style>-->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+    <!--<style>-->
+    <!--  /* Hiệu ứng chọn sao lan tỏa ngược lại */-->
+    <!--  .peer:hover ~ label, .peer:checked ~ label {-->
+    <!--    color: #facc15; /* yellow-400 */-->
+    <!--  }-->
+    <!--  .animate-fade-in { animation: fadeIn 0.3s ease-out; }-->
+    <!--  @keyframes fadeIn {-->
+    <!--    from { opacity: 0; transform: translateY(20px); }-->
+    <!--    to { opacity: 1; transform: translateY(0); }-->
+    <!--  }-->
+    <!--</style>-->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tabButtons = document.querySelectorAll(".tab-btn");
+        const tabContents = document.querySelectorAll(".tab-content");
 
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
+        tabButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const targetTab = btn.getAttribute("data-tab");
 
-        // 1. Cập nhật trạng thái nút Sidebar
-        tabButtons.forEach(b => {
-          b.classList.remove('text-blue-600', 'bg-blue-50', 'border-blue-600');
-          b.classList.add('text-gray-600', 'border-transparent');
+            // 1. Cập nhật trạng thái nút Sidebar
+            tabButtons.forEach((b) => {
+              b.classList.remove(
+                "text-blue-600",
+                "bg-blue-50",
+                "border-blue-600"
+              );
+              b.classList.add("text-gray-600", "border-transparent");
+            });
+            btn.classList.add("text-blue-600", "bg-blue-50", "border-blue-600");
+            btn.classList.remove("text-gray-600", "border-transparent");
+
+            // 2. Ẩn/Hiện nội dung Content
+            tabContents.forEach((content) => {
+              content.classList.add("hidden");
+              if (content.id === `content-${targetTab}`) {
+                content.classList.remove("hidden");
+              }
+            });
+          });
         });
-        btn.classList.add('text-blue-600', 'bg-blue-50', 'border-blue-600');
-        btn.classList.remove('text-gray-600', 'border-transparent');
 
-        // 2. Ẩn/Hiện nội dung Content
-        tabContents.forEach(content => {
-          content.classList.add('hidden');
-          if (content.id === `content-${targetTab}`) {
-            content.classList.remove('hidden');
-          }
+        // Code xử lý sub-tab trong phần Đơn Mua
+        const subTabs = document.querySelectorAll(".order-subtab");
+        subTabs.forEach((stb) => {
+          stb.addEventListener("click", () => {
+            subTabs.forEach((s) => {
+              s.classList.remove("text-blue-600", "border-blue-600");
+              s.classList.add("text-gray-500");
+            });
+            stb.classList.add("text-blue-600", "border-blue-600");
+            stb.classList.remove("text-gray-500");
+          });
         });
       });
-    });
 
-    // Code xử lý sub-tab trong phần Đơn Mua
-    const subTabs = document.querySelectorAll('.order-subtab');
-    subTabs.forEach(stb => {
-      stb.addEventListener('click', () => {
-        subTabs.forEach(s => {
-          s.classList.remove('text-blue-600', 'border-blue-600');
-          s.classList.add('text-gray-500');
-        });
-        stb.classList.add('text-blue-600', 'border-blue-600');
-        stb.classList.remove('text-gray-500');
-      });
-    });
-  });
+      function togglePasswordView(show) {
+        const profileView = document.getElementById("profile-main-view");
+        const passwordView = document.getElementById("password-change-view");
 
-
-  function togglePasswordView(show) {
-    const profileView = document.getElementById('profile-main-view');
-    const passwordView = document.getElementById('password-change-view');
-
-    if (show) {
-      profileView.classList.add('hidden');
-      passwordView.classList.remove('hidden');
-    } else {
-      profileView.classList.remove('hidden');
-      passwordView.classList.add('hidden');
-    }
-  }
-
-
-
-
-
-  //   dánh giá
-  function openReviewModal(name, variant, img) {
-    const modal = document.getElementById('reviewModal');
-
-    // Gán thông tin sản phẩm vào modal
-    document.getElementById('modalProductName').innerText = name;
-    document.getElementById('modalProductVariant').innerText = 'Phân loại: ' + variant;
-    document.getElementById('modalProductImg').src = img;
-
-    // Hiện modal
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
-  }
-
-  function closeReviewModal() {
-    const modal = document.getElementById('reviewModal');
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto'; // Mở lại cuộn trang
-  }
-
-  // Xử lý xem trước ảnh khi upload
-  document.getElementById('imageInput').addEventListener('change', function (e) {
-    const preview = document.getElementById('imagePreview');
-    preview.innerHTML = '';
-    [...this.files].forEach(file => {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.className = "w-16 h-16 object-cover rounded-lg border";
-        preview.appendChild(img);
+        if (show) {
+          profileView.classList.add("hidden");
+          passwordView.classList.remove("hidden");
+        } else {
+          profileView.classList.remove("hidden");
+          passwordView.classList.add("hidden");
+        }
       }
-      reader.readAsDataURL(file);
-    });
-  });
 
-  // Đóng modal khi click ra ngoài vùng trắng
-  window.onclick = function (event) {
-    const modal = document.getElementById('reviewModal');
-    if (event.target == modal) {
-      closeReviewModal();
-    }
-  }
+      // xu li chuyen tab don hang
+      const tabs = document.querySelectorAll(".order-subtab");
+      const contents = document.querySelectorAll(".order-tab-content");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // reset tab UI
+          tabs.forEach((t) => {
+            t.classList.remove(
+              "text-blue-600",
+              "border-b-2",
+              "border-blue-600",
+              "active"
+            );
+            t.classList.add("text-gray-500");
+          });
+
+          // active tab
+          tab.classList.add(
+            "text-blue-600",
+            "border-b-2",
+            "border-blue-600",
+            "active"
+          );
+          tab.classList.remove("text-gray-500");
+
+          const tabName = tab.dataset.tab;
+
+          // show đúng content
+          contents.forEach((c) => {
+            if (c.dataset.content === tabName) {
+              c.classList.remove("hidden");
+            } else {
+              c.classList.add("hidden");
+            }
+          });
+        });
+      });
+
+      //   dánh giá
+      function openReviewModal(name, variant, img) {
+        const modal = document.getElementById("reviewModal");
+
+        // Gán thông tin sản phẩm vào modal
+        document.getElementById("modalProductName").innerText = name;
+        document.getElementById("modalProductVariant").innerText =
+          "Phân loại: " + variant;
+        document.getElementById("modalProductImg").src = img;
+
+        // Hiện modal
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden"; // Khóa cuộn trang chính
+      }
+
+      function closeReviewModal() {
+        const modal = document.getElementById("reviewModal");
+        modal.classList.add("hidden");
+        document.body.style.overflow = "auto"; // Mở lại cuộn trang
+      }
+
+      // Xử lý xem trước ảnh khi upload
+      document
+        .getElementById("imageInput")
+        .addEventListener("change", function (e) {
+          const preview = document.getElementById("imagePreview");
+          preview.innerHTML = "";
+          [...this.files].forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const img = document.createElement("img");
+              img.src = e.target.result;
+              img.className = "w-16 h-16 object-cover rounded-lg border";
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          });
+        });
+
+      // Đóng modal khi click ra ngoài vùng trắng
+      window.onclick = function (event) {
+        const modal = document.getElementById("reviewModal");
+        if (event.target == modal) {
+          closeReviewModal();
+        }
+      };
+    </script>
+
+    <script th:src="@{/js/profile/profile-reviews.js}"></script>
+    <script type="module" src="/pages/pending-order.page.js"></script>
 
 
-</script>
-
-<script th:src="@{/js/profile/profile-reviews.js}"></script>
-</body>
-
+  </body>
 </html>

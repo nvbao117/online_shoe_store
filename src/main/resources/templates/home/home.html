@@ -10,6 +10,8 @@
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
+  <link rel="stylesheet" th:href="@{/css/chatbot.css}">
+
   <!-- CSS header dùng chung -->
   <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
 
@@ -225,33 +227,22 @@
   </div>
 </section>
 
-<!-- AI Support Button -->
-<div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6">
-  <button
-          class="bg-blue-600 text-white px-4 py-2 sm:px-4 sm:py-3 rounded-full flex items-center gap-2 shadow-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
-  >
-    <svg
-            class="w-4 h-4 sm:w-5 sm:h-5"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-    >
-      <path
-              d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
-      />
-    </svg>
-    Tư Vấn AI
-  </button>
-</div>
+
 
 <!-- Footer -->
 <div th:replace="fragments/footer :: mainFooter"></div>
 
 <!-- JS -->
 <!--<script type="module" src="/home/script/home-ui.js"></script>-->
+
+
+
+
 <script type="module" src="/pages/home.page.js"></script>
 <script type="module" src="/pages/search.page.js"></script>
 <script type="module" src="/pages/header-auth.page.js"></script>
-
+<div th:replace="~{fragments/chatbot :: chatbot}"></div>
+<!-- Chatbot JS -->
+<script th:src="@{/js/chatbot.js}"></script>
 </body>
-</html>
 </html>
