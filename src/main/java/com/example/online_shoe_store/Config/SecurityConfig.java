@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/admin/users/**").permitAll()
                         .requestMatchers(
                                 "/login",
                                 "/register",
@@ -89,7 +90,9 @@ public class SecurityConfig {
                                 "/home/image/**",
                                 "/src/data/images/categories/**",
                                 "/about",
-                                "/contact"
+                                "/contact",
+                                "/admin/**",
+                                "/api/vouchers/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
