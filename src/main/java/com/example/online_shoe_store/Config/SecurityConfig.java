@@ -92,7 +92,8 @@ public class SecurityConfig {
                                 "/about",
                                 "/contact",
                                 "/admin/**",
-                                "/api/vouchers/**"
+                                "/api/vouchers/**",
+                                "/api/search/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

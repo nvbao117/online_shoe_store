@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,8 +8,7 @@
 
   <!-- Bootstrap + Bootstrap Icons (dùng cho header) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
   <link rel="stylesheet" th:href="@{/css/chatbot.css}">
   <!-- CSS header dùng chung -->
   <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
@@ -21,6 +21,7 @@
       background-color: #3b82f6;
       color: white;
     }
+
     .sport-card:hover img {
       transform: scale(1.05);
     }
@@ -29,14 +30,17 @@
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
+
     .no-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
     .slide-enter {
       opacity: 0;
       transform: translateX(30px);
     }
+
     .slide-enter-active {
       opacity: 1;
       transform: translateX(0);
@@ -47,6 +51,7 @@
       opacity: 1;
       transform: translateX(0);
     }
+
     .slide-exit-active {
       opacity: 0;
       transform: translateX(-30px);
@@ -54,160 +59,153 @@
     }
   </style>
 </head>
-  <body class="bg-white">
-    <!-- Header -->
+
+<body class="bg-white">
+  <!-- Header -->
   <div th:replace="fragments/header :: mainHeader"></div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-4">
-      <!-- Breadcrumb -->
-      <div class="bg-red-50 -m-4 text-gray-600 mb-4 w-full">
-        Trang Chủ > Sản Phẩm
-      </div>
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-4">
+    <!-- Breadcrumb -->
+    <div class="bg-red-50 -m-4 text-gray-600 mb-4 w-full">
+      Trang Chủ > Sản Phẩm
+    </div>
 
-      <!-- Category Tabs -->
-      <div  id="category-tabs" class="flex gap-2 mb-6 overflow-x-auto">
-<!--        đẩy nút từ database-->
-      </div>
-
-
-      <div class="flex gap-6">
-        <!-- Sidebar Filters -->
-        <aside class="w-64 flex-shrink-0">
-          <div class="bg-white rounded-lg border border-blue-200 p-4 space-y-6">
-            <!-- Price Filter -->
-            <div>
-              <h3 class="font-bold text-gray-800 mb-3">Chọn mức giá</h3>
-              <div class="space-y-2" id="price-filters">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="0-500000" class="price-filter w-4 h-4" />
-                  <span>Dưới 500k</span>
-                </label>
-
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="500000-1000000" class="price-filter w-4 h-4" />
-                  <span>Từ 500k - 1 Triệu</span>
-                </label>
-
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="1000000-2000000" class="price-filter w-4 h-4" />
-                  <span>Từ 1 Triệu - 2 Triệu</span>
-                </label>
-
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="2000000-3000000" class="price-filter w-4 h-4" />
-                  <span>Từ 2 Triệu - 3 Triệu</span>
-                </label>
-
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" value="3000000-999999" class="price-filter w-4 h-4" />
-                  <span>Trên 3 Triệu</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Brand Filter -->
-            <div>
-              <h3 class="font-bold text-gray-800 mb-3">THƯƠNG HIỆU</h3>
-              <input
-                type="text"
-                placeholder="Tìm kiếm sản phẩm"
-                class="w-full px-3 py-2 border border-gray-300 rounded mb-3 text-sm"
-              />
-              <div id="bands-container" class="space-y-2">
-              </div>
-            </div>
-
-            <!-- Size Filter -->
-            <div>
-              <h3 class="font-bold text-gray-800 mb-3">CHỌN SIZE</h3>
-              <div id="checkbox-container" class="space-y-2">
-<!--                đẩy từ product-ui-->
-              </div>
-            </div>
-
-            <!-- Gender Filter -->
-            <div class="relative">
-              <h3 class="font-bold text-gray-800 mb-3">ĐỐI TƯỢNG</h3>
-              <div class="flex gap-6">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="gender-filter w-4 h-4" />
-                  <span>Nam</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" class="gender-filter w-4 h-4" />
-                  <span>Nữ</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </aside>
+    <!-- Category Tabs -->
+    <div id="category-tabs" class="flex gap-2 mb-6 overflow-x-auto">
+      <!--        đẩy nút từ database-->
+    </div>
 
 
+    <div class="flex gap-6">
+      <!-- Sidebar Filters -->
+      <aside class="w-64 flex-shrink-0">
+        <div class="bg-white rounded-lg border border-blue-200 p-4 space-y-6">
+          <!-- Price Filter -->
+          <div>
+            <h3 class="font-bold text-gray-800 mb-3">Chọn mức giá</h3>
+            <div class="space-y-2" id="price-filters">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" value="0-500000" class="price-filter w-4 h-4" />
+                <span>Dưới 500k</span>
+              </label>
 
-        <!-- Products Section -->
-        <div class="flex-1">
-          <!-- Sort Options -->
-          <div class="flex items-center gap-4 mb-4 text-sm">
-            <span class="text-gray-600">Sắp xếp theo:</span>
-            <button class="font-medium hover:text-blue-600" data-sort="featured">
-              Nổi bật
-            </button>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" value="500000-1000000" class="price-filter w-4 h-4" />
+                <span>Từ 500k - 1 Triệu</span>
+              </label>
 
-            <button class="font-medium hover:text-blue-600" data-sort="sold_desc">
-              Bán chạy
-            </button>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" value="1000000-2000000" class="price-filter w-4 h-4" />
+                <span>Từ 1 Triệu - 2 Triệu</span>
+              </label>
 
-            <button class="font-medium hover:text-blue-600" data-sort="newest">
-              Mới
-            </button>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" value="2000000-3000000" class="price-filter w-4 h-4" />
+                <span>Từ 2 Triệu - 3 Triệu</span>
+              </label>
 
-            <button class="font-medium hover:text-blue-600" data-sort="sale">
-              Giảm giá
-            </button>
-
-            <div class="relative">
-              <!-- Button Giá -->
-              <button id="sortPriceBtn" class="font-medium hover:text-blue-600">
-                Giá
-              </button>
-
-              <!-- Dropdown -->
-              <div
-                id="priceDropdown"
-                class="z-50 hidden absolute left-0 top-full mt-1 bg-white border rounded shadow-md text-sm w-40"
-              >
-                <button
-                  class="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  data-sort="price_asc"
-                >
-                  Giá tăng dần
-                </button>
-                <button
-                  class="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  data-sort="price_desc"
-                >
-                  Giá giảm dần
-                </button>
-              </div>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" value="3000000-999999" class="price-filter w-4 h-4" />
+                <span>Trên 3 Triệu</span>
+              </label>
             </div>
           </div>
 
-          <!-- Products Grid -->
-          <div id="product-container" class="grid grid-cols-4 gap-4">
-<!--          kéo từ database-->
+          <!-- Brand Filter -->
+          <div>
+            <h3 class="font-bold text-gray-800 mb-3">THƯƠNG HIỆU</h3>
+            <input type="text" placeholder="Tìm kiếm sản phẩm"
+              class="w-full px-3 py-2 border border-gray-300 rounded mb-3 text-sm" />
+            <div id="bands-container" class="space-y-2">
+            </div>
+          </div>
+
+          <!-- Size Filter -->
+          <div>
+            <h3 class="font-bold text-gray-800 mb-3">CHỌN SIZE</h3>
+            <div id="checkbox-container" class="space-y-2">
+              <!--                đẩy từ product-ui-->
+            </div>
+          </div>
+
+          <!-- Gender Filter -->
+          <div class="relative">
+            <h3 class="font-bold text-gray-800 mb-3">ĐỐI TƯỢNG</h3>
+            <div class="flex gap-6">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" class="gender-filter w-4 h-4" />
+                <span>Nam</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" class="gender-filter w-4 h-4" />
+                <span>Nữ</span>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
-    <!-- Footer -->
-    <div th:replace="~{fragments/chatbot :: chatbot}"></div>
-    <!-- Chatbot JS -->
-    <script th:src="@{/js/chatbot.js}"></script>
-    <div th:replace="fragments/footer :: mainFooter"></div>
-    <script type="module" src="/pages/products.page.js"></script>
-    <script type="module" src="/pages/search.page.js"></script>
-    <script type="module" src="/pages/header-auth.page.js"></script>
+      </aside>
 
-  </body>
+
+
+      <!-- Products Section -->
+      <div class="flex-1">
+        <!-- Sort Options -->
+        <div class="flex items-center gap-4 mb-4 text-sm">
+          <span class="text-gray-600">Sắp xếp theo:</span>
+          <button class="font-medium hover:text-blue-600" data-sort="featured">
+            Nổi bật
+          </button>
+
+          <button class="font-medium hover:text-blue-600" data-sort="sold_desc">
+            Bán chạy
+          </button>
+
+          <button class="font-medium hover:text-blue-600" data-sort="newest">
+            Mới
+          </button>
+
+          <button class="font-medium hover:text-blue-600" data-sort="sale">
+            Giảm giá
+          </button>
+
+          <div class="relative">
+            <!-- Button Giá -->
+            <button id="sortPriceBtn" class="font-medium hover:text-blue-600">
+              Giá
+            </button>
+
+            <!-- Dropdown -->
+            <div id="priceDropdown"
+              class="z-50 hidden absolute left-0 top-full mt-1 bg-white border rounded shadow-md text-sm w-40">
+              <button class="w-full text-left px-4 py-2 hover:bg-gray-100" data-sort="price_asc">
+                Giá tăng dần
+              </button>
+              <button class="w-full text-left px-4 py-2 hover:bg-gray-100" data-sort="price_desc">
+                Giá giảm dần
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="product-container" class="grid grid-cols-4 gap-4">
+          <!--          kéo từ database-->
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Footer -->
+  <div th:replace="~{fragments/chatbot :: chatbot}"></div>
+  <!-- Chatbot JS -->
+  <script th:src="@{/js/chatbot.js}"></script>
+  <!-- CLIP Search JS -->
+  <script th:src="@{/js/clip-search.js}"></script>
+  <div th:replace="fragments/footer :: mainFooter"></div>
+  <script type="module" src="/pages/products.page.js"></script>
+  <script type="module" src="/pages/search.page.js"></script>
+  <script type="module" src="/pages/header-auth.page.js"></script>
+
+</body>
+
 </html>

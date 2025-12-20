@@ -1,15 +1,18 @@
-import {fetchFilteredProducts, fetchProductsByCategory} from "../api/product.api.js";
+import { fetchFilteredProducts, fetchProductsByCategory, fetchProductsByIds } from "../api/product.api.js";
+import { fetchProductsByKeyword } from "../api/search-product.api.js";
+import { fetchProductsBySemantic } from "../api/search-semantic.api.js";
 import { initCategoryTabs } from "../ui/category-tabs.ui.js";
 import { renderProductGrid } from "../ui/product-list.ui.js";
 import { getCategories } from "../api/category.api.js";
-import {renderBrandCheckboxes, renderSizeCheckboxes} from "../ui/product-filter.ui.js";
-import {getBrands} from "../api/brand.api.js";
-import {initSortPriceDropdown} from "../ui/product-sort.ui.js";
+import { renderBrandCheckboxes, renderSizeCheckboxes } from "../ui/product-filter.ui.js";
+import { getBrands } from "../api/brand.api.js";
+import { initSortPriceDropdown } from "../ui/product-sort.ui.js";
 
 async function initProductsPage() {
-    // ✅ LẤY categoryId TỪ URL
     const params = new URLSearchParams(window.location.search);
     const categoryId = params.get("categoryId") || "21112005";
+    const keyword = params.get("keyword");
+    const isImageSearch = params.get("imageSearch") === "true";
 
     const categories = [
         { categoryId: "21112005", name: "Tất cả" },
@@ -19,7 +22,6 @@ async function initProductsPage() {
     const tabContainer = document.getElementById("category-tabs");
     const productContainer = document.getElementById("product-container");
 
-    // ✅ TRUYỀN categoryId VÀO initCategoryTabs
     initCategoryTabs(
         tabContainer,
         categories,
@@ -29,22 +31,58 @@ async function initProductsPage() {
             const brands = await getBrands(selectedCategoryId);
             renderBrandCheckboxes(brands);
         },
-        categoryId // 🔥 CHỈ THÊM DÒNG NÀY
+        categoryId
     );
 
-    // load sản phẩm ban đầu
-    const products = await fetchProductsByCategory(categoryId);
-    renderProductGrid(productContainer, products);
-    // render checkbox size
+    // ===================== IMAGE SEARCH RESULTS =====================
+    if (isImageSearch) {
+        const storedIds = sessionStorage.getItem('imageSearchResults');
+        const searchQuery = sessionStorage.getItem('imageSearchQuery') || '📷 Tìm kiếm bằng hình ảnh';
+
+        if (storedIds) {
+            const productIds = JSON.parse(storedIds);
+            const products = await fetchProductsByIds(productIds);
+            renderProductGrid(productContainer, products || []);
+
+            // Show search indicator
+            const titleEl = document.querySelector('h2, .page-title');
+            if (titleEl) {
+                titleEl.textContent = searchQuery + ` (${products.length} sản phẩm)`;
+            }
+
+            // Clear session after use
+            sessionStorage.removeItem('imageSearchResults');
+            sessionStorage.removeItem('imageSearchQuery');
+        }
+        return;
+    }
+
+    // ===================== KEYWORD SEARCH =====================
+    if (keyword && keyword.trim().length >= 2) {
+        const kw = keyword.trim();
+        let products = [];
+        try {
+            products = await fetchProductsByKeyword(kw);
+        } catch (_) {
+            products = [];
+        }
+        if (!products || products.length === 0) {
+            products = await fetchProductsBySemantic(kw, 20, 0.4);
+        }
+        renderProductGrid(productContainer, products || []);
+    } else {
+        const products = await fetchProductsByCategory(categoryId);
+        renderProductGrid(productContainer, products);
+    }
+
     renderSizeCheckboxes();
-    // render brand checkbox
     const brands = await getBrands(categoryId);
     renderBrandCheckboxes(brands);
 }
 
 initProductsPage();
 // nghe sự kiện click trên các checkbox lọc
-document.addEventListener("change", function(e) {
+document.addEventListener("change", function (e) {
     if (e.target.matches(".price-filter, .brand-filter, .size-filter, .gender-filter")) {
         console.log("Filter changed");
         fetchFilteredProducts();
