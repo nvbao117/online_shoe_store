@@ -257,7 +257,7 @@ function populateCartItems(cartItems) {
             imgUrl = imgUrl.replace('src/data', '');
         }
         if (!imgUrl || imgUrl === 'null') {
-            imgUrl = '/images/placeholder.png';
+            imgUrl = '/images/logo-shop/favicon.png';
         }
         return `
         <div class="order-item" style="display: flex; gap: 10px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #E5E7EB;">

@@ -14,68 +14,92 @@ export function renderAllOrders(orders) {
 
   allBox.innerHTML = `
     <div class="space-y-4">
-      ${orders
-        .map(
-          (order) => `
-          <div class="order-item border rounded-xl p-4 md:p-6 hover:shadow-md transition-shadow" data-order-id="${escapeAttr(order.orderId)}">
-            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
-              <div class="text-sm text-gray-500">
-                Mã đơn:
-                <span class="font-medium text-gray-800">#${escapeHtml(order.orderId)}</span>
-              </div>
-              <span class="${statusClass(order.status)} font-semibold text-sm uppercase">
-                ${escapeHtml(mapStatus(order.status))}
-              </span>
-            </div>
-
-            ${renderItems(order.items)}
-
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mt-5 pt-4 border-t border-gray-100">
-              <div class="text-sm text-gray-500">
-                Tổng thanh toán:
-                <span class="text-lg font-bold text-blue-600 ml-1">${formatPrice(order.finalAmount ?? order.totalAmount ?? 0)}</span>
-              </div>
-              <div class="text-xs text-gray-400">
-                ${order.createdAt ? `Ngày đặt: ${formatDate(order.createdAt)}` : ''}
-              </div>
-            </div>
-          </div>
-        `
-        )
-        .join('')}
+      ${orders.map((order) => renderOrderCard(order)).join('')}
     </div>
   `;
 }
 
-function renderItems(items) {
-  if (!items || items.length === 0) return '';
+function renderOrderCard(order) {
+  const items = Array.isArray(order?.items) ? order.items : [];
+  const first = items[0] || {};
+  const moreCount = items.length > 1 ? items.length - 1 : 0;
+  const total = order?.finalAmount ?? order?.totalAmount ?? 0;
 
-  return items
-    .map(
-      (item) => `
+  const statusText = mapStatus(order?.status);
+  const statusTextUpper = statusText ? statusText.toUpperCase() : '';
+
+  // mimic the screenshot: show return label for completed-like states
+  const showReturnPill = order?.status === 'DELIVERED' || order?.status === 'COMPLETED';
+
+  return `
+    <div class="border border-gray-100 rounded-xl bg-white p-4 md:p-6 hover:shadow-md transition-shadow" data-order-id="${escapeAttr(order?.orderId)}">
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div class="text-sm text-gray-500">
+          Mã đơn: <span class="font-medium text-gray-800">#${escapeHtml(order?.orderId || '')}</span>
+        </div>
+        <div class="${statusClass(order?.status)} font-semibold text-sm uppercase">${escapeHtml(statusTextUpper)}</div>
+      </div>
+
       <div class="flex gap-4 mt-4">
-        <div class="w-20 h-20 flex-shrink-0">
+        <div class="relative w-20 h-20 flex-shrink-0">
           <img
-            src="${escapeAttr(item.imageUrl || '/images/placeholder.png')}"
+            src="${escapeAttr(normalizeImageUrl(first.imageUrl) || '/images/logo-shop/favicon.png')}"
             class="w-full h-full object-cover rounded-lg border"
-            alt="${escapeAttr(item.productName || 'Sản phẩm')}"
-            onerror="this.src='/images/placeholder.png'"
+            alt="${escapeAttr(first.productName || 'Sản phẩm')}"
+            onerror="this.onerror=null; this.src='/images/logo-shop/favicon.png'"
           />
+          ${first.quantity ? `
+            <span class="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-gray-900 text-white text-xs flex items-center justify-center">
+              ${escapeHtml(String(first.quantity))}
+            </span>
+          ` : ''}
         </div>
 
         <div class="flex-1 min-w-0">
-          <h4 class="font-medium text-gray-800 truncate">${escapeHtml(item.productName || '')}</h4>
-          <p class="text-xs text-gray-400 mt-1">Phân loại: ${escapeHtml(item.color || '')} · Size ${escapeHtml(item.size || '')}</p>
-          <p class="text-xs text-gray-400 mt-1">Số lượng: x${escapeHtml(String(item.quantity ?? ''))}</p>
-        </div>
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h4 class="font-medium text-gray-800 truncate">${escapeHtml(first.productName || '')}</h4>
+              <p class="text-xs text-gray-400 mt-1">
+                Phân loại: ${escapeHtml(first.color || '')}${first.color && first.size ? ' · ' : ''}${first.size ? `Size ${escapeHtml(first.size)}` : ''}
+              </p>
+              ${showReturnPill ? `<span class="inline-block mt-2 px-3 py-1 rounded-full border border-gray-200 text-xs text-gray-500">7 ngày trả hàng</span>` : ''}
+              ${moreCount ? `<div class="text-xs text-gray-400 mt-2">+${moreCount} sản phẩm khác</div>` : ''}
+            </div>
 
-        <div class="text-right">
-          <p class="text-blue-600 font-bold">${formatPrice(item.totalPrice ?? item.price ?? 0)}</p>
+            <div class="text-right flex-shrink-0">
+              <p class="text-blue-600 font-bold">${formatPrice(first.totalPrice ?? first.price ?? 0)}</p>
+            </div>
+          </div>
         </div>
       </div>
-    `
-    )
-    .join('');
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-5 pt-4 border-t border-gray-100">
+        <div class="text-sm text-gray-500">
+          Tổng số tiền:
+          <span class="text-lg font-bold text-blue-600 ml-1">${formatPrice(total)}</span>
+        </div>
+
+        <div class="flex flex-wrap gap-3 md:justify-end">
+          <button class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
+            Yêu cầu Trả hàng/Hoàn tiền
+          </button>
+          <button class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
+            Đánh Giá
+          </button>
+          <button class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
+            Mua Lại
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function normalizeImageUrl(url) {
+  if (!url) return url;
+  // Some APIs may return a placeholder path that doesn't exist in static assets.
+  if (url === '/images/placeholder.png') return '/images/logo-shop/favicon.png';
+  return url;
 }
 
 function formatPrice(price) {
