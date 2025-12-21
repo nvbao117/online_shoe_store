@@ -30,34 +30,26 @@ public class AiModelConfig {
     @Bean(name = "orchestratorModel")
     @Primary
     public ChatModel orchestratorModel() {
-        log.info("Initializing orchestrator model (Sonnet 4-5 Thinking)...");
         return AnthropicChatModel.builder()
                 .apiKey(anthropicpiKey)
                 .modelName(orchestratorModel)
-                .thinkingType("enabled")
-                .thinkingBudgetTokens(2048)
-                .maxTokens(2048+200)
-                .maxRetries(1)
-                .returnThinking(true)
+                .maxTokens(1024)
                 .temperature(1.0)
-                .timeout(Duration.ofSeconds(90))
-                .build();
-    }
-
-    // Dùng cho các Agent con (Search, FAQ) để phản hồi nhanh, rẻ
-    @Bean(name = "workerModel")
-    public ChatModel workerModel() {
-        log.info("Initializing worker model (Haiku 4-5 Thinking)...)");
-        return AnthropicChatModel.builder()
-                .apiKey(anthropicpiKey)
-                .modelName(workerModel)
-                .temperature(0.3)
-                .maxTokens(2048)
                 .timeout(Duration.ofSeconds(30))
                 .build();
     }
 
-    // --- 3. EMBEDDING MODEL ---
+    @Bean(name = "workerModel")
+    public ChatModel workerModel() {
+        return AnthropicChatModel.builder()
+                .apiKey(anthropicpiKey)
+                .modelName(workerModel)
+                .temperature(0.3)
+                .maxTokens(1536)
+                .timeout(Duration.ofSeconds(30))
+                .build();
+    }
+
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()

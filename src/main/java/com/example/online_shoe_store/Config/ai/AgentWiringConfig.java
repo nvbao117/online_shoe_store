@@ -1,15 +1,9 @@
 package com.example.online_shoe_store.Config.ai;
 
 import com.example.online_shoe_store.Service.ai.agent.OrchestratorAgent;
-import com.example.online_shoe_store.Service.ai.agent.SearchAgent;
+import com.example.online_shoe_store.Service.ai.agent.ProductAgent;
 import com.example.online_shoe_store.Service.ai.agent.SupportAgent;
-import com.example.online_shoe_store.Service.ai.agent.sales.SalesAgent;
-import com.example.online_shoe_store.Service.ai.agent.sales.CartAgent;
-import com.example.online_shoe_store.Service.ai.agent.sales.RecommendAgent;
-import com.example.online_shoe_store.Service.ai.agent.operations.LogisticsAgent;
-import com.example.online_shoe_store.Service.ai.agent.operations.InventoryAgent;
-import com.example.online_shoe_store.Service.ai.agent.marketing.MarketingAgent;
-import com.example.online_shoe_store.Service.ai.agent.system.SummarizerAgent;
+import com.example.online_shoe_store.Service.ai.agent.SummarizerAgent;
 import com.example.online_shoe_store.Service.ai.tool.*;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -28,17 +22,13 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class AgentWiringConfig {
 
-    // ═══════════════════════════════════════════
-    // ORCHESTRATION LAYER
-    // ═══════════════════════════════════════════
-    
     @Bean
     public OrchestratorAgent orchestratorAgent(
             @Qualifier("orchestratorModel") ChatModel model
     ) {
         return AiServices.builder(OrchestratorAgent.class)
                 .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(2))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(5))
                 .build();
     }
 
@@ -48,68 +38,23 @@ public class AgentWiringConfig {
     ) {
         return AiServices.builder(SummarizerAgent.class)
                 .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(2))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(5))
                 .build();
     }
 
-    // ═══════════════════════════════════════════
-    // SALES DOMAIN (with Tools)
-    // ═══════════════════════════════════════════
-    
     @Bean
-    public SearchAgent searchAgent(
+    public ProductAgent productAgent(
             @Qualifier("workerModel") ChatModel model,
             ProductSearchTools productTools,
             InventoryTools inventoryTools
     ) {
-        return AiServices.builder(SearchAgent.class)
+        return AiServices.builder(ProductAgent.class)
                 .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(20))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(5))
                 .tools(productTools, inventoryTools)
                 .build();
     }
 
-    @Bean
-    public SalesAgent salesAgent(
-            @Qualifier("workerModel") ChatModel model,
-            SalesTools salesTools,
-            InventoryTools inventoryTools
-    ) {
-        return AiServices.builder(SalesAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(20))
-                .tools(salesTools, inventoryTools)
-                .build();
-    }
-
-    @Bean
-    public CartAgent cartAgent(
-            @Qualifier("workerModel") ChatModel model,
-            SalesTools salesTools
-    ) {
-        return AiServices.builder(CartAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
-                .tools(salesTools)
-                .build();
-    }
-
-    @Bean
-    public RecommendAgent recommendAgent(
-            @Qualifier("workerModel") ChatModel model,
-            ProductSearchTools productTools
-    ) {
-        return AiServices.builder(RecommendAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(15))
-                .tools(productTools)
-                .build();
-    }
-
-    // ═══════════════════════════════════════════
-    // SUPPORT DOMAIN (with Tools + RAG)
-    // ═══════════════════════════════════════════
-    
     @Bean
     public SupportAgent supportAgent(
             @Qualifier("workerModel") ChatModel model,
@@ -120,59 +65,12 @@ public class AgentWiringConfig {
         return AiServices.builder(SupportAgent.class)
                 .chatModel(model)
                 .contentRetriever(faqRetriever)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(5))
                 .tools(supportTools, orderTools)
                 .build();
     }
 
-    // ═══════════════════════════════════════════
-    // OPERATIONS DOMAIN (with Tools)
-    // ═══════════════════════════════════════════
-    
-    @Bean
-    public LogisticsAgent logisticsAgent(
-            @Qualifier("workerModel") ChatModel model,
-            OrderTools orderTools
-    ) {
-        return AiServices.builder(LogisticsAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
-                .tools(orderTools)
-                .build();
-    }
 
-    @Bean
-    public InventoryAgent inventoryAgent(
-            @Qualifier("workerModel") ChatModel model,
-            InventoryTools inventoryTools
-    ) {
-        return AiServices.builder(InventoryAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
-                .tools(inventoryTools)
-                .build();
-    }
-
-    // ═══════════════════════════════════════════
-    // MARKETING DOMAIN (with Tools)
-    // ═══════════════════════════════════════════
-    
-    @Bean
-    public MarketingAgent marketingAgent(
-            @Qualifier("workerModel") ChatModel model,
-            MarketingTools marketingTools
-    ) {
-        return AiServices.builder(MarketingAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(15))
-                .tools(marketingTools)
-                .build();
-    }
-
-    // ═══════════════════════════════════════════
-    // CONTENT RETRIEVERS (RAG)
-    // ═══════════════════════════════════════════
-    
     @Bean
     public ContentRetriever faqRetriever(
             @Qualifier("faqEmbeddingStore") EmbeddingStore<TextSegment> store,

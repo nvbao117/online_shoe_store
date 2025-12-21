@@ -21,19 +21,12 @@ import java.util.List;
 @AllArgsConstructor
 public class SupervisorResponse {
 
-    //=========================================
-    // CORE RESPONSE
-    //=========================================
 
     @Description("Nội dung phản hồi gửi cho khách hàng. Đây là câu trả lời cuối cùng đã qua kiểm duyệt.")
     private String response;
 
     @Description("ID phiên chat để theo dõi lịch sử hội thoại.")
     private String sessionId;
-
-    //=========================================
-    // CLASSIFICATION INFO
-    //=========================================
 
     @Description("Intent đã detect. Enum: SEARCH, PURCHASE, RECOMMENDATION, SUPPORT, COMPLAINT...")
     private IntentType intent;
@@ -47,17 +40,11 @@ public class SupervisorResponse {
     @Description("Mức khẩn cấp. LOW | NORMAL | HIGH | CRITICAL")
     private UrgencyLevel urgency;
 
-    //=========================================
-    // SUGGESTED ACTIONS
-    //=========================================
 
     @Description("Các quick-reply buttons gợi ý. VD: ['Xem chi tiết', 'Thêm vào giỏ', 'Hỏi thêm']")
     @Builder.Default
     private List<String> suggestedActions = new ArrayList<>();
 
-    //=========================================
-    // ESCALATION
-    //=========================================
 
     @Description("TRUE nếu đã chuyển cho nhân viên thật xử lý.")
     @Builder.Default
@@ -65,10 +52,6 @@ public class SupervisorResponse {
 
     @Description("Lý do escalation. VD: 'Khách dọa báo cáo', 'Yêu cầu ngoài phạm vi AI'")
     private String escalationReason;
-
-    //=========================================
-    // METADATA (không phải output của LLM)
-    //=========================================
 
     private Long processingTimeMs;
 

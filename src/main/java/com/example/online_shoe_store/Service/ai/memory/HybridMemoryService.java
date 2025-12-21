@@ -2,7 +2,7 @@ package com.example.online_shoe_store.Service.ai.memory;
 
 import com.example.online_shoe_store.Entity.Conversation;
 import com.example.online_shoe_store.Repository.ConversationRepository;
-import com.example.online_shoe_store.Service.ai.agent.system.SummarizerAgent;
+import com.example.online_shoe_store.Service.ai.agent.SummarizerAgent;
 import com.example.online_shoe_store.Service.ai.execution.ConversationService;
 import com.example.online_shoe_store.dto.memory.HybridMemoryContext;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class HybridMemoryService {
 
-    private static final int SUMMARY_TRIGGER_DELTA = 8; // summarize every 8 new messages
-    private static final int SUMMARY_WINDOW = 20;       // take up to last 20 messages for summary
-    private static final int RECENT_WINDOW = 8;         // expose last 8 messages to agent
+    private static final int SUMMARY_TRIGGER_DELTA = 8;
+    private static final int SUMMARY_WINDOW = 20;
+    private static final int RECENT_WINDOW = 8;
 
     private final ConversationRepository conversationRepository;
     private final ConversationService conversationService;
@@ -28,13 +28,10 @@ public class HybridMemoryService {
 
     @Transactional
     public HybridMemoryContext buildContext(String sessionId) {
+
         Conversation conv = conversationService.getOrCreateConversation(sessionId);
-
-        // maybe update summary if enough new messages
         refreshSummaryIfNeeded(conv);
-
         List<String> recent = conversationService.getRecentHistory(sessionId, RECENT_WINDOW);
-
         return HybridMemoryContext.builder()
                 .summary(conv.getSummary())
                 .recentMessages(recent)
@@ -42,9 +39,7 @@ public class HybridMemoryService {
                 .build();
     }
 
-    /**
-     * Build user query enriched with hybrid memory (summary + short history).
-     */
+
     @Transactional(readOnly = true)
     public String enrichWithContext(String sessionId, String userMessage) {
         HybridMemoryContext ctx = buildContext(sessionId);
@@ -74,7 +69,7 @@ public class HybridMemoryService {
         String payload = "Previous summary:" + prevSummary + "\nRecent messages:" + String.join("\n", window);
 
         try {
-            String newSummary = summarizerAgent.summarize(payload);
+            String newSummary = summarizerAgent.aggregate(payload);
             conv.setSummary(newSummary);
             conv.setLastSummarizedCount(conv.getMessageCount());
             conversationRepository.save(conv);

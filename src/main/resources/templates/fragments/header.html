@@ -85,31 +85,25 @@
 
 
 
-                <!-- Ô tìm kiếm CLIP Semantic -->
+                <!-- Ô tìm kiếm sản phẩm (RAG semantic fallback) -->
                 <div class="header-search flex-grow-1 mx-4 position-relative">
-                    <form id="clipSearchForm" class="search-form d-flex">
+                    <form class="search-form d-flex" th:action="@{/products}" method="get">
                         <input type="text" class="form-control search-input" id="mainSearchInput" name="keyword"
                             placeholder="Tìm kiếm sản phẩm..." autocomplete="off">
-                        <!-- Camera button for image search -->
-                        <button type="button" class="btn search-image-btn" id="imageSearchBtn"
-                            title="Tìm bằng hình ảnh">
-                            <i class="bi bi-camera"></i>
-                        </button>
-                        <input type="file" id="imageSearchInput" accept="image/*" hidden>
                         <button type="submit" class="btn search-btn">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
-                    <!-- CLIP Search Results Dropdown -->
-                    <div id="clip-search-results"
+                    <!-- Search Results Dropdown -->
+                    <div id="search-results-dropdown"
                         class="position-absolute mt-1 bg-white shadow-xl rounded-xl overflow-hidden d-none"
                         style="top: 100%; z-index: 1001; width: 100%; max-height: 450px; overflow-y: auto;">
                         <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                             <span class="fw-bold" id="searchResultTitle">🔍 Kết quả tìm kiếm</span>
                             <button type="button" class="btn btn-sm btn-outline-secondary"
-                                id="closeClipResults">✕</button>
+                                id="closeSearchResults">✕</button>
                         </div>
-                        <div id="clip-results-content" class="p-2"></div>
+                        <div id="search-suggest" class="p-2"></div>
                     </div>
                 </div>
 
@@ -190,8 +184,15 @@
         </nav>
     </header>
 
-    <!-- CLIP Search Script -->
-    <script th:src="@{/js/clip-search.js}"></script>
+    <script>
+        (function () {
+            const closeBtn = document.getElementById('closeSearchResults');
+            const dropdown = document.getElementById('search-results-dropdown');
+            if (closeBtn && dropdown) {
+                closeBtn.addEventListener('click', () => dropdown.classList.add('d-none'));
+            }
+        })();
+    </script>
 
 </body>
 

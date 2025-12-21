@@ -2,13 +2,13 @@ function getSuggestBox() {
     return document.getElementById("search-suggest") || document.getElementById("clip-results-content");
 }
 
-function getClipDropdown() {
-    return document.getElementById("clip-search-results");
+function getSearchDropdown() {
+    return document.getElementById("search-results-dropdown") || document.getElementById("clip-search-results");
 }
 
 export function renderSuggest(items, keyword) {
     const suggestBox = getSuggestBox();
-    const clipDropdown = getClipDropdown();
+    const dropdown = getSearchDropdown();
 
     if (!suggestBox) {
         console.error("suggestBox not found");
@@ -29,7 +29,7 @@ export function renderSuggest(items, keyword) {
             </div>
         `;
         suggestBox.classList.remove("d-none");
-        if (clipDropdown) clipDropdown.classList.remove("d-none");
+        if (dropdown) dropdown.classList.remove("d-none");
         return;
     }
 
@@ -63,7 +63,7 @@ export function renderSuggest(items, keyword) {
     `;
 
     suggestBox.classList.remove("d-none");
-    if (clipDropdown) clipDropdown.classList.remove("d-none");
+    if (dropdown) dropdown.classList.remove("d-none");
 }
 
 function formatPrice(price) {
@@ -73,13 +73,13 @@ function formatPrice(price) {
 
 export function hideSuggest() {
     const suggestBox = getSuggestBox();
-    const clipDropdown = getClipDropdown();
+    const dropdown = getSearchDropdown();
 
     if (suggestBox) {
         suggestBox.classList.add("d-none");
         suggestBox.innerHTML = "";
     }
-    if (clipDropdown) {
-        clipDropdown.classList.add("d-none");
+    if (dropdown) {
+        dropdown.classList.add("d-none");
     }
 }

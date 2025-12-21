@@ -34,7 +34,6 @@ public class FaqEmbeddingService {
     @Value("classpath:knowledge-base/faq")
     private Resource faqDirectoryResource;
 
-    // Constructor với @Qualifier để inject đúng bean
     public FaqEmbeddingService(
             @Qualifier("faqEmbeddingStore") EmbeddingStore<TextSegment> embeddingStore,
             EmbeddingModel embeddingModel

@@ -12,7 +12,6 @@ async function initProductsPage() {
     const params = new URLSearchParams(window.location.search);
     const categoryId = params.get("categoryId") || "21112005";
     const keyword = params.get("keyword");
-    const isImageSearch = params.get("imageSearch") === "true";
 
     const categories = [
         { categoryId: "21112005", name: "Tất cả" },
@@ -33,29 +32,6 @@ async function initProductsPage() {
         },
         categoryId
     );
-
-    // ===================== IMAGE SEARCH RESULTS =====================
-    if (isImageSearch) {
-        const storedIds = sessionStorage.getItem('imageSearchResults');
-        const searchQuery = sessionStorage.getItem('imageSearchQuery') || '📷 Tìm kiếm bằng hình ảnh';
-
-        if (storedIds) {
-            const productIds = JSON.parse(storedIds);
-            const products = await fetchProductsByIds(productIds);
-            renderProductGrid(productContainer, products || []);
-
-            // Show search indicator
-            const titleEl = document.querySelector('h2, .page-title');
-            if (titleEl) {
-                titleEl.textContent = searchQuery + ` (${products.length} sản phẩm)`;
-            }
-
-            // Clear session after use
-            sessionStorage.removeItem('imageSearchResults');
-            sessionStorage.removeItem('imageSearchQuery');
-        }
-        return;
-    }
 
     // ===================== KEYWORD SEARCH =====================
     if (keyword && keyword.trim().length >= 2) {
