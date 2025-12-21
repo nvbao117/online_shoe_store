@@ -25,7 +25,6 @@ public enum UrgencyLevel {
             return NORMAL;
         }
     }
-
     public boolean needsPriority() {
         return this == HIGH || this == CRITICAL;
 

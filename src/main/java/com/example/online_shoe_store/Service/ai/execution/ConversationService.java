@@ -67,7 +67,6 @@ public class ConversationService {
             List<ConversationMessage> messages = messageRepository
                 .findRecentMessages(conversation.getId(), PageRequest.of(0, count));
             
-            // Reverse to get chronological order
             Collections.reverse(messages);
             
             return messages.stream()
@@ -215,13 +214,13 @@ public class ConversationService {
     
     private AgentType parseAgentType(String agentName) {
         if (agentName == null || agentName.isBlank()) {
-            return AgentType.SUPPORT;
+            return AgentType.SUPPORT_SERVICES;
         }
         try {
             return AgentType.valueOf(agentName.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            log.warn("Unknown agent type: {}, defaulting to SUPPORT", agentName);
-            return AgentType.SUPPORT;
+            log.warn("Unknown agent type: {}, defaulting to SUPPORT_SERVICES", agentName);
+            return AgentType.SUPPORT_SERVICES;
         }
     }
 }

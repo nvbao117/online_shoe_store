@@ -86,13 +86,36 @@
 
             <!-- Input Area -->
             <div class="chatbot-input-area">
+                <!-- Hidden file input for image upload -->
+                <input type="file" id="chatImageInput" accept="image/*" capture="environment" hidden>
+
+                <!-- Image button -->
+                <button class="chatbot-image-btn" id="chatImageBtn" type="button" title="Gửi ảnh tìm sản phẩm">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                        <path
+                            d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                    </svg>
+                </button>
+
+                <!-- Text input -->
                 <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Nhập tin nhắn..."
                     autocomplete="off">
+
+                <!-- Send button -->
                 <button class="chatbot-send" id="chatbotSend">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                     </svg>
                 </button>
+            </div>
+
+            <!-- Image Preview (shown when image selected) -->
+            <div class="image-preview-container" id="imagePreviewContainer" hidden>
+                <div class="image-preview-wrapper">
+                    <img id="imagePreviewImg" src="" alt="Preview">
+                    <button class="image-remove-btn" id="imageRemoveBtn" type="button" title="Xóa ảnh">✕</button>
+                </div>
+                <span class="image-preview-hint">Nhấn gửi để tìm sản phẩm tương tự</span>
             </div>
         </div>
 

@@ -26,17 +26,17 @@ public class RoutingDecision {
     @Description("Phản hồi trực tiếp từ Orchestrator. Dùng khi: chào hỏi, thiếu thông tin, không cần agent.")
     private String directResponse;
 
-    @Description("Tên agent cần gọi: SEARCH, SALES, RECOMMEND, CART, SUPPORT, LOGISTICS, INVENTORY, MARKETING")
+    @Description("Agent cần gọi: PRODUCT hoặc SUPPORT. PRODUCT=tìm/tư vấn sản phẩm. SUPPORT=FAQ/đổi trả/khiếu nại.")
     private String targetAgent;
 
     //=========================================
-    // AGENT ASSIGNMENT
+    // DEPRECATED - KHÔNG SỬ DỤNG
     //=========================================
 
-    @Description("Agent chính xử lý. VD: SEARCH, SALES, SUPPORT, RECOMMEND, CART, LOGISTICS, INVENTORY, MARKETING")
+    @Description("DEPRECATED - Không sử dụng. Luôn để null.")
     private String primaryAgent;
 
-    @Description("Agents phụ hỗ trợ. VD: ['INVENTORY'] nếu cần check kho")
+    @Description("DEPRECATED - Không sử dụng. Luôn để rỗng [].")
     @Builder.Default
     private List<String> secondaryAgents = new ArrayList<>();
 
@@ -44,23 +44,23 @@ public class RoutingDecision {
     // EXECUTION MODE
     //=========================================
 
-    @Description("TRUE = agents chạy song song (nhanh hơn). FALSE = chạy tuần tự (có dependency)")
+    @Description("DEPRECATED - Không sử dụng. Luôn để false.")
     @Builder.Default
     private Boolean parallel = false;
 
-    @Description("Độ ưu tiên 1-10. 1-3: thấp | 4-6: bình thường | 7-8: cao | 9-10: khẩn cấp")
+    @Description("Độ ưu tiên 1-10. Mặc định 5.")
     @Builder.Default
     private Integer priority = 5;
 
     //=========================================
-    // AGENT-TO-AGENT (A2A)
+    // DEPRECATED - A2A KHÔNG SỬ DỤNG
     //=========================================
 
-    @Description("TRUE nếu primary agent cần kết quả từ secondary agent trước khi trả lời")
+    @Description("DEPRECATED - Không sử dụng. Luôn để false.")
     @Builder.Default
     private Boolean requiresA2A = false;
 
-    @Description("Mô tả luồng A2A. VD: 'SALES chờ INVENTORY check tồn kho trước khi báo giá'")
+    @Description("DEPRECATED - Không sử dụng. Luôn để null.")
     private String a2aFlow;
 
     //=========================================

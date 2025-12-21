@@ -154,10 +154,10 @@ function renderPendingItem(item) {
     return `
         <div class="border rounded-xl p-4 hover:shadow-md transition-shadow">
             <div class="flex gap-4">
-                <img src="${item.productImage || '/images/placeholder.png'}" 
+                 <img src="${item.productImage || '/images/logo-shop/favicon.png'}" 
                      alt="${item.productName}"
                      class="w-20 h-20 object-cover rounded-lg border"
-                     onerror="this.src='/images/placeholder.png'">
+                     onerror="this.onerror=null; this.src='/images/logo-shop/favicon.png'">
                 <div class="flex-1 min-w-0">
                     <h4 class="font-medium text-gray-800 truncate">${item.productName}</h4>
                     <p class="text-sm text-gray-500 mt-1">
@@ -197,10 +197,10 @@ function renderCompletedReview(review) {
     return `
         <div class="border rounded-xl p-4 hover:shadow-md transition-shadow">
             <div class="flex gap-4">
-                <img src="${review.productImage || '/images/placeholder.png'}" 
+                 <img src="${review.productImage || '/images/logo-shop/favicon.png'}" 
                      alt="${review.productName}"
                      class="w-20 h-20 object-cover rounded-lg border"
-                     onerror="this.src='/images/placeholder.png'">
+                     onerror="this.onerror=null; this.src='/images/logo-shop/favicon.png'">
                 <div class="flex-1 min-w-0">
                     <h4 class="font-medium text-gray-800 truncate">${review.productName}</h4>
                     <p class="text-sm text-gray-500">
@@ -238,7 +238,7 @@ function openReviewModalForItem(variantId, productName, color, size, imageUrl) {
     // Gán thông tin sản phẩm vào modal
     document.getElementById('modalProductName').innerText = productName;
     document.getElementById('modalProductVariant').innerText = `Phân loại: ${color} - Size ${size}`;
-    document.getElementById('modalProductImg').src = imageUrl || '/images/placeholder.png';
+    document.getElementById('modalProductImg').src = imageUrl || '/images/logo-shop/favicon.png';
 
     // Reset form
     document.getElementById('reviewForm').reset();

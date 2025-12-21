@@ -3,17 +3,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GiayTop1 - Trang Chủ</title>
 
     <!-- Bootstrap + Bootstrap Icons (dùng cho header) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link rel="icon" href="/favicon.ico">
     <!-- CSS header dùng chung -->
-    <link rel="stylesheet" th:href="@{/css/product-detail/header.css}"/>
+    <link rel="stylesheet" th:href="@{/css/product-detail/header.css}" />
 
     <!-- Tailwind CSS (phần body bên dưới vẫn dùng tailwind như cũ) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -61,122 +60,140 @@
         }
     </style>
 </head>
+
 <body>
-<header class="main-header" th:fragment="mainHeader">
-    <!-- ==================== HÀNG TRÊN: NỀN XANH NHẠT ==================== -->
-    <div class="header-top-wrapper">
-        <div class="header-top container d-flex align-items-center justify-content-between">
+    <header class="main-header" th:fragment="mainHeader">
+        <!-- ==================== HÀNG TRÊN: NỀN XANH NHẠT ==================== -->
+        <div class="header-top-wrapper">
+            <div class="header-top container d-flex align-items-center justify-content-between">
 
-            <!-- Logo + Hotline -->
-            <div class="d-flex align-items-center header-left">
-                <!-- Logo -->
-                <a th:href="@{/home}" class="header-logo">
-                    <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="5A STORE" class="header-logo-img">
-                </a>
+                <!-- Logo + Hotline -->
+                <div class="d-flex align-items-center header-left">
+                    <!-- Logo -->
+                    <a th:href="@{/home}" class="header-logo">
+                        <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="5A STORE" class="header-logo-img">
+                    </a>
 
-                <!-- Hotline (giữ style giống hình 1) -->
-                <div class="header-hotline ms-4">
-                    <div class="hotline-label">
-                        <i class="bi bi-telephone-fill me-1"></i> HOTLINE:
+                    <!-- Hotline (giữ style giống hình 1) -->
+                    <div class="header-hotline ms-4">
+                        <div class="hotline-label">
+                            <i class="bi bi-telephone-fill me-1"></i> HOTLINE:
+                        </div>
+                        <div class="hotline-number">0819 893 3355</div>
                     </div>
-                    <div class="hotline-number">0819 893 3355</div>
+                </div>
+
+
+
+                <!-- Ô tìm kiếm sản phẩm (RAG semantic fallback) -->
+                <div class="header-search flex-grow-1 mx-4 position-relative">
+                    <form class="search-form d-flex" th:action="@{/products}" method="get">
+                        <input type="text" class="form-control search-input" id="mainSearchInput" name="keyword"
+                            placeholder="Tìm kiếm sản phẩm..." autocomplete="off">
+                        <button type="submit" class="btn search-btn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                    <!-- Search Results Dropdown -->
+                    <div id="search-results-dropdown"
+                        class="position-absolute mt-1 bg-white shadow-xl rounded-xl overflow-hidden d-none"
+                        style="top: 100%; z-index: 1001; width: 100%; max-height: 450px; overflow-y: auto;">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                            <span class="fw-bold" id="searchResultTitle">🔍 Kết quả tìm kiếm</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="closeSearchResults">✕</button>
+                        </div>
+                        <div id="search-suggest" class="p-2"></div>
+                    </div>
+                </div>
+
+
+                <!-- Tài khoản + Giỏ hàng (kiểu giống hình 2) -->
+                <div class="header-right d-flex align-items-center">
+
+                    <!-- CHƯA đăng nhập -->
+                    <div id="authButtons" class="d-flex align-items-center me-3 d-none">
+                        <a href="/login" class="btn btn-outline-primary btn-sm me-2">Đăng nhập</a>
+                        <a href="/register" class="btn btn-primary btn-sm">Đăng ký</a>
+                    </div>
+                    <div id="userProfile" class="relative inline-block group overflow-visible d-none">
+                        <a class="flex items-center me-3 text-dark no-underline">
+
+                            <div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="bi bi-person"></i>
+                            </div>
+
+                            <span id="username" class="ml-2 font-semibold hidden md:inline"></span>
+                        </a>
+
+                        <div class="absolute right-0 top-full pt-2 w-44 bg-white rounded-lg shadow-lg
+                hidden group-hover:block z-50">
+                            <a th:href="@{/profile}" class="block px-4 py-2 hover:bg-gray-100">
+                                Thông tin của tôi
+                            </a>
+
+                            <a href="/orders" class="block px-4 py-2 hover:bg-gray-100">
+                                Đơn hàng
+                            </a>
+
+                            <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                                Đăng xuất
+                            </button>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- Giỏ hàng -->
+                    <div class="header-right-item">
+                        <a th:href="@{/templates/cart}" class="text-decoration-none">
+                            <div class="icon-circle position-relative">
+                                <i class="bi bi-cart3"></i>
+                                <!-- Badge số lượng sản phẩm -->
+                                <span id="cart-badge" class="cart-count" th:text="${cartItemCount}">0</span>
+                            </div>
+                        </a>
+                    </div>
+
                 </div>
             </div>
+        </div>
 
-            <!-- Ô tìm kiếm -->
-            <div class="header-search flex-grow-1 mx-4 position-relative">
-                <form th:action="@{/search}" method="get" class="search-form d-flex">
-                    <input type="text"
-                           class="form-control search-input"
-                           name="keyword"
-                           placeholder="Tìm kiếm sản phẩm..."
-                           autocomplete="off">
-                    <button type="submit" class="btn search-btn">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-                <ul id="search-suggest"
-                    class="list-group position-absolute mt-1 bg-white shadow-xl rounded-xl overflow-hidden d-none"
-                    style="top: 100%;
-           z-index: 1000;
-           width: 60%;
-           left: 50%;
-           transform: translateX(-50%);">
+        <!-- ==================== HÀNG DƯỚI: MENU CHÍNH (NỀN TRẮNG, CHỮ XANH) ==================== -->
+        <nav class="header-nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a th:href="@{/home}">TRANG CHỦ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="@{/products}">SẢN PHẨM</a>
+                    </li>
+                    <!--                <li class="nav-item">-->
+                    <!--                    <a th:href="@{/sale-off}">SALE OFF</a>-->
+                    <!--                </li>-->
+                    <li class="nav-item">
+                        <a th:href="@{/about}">GIỚI THIỆU</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:href="@{/contact}">LIÊN HỆ</a>
+                    </li>
                 </ul>
             </div>
+        </nav>
+    </header>
 
-
-            <!-- Tài khoản + Giỏ hàng (kiểu giống hình 2) -->
-            <div class="header-right d-flex align-items-center">
-
-                <!-- CHƯA đăng nhập -->
-                <div id="authButtons" class="d-flex align-items-center me-3 d-none">
-                    <a href="/login" class="btn btn-outline-primary btn-sm me-2">Đăng nhập</a>
-                    <a href="/register" class="btn btn-primary btn-sm">Đăng ký</a>
-                </div>
-                <div id="userProfile" class="position-relative d-inline-block d-none">
-                    <a href="#" class="d-flex align-items-center me-3 text-dark text-decoration-none user-profile-link">
-                        <div class="user-avatar">
-                            <i class="bi bi-person"></i>
-                        </div>
-                        <span id="username" class="ms-2 fw-semibold d-none d-md-inline"></span>
-                    </a>
-                    <div class="user-dropdown position-absolute end-0 top-100 mt-2 bg-white rounded shadow-lg d-none">
-                        <a th:href="@{/profile}" class="dropdown-item">
-                            Thông tin của tôi
-                        </a>
-                        <a href="/orders" class="dropdown-item">
-                            Đơn hàng
-                        </a>
-                        <button id="logoutBtn" class="dropdown-item logout-btn">
-                            Đăng xuất
-                        </button>
-                    </div>
-                </div>
-
-
-
-
-                <!-- Giỏ hàng -->
-                <div class="header-right-item">
-                    <a th:href="@{/templates/cart}" class="text-decoration-none">
-                        <div class="icon-circle position-relative">
-                            <i class="bi bi-cart3"></i>
-                            <!-- Badge số lượng sản phẩm -->
-                            <span id="cart-badge"
-                                  class="cart-count"
-                                  th:text="${cartItemCount}">0</span>
-                        </div>
-                    </a>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== HÀNG DƯỚI: MENU CHÍNH (NỀN TRẮNG, CHỮ XANH) ==================== -->
-    <nav class="header-nav">
-        <div class="container">
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a th:href="@{/home}">TRANG CHỦ</a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/products}">SẢN PHẨM</a>
-                </li>
-                <!--                <li class="nav-item">-->
-                <!--                    <a th:href="@{/sale-off}">SALE OFF</a>-->
-                <!--                </li>-->
-                <li class="nav-item">
-                    <a th:href="@{/about}">GIỚI THIỆU</a>
-                </li>
-                <li class="nav-item">
-                    <a th:href="@{/contact}">LIÊN HỆ</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-</header>
+    <script>
+        (function () {
+            const closeBtn = document.getElementById('closeSearchResults');
+            const dropdown = document.getElementById('search-results-dropdown');
+            if (closeBtn && dropdown) {
+                closeBtn.addEventListener('click', () => dropdown.classList.add('d-none'));
+            }
+        })();
+    </script>
 
 </body>
+
 </html>

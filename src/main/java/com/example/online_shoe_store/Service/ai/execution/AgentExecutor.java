@@ -1,18 +1,12 @@
 package com.example.online_shoe_store.Service.ai.execution;
 
-import com.example.online_shoe_store.Service.ai.agent.OrchestratorAgent;
-import com.example.online_shoe_store.Service.ai.agent.SearchAgent;
-import com.example.online_shoe_store.Service.ai.agent.SupportAgent;
-import com.example.online_shoe_store.Service.ai.agent.sales.SalesAgent;
-import com.example.online_shoe_store.Service.ai.agent.sales.CartAgent;
-import com.example.online_shoe_store.Service.ai.agent.sales.RecommendAgent;
-import com.example.online_shoe_store.Service.ai.agent.operations.LogisticsAgent;
-import com.example.online_shoe_store.Service.ai.agent.operations.InventoryAgent;
-import com.example.online_shoe_store.Service.ai.agent.marketing.MarketingAgent;
+import com.example.online_shoe_store.Service.ai.agent.*;
+import com.example.online_shoe_store.Service.ai.tool.SupportTools;
 import com.example.online_shoe_store.Service.ai.memory.HybridMemoryService;
 import com.example.online_shoe_store.dto.orchestrator.RoutingDecision;
 import com.example.online_shoe_store.dto.orchestrator.SupervisorResponse;
 import com.example.online_shoe_store.Entity.enums.AgentType;
+import com.example.online_shoe_store.Entity.enums.RiskLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,69 +15,91 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AgentExecutor {
 
-        private static final Set<String> ALLOWED_AGENTS = Set.of(
-             "SEARCH", "SALES", "SUPPORT",
-            "LOGISTICS", "MARKETING", "INVENTORY", "RECOMMEND", "CART"
-        );
+    private static final Set<String> ALLOWED_AGENTS = Set.of("PRODUCT", "SUPPORT");
 
-        private static final Map<String, String> AGENT_SYNONYMS = Map.of(
-            "FAQ", "SUPPORT",
-            "RETURN", "SUPPORT",
-            "RETURNS", "SUPPORT",
-            "COMPLAINT", "SUPPORT",
-            "COMPLAINTS", "SUPPORT",
-            "TRACKING", "LOGISTICS",
-            "STOCK", "INVENTORY",
-            "ANALYTICS", "MARKETING",
-            "RECOMMENDATION", "RECOMMEND"
-        );
+    private static final Map<String, String> AGENT_SYNONYMS = Map.of(
+        "SEARCH", "PRODUCT",
+        "SALES", "PRODUCT",
+        "INVENTORY", "PRODUCT",
+        "FAQ", "SUPPORT",
+        "RETURN", "SUPPORT",
+        "RETURNS", "SUPPORT",
+        "COMPLAINT", "SUPPORT",
+        "COMPLAINTS", "SUPPORT",
+        "LOGISTICS", "SUPPORT",
+        "MARKETING", "SUPPORT"
+    );
 
-    // ═══════════════════════════════════════════
-    // ORCHESTRATION LAYER
-    // ═══════════════════════════════════════════
     private final OrchestratorAgent orchestratorAgent;
-
-    // ═══════════════════════════════════════════
-    // SALES DOMAIN
-    // ═══════════════════════════════════════════
-    private final SearchAgent searchAgent;
-    private final SalesAgent salesAgent;
-    private final CartAgent cartAgent;
-    private final RecommendAgent recommendAgent;
-
-    // ═══════════════════════════════════════════
-    // SUPPORT DOMAIN
-    // ═══════════════════════════════════════════
+    private final ProductAgent productAgent;
     private final SupportAgent supportAgent;
-
-    // ═══════════════════════════════════════════
-    // OPERATIONS DOMAIN
-    // ═══════════════════════════════════════════
-    private final LogisticsAgent logisticsAgent;
-    private final InventoryAgent inventoryAgent;
-
-    // ═══════════════════════════════════════════
-    // MARKETING DOMAIN
-    // ═══════════════════════════════════════════
-    private final MarketingAgent marketingAgent;
-
-    // ═══════════════════════════════════════════
-    // MEMORY
-    // ═══════════════════════════════════════════
+    private final SummarizerAgent summarizerAgent;
+    private final SupportTools supportTools;
     private final HybridMemoryService hybridMemoryService;
+    private final Executor agentTaskExecutor;
+
+    private final Map<String, EscalationContext> pendingEscalations = new ConcurrentHashMap<>();
+
+    private record ExecutionOutcome(String response, List<String> agentsUsed) {}
 
     public SupervisorResponse process(String sessionId, String userMessage) {
         long startTime = System.currentTimeMillis();
 
-        // BƯỚC 1: ORCHESTRATOR PHÂN TÍCH
+        EscalationContext pending = sessionId != null ? pendingEscalations.get(sessionId) : null;
+        if (pending != null) {
+            if (isAffirmative(userMessage)) {
+                String ticket = supportTools.escalateToHuman(
+                    pending.reason(),
+                    pending.priority(),
+                    sessionId,
+                    pending.lastMessage()
+                );
+                pendingEscalations.remove(sessionId);
+                long processingTime = System.currentTimeMillis() - startTime;
+                return SupervisorResponse.builder()
+                        .response(ticket + "\n\nĐã chuyển cho nhân viên. Bạn cần hỗ trợ gì thêm không?")
+                        .sessionId(sessionId)
+                        .agentsUsed(List.of(AgentType.SUPPORT_SERVICES))
+                        .processingTimeMs(processingTime)
+                        .escalationTriggered(true)
+                        .escalationReason(pending.reason())
+                        .build();
+            }
+            if (isNegative(userMessage)) {
+                pendingEscalations.remove(sessionId);
+                long processingTime = System.currentTimeMillis() - startTime;
+                return SupervisorResponse.builder()
+                        .response("Đã tạm hoãn kết nối với nhân viên. Mình vẫn có thể hỗ trợ thêm qua chatbot!")
+                        .sessionId(sessionId)
+                        .agentsUsed(List.of(AgentType.SUPPORT_SERVICES))
+                        .processingTimeMs(processingTime)
+                        .escalationTriggered(false)
+                        .escalationReason(pending.reason())
+                        .build();
+            }
+        }
+
+        // BƯỚC 0: ENRICH MESSAGE VỚI CONVERSATION CONTEXT
+        String enrichedForOrchestrator = hybridMemoryService.enrichWithContext(sessionId, userMessage);
+        log.info("Enriched message for orchestrator: {}", 
+            enrichedForOrchestrator.length() > 200 
+                ? enrichedForOrchestrator.substring(0, 200) + "..." 
+                : enrichedForOrchestrator);
+
+        // BƯỚC 1: ORCHESTRATOR PHÂN TÍCH (với context)
         log.info("Orchestrator analyzing intent...");
-        RoutingDecision decision = orchestratorAgent.decide(userMessage, sessionId);
+        RoutingDecision decision = orchestratorAgent.decide(enrichedForOrchestrator, sessionId);
 
         System.out.println("Orchestrator analyzing intent: " + decision);
 
@@ -100,16 +116,41 @@ public class AgentExecutor {
             decision.getRiskLevel());
 
         String finalResponse;
+        List<String> agentsUsedNames = List.of();
         boolean onlyDirectResponse = (rawTargetAgent == null || rawTargetAgent.isBlank()) 
             && (resolvedPrimary == null || resolvedPrimary.isBlank())
             && decision.getDirectResponse() != null && !decision.getDirectResponse().isBlank();
 
+        boolean forceSupportInsteadOfDirect = onlyDirectResponse
+            && shouldRouteToSupportInsteadOfDirect(userMessage, decision.getDirectResponse());
+
         // BƯỚC 2: XỬ LÝ
-        if (Boolean.TRUE.equals(decision.getRequiresEscalation())) {
+        if (forceSupportInsteadOfDirect) {
+            log.warn("Overriding orchestrator directResponse -> SUPPORT (RAG) for message: {}",
+                userMessage != null && userMessage.length() > 120 ? userMessage.substring(0, 120) + "..." : userMessage);
+            String enriched = hybridMemoryService.enrichWithContext(sessionId, userMessage);
+            finalResponse = routeToAgent("SUPPORT", sessionId, enriched);
+            agentsUsedNames = List.of("SUPPORT");
+            log.info("[AGENT RESPONSE] agent=SUPPORT | length={} | preview: {}",
+                finalResponse.length(),
+                finalResponse.substring(0, Math.min(100, finalResponse.length())));
+        } else if (Boolean.TRUE.equals(decision.getRequiresEscalation())) {
             log.info("Escalation requested: {}", decision.getEscalationReason());
-            finalResponse = decision.getDirectResponse() != null && !decision.getDirectResponse().isBlank()
-                    ? decision.getDirectResponse()
-                    : "Yêu cầu của bạn cần nhân viên hỗ trợ trực tiếp. Chúng tôi sẽ liên hệ sớm nhất.";
+            String priority = mapPriority(decision);
+            pendingEscalations.put(sessionId, new EscalationContext(
+                decision.getEscalationReason() != null ? decision.getEscalationReason() : userMessage,
+                priority,
+                userMessage
+            ));
+
+            String base = decision.getDirectResponse() != null && !decision.getDirectResponse().isBlank()
+                ? decision.getDirectResponse()
+                : "Yêu cầu của bạn cần nhân viên hỗ trợ trực tiếp.";
+
+            finalResponse = base + "\n\n" +
+                "Bạn có muốn kết nối với nhân viên không?" + "\n" +
+                "- Trả lời 'Có' để mình tạo ticket và chuyển ngay." + "\n" +
+                "- Trả lời 'Không' nếu muốn tiếp tục trao đổi với chatbot.";
             log.info("[ESCALATION RESPONSE] length={} | preview: {}", 
                 finalResponse.length(), 
                 finalResponse.substring(0, Math.min(100, finalResponse.length())));
@@ -122,7 +163,9 @@ public class AgentExecutor {
         } else {
             String enriched = hybridMemoryService.enrichWithContext(sessionId, userMessage);
             String agentToRoute = targetAgentForRouting != null ? targetAgentForRouting : "SUPPORT";
-            finalResponse = executeWithSecondary(decision, sessionId, enriched, agentToRoute);
+            ExecutionOutcome outcome = executeAccordingToDecision(decision, sessionId, enriched, agentToRoute);
+            finalResponse = outcome.response();
+            agentsUsedNames = outcome.agentsUsed();
             log.info("[AGENT RESPONSE] agent={} | length={} | preview: {}", 
                 agentToRoute, 
                 finalResponse.length(), 
@@ -138,13 +181,119 @@ public class AgentExecutor {
         return SupervisorResponse.builder()
                 .response(finalResponse)
                 .sessionId(sessionId)
-            .agentsUsed(!onlyDirectResponse && targetAgentForRouting != null
-                ? List.of(mapToAgentType(targetAgentForRouting))
+            .agentsUsed(!onlyDirectResponse
+                ? agentsUsedNames.stream().map(this::mapToAgentType).collect(Collectors.toList())
                 : List.of())
                 .processingTimeMs(processingTime)
                 .escalationTriggered(Boolean.TRUE.equals(decision.getRequiresEscalation()))
                 .escalationReason(decision.getEscalationReason())
                 .build();
+    }
+
+    private boolean shouldRouteToSupportInsteadOfDirect(String userMessage, String directResponse) {
+        if (userMessage == null) return false;
+        String q = userMessage.toLowerCase();
+
+        // Any contact/info/policy question must go through SUPPORT agent with FAQ RAG.
+        boolean isContactQuestion = q.contains("email")
+                || q.contains("e-mail")
+                || q.contains("mail")
+                || q.contains("số điện thoại")
+                || q.contains("so dien thoai")
+                || q.contains("hotline")
+                || q.contains("liên hệ")
+                || q.contains("lien he")
+                || q.contains("địa chỉ")
+                || q.contains("dia chi")
+                || q.contains("support")
+                || q.contains("csbh")
+                || q.contains("chăm sóc")
+                || q.contains("cham soc");
+
+        if (!isContactQuestion) return false;
+
+        // If orchestrator tried to answer with a direct response, treat as unsafe.
+        return directResponse != null && !directResponse.isBlank();
+    }
+
+    private ExecutionOutcome executeAccordingToDecision(
+            RoutingDecision decision,
+            String sessionId,
+            String userMessage,
+            String fallbackTargetAgent
+    ) {
+        boolean parallelRequested = Boolean.TRUE.equals(decision.getParallel());
+        boolean requiresA2A = Boolean.TRUE.equals(decision.getRequiresA2A());
+
+        if (parallelRequested && decision.hasSecondaryAgents() && !requiresA2A) {
+            return executeParallelFanOut(decision, sessionId, userMessage);
+        }
+
+        String targetAgent = (fallbackTargetAgent != null && !fallbackTargetAgent.isBlank())
+                ? fallbackTargetAgent
+                : (decision.getTargetAgent() != null ? decision.getTargetAgent() : "SUPPORT");
+
+        String response = executeWithSecondary(decision, sessionId, userMessage, targetAgent);
+
+        List<String> used = new ArrayList<>();
+        used.add(targetAgent);
+        if (decision.hasSecondaryAgents() && !parallelRequested) {
+            used.addAll(decision.getSecondaryAgents());
+        }
+
+        return new ExecutionOutcome(response, normalizeAgentsList(used));
+    }
+
+    private ExecutionOutcome executeParallelFanOut(RoutingDecision decision, String sessionId, String userMessage) {
+        List<String> agentsToRun = normalizeAgentsList(new ArrayList<>(new LinkedHashSet<>(decision.getAllAgents())));
+
+        if (agentsToRun.size() <= 1) {
+            String agent = agentsToRun.isEmpty()
+                    ? (decision.getTargetAgent() != null ? decision.getTargetAgent() : "SUPPORT")
+                    : agentsToRun.get(0);
+            String response = routeToAgent(agent, sessionId, userMessage);
+            return new ExecutionOutcome(response, List.of(normalizeAgent(agent)));
+        }
+
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+        for (String agent : agentsToRun) {
+            String isolatedMemoryId = sessionId + "::" + agent;
+            futures.add(CompletableFuture.supplyAsync(
+                    () -> routeToAgent(agent, isolatedMemoryId, userMessage),
+                    agentTaskExecutor
+            ).exceptionally(ex -> {
+                log.warn("[PARALLEL AGENT ERROR] agent={} | error={}", agent, ex.getMessage());
+                return "Không thể lấy kết quả do lỗi hệ thống.";
+            }));
+        }
+
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
+
+        List<String> blocks = new ArrayList<>();
+        for (int i = 0; i < agentsToRun.size(); i++) {
+            String agent = agentsToRun.get(i);
+            String result = futures.get(i).join();
+            blocks.add("[" + agent + "] " + (result == null ? "" : result));
+        }
+
+        String synthesisInput = "YÊU CẦU KHÁCH:\n" + userMessage
+                + "\n\nKẾT QUẢ TỪ CÁC AGENT:\n"
+                + String.join("\n\n", blocks)
+                + "\n\nHãy tổng hợp thành câu trả lời cuối cùng.";
+
+        String finalResponse = summarizerAgent.aggregate(synthesisInput);
+        return new ExecutionOutcome(finalResponse, agentsToRun);
+    }
+
+    private List<String> normalizeAgentsList(List<String> agentNames) {
+        if (agentNames == null || agentNames.isEmpty()) {
+            return List.of();
+        }
+        return agentNames.stream()
+                .filter(a -> a != null && !a.isBlank())
+                .map(this::normalizeAgent)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private String routeToAgent(String agentName, String sessionId, String userMessage) {
@@ -154,24 +303,8 @@ public class AgentExecutor {
         long agentStartTime = System.currentTimeMillis();
         try {
             String response = switch (normalized) {
-                // SALES DOMAIN
-                case "SEARCH" -> searchAgent.search(sessionId, userMessage);
-                case "SALES" -> salesAgent.consult(sessionId, userMessage);
-                case "RECOMMEND" -> recommendAgent.recommend(sessionId, userMessage);
-                case "CART" -> cartAgent.manage(sessionId, userMessage);
-                
-                // SUPPORT DOMAIN
+                case "PRODUCT" -> productAgent.handle(sessionId, userMessage);
                 case "SUPPORT" -> supportAgent.answer(sessionId, userMessage);
-                case "RETURNS" -> supportAgent.answer(sessionId, userMessage);
-                case "COMPLAINT" -> supportAgent.answer(sessionId, userMessage);
-                
-                // OPERATIONS DOMAIN
-                case "LOGISTICS" -> logisticsAgent.track(sessionId, userMessage);
-                case "INVENTORY" -> inventoryAgent.check(sessionId, userMessage);
-                
-                // MARKETING DOMAIN
-                case "MARKETING" -> marketingAgent.analyze(sessionId, userMessage);
-                
                 default -> supportAgent.answer(sessionId, userMessage);
             };
             
@@ -188,13 +321,13 @@ public class AgentExecutor {
         }
     }
 
-    /**
-     * Execute primary agent, optionally running secondary agents first and injecting their results as context.
-     */
     private String executeWithSecondary(RoutingDecision decision, String sessionId, String userMessage, String targetAgent) {
         List<String> secondaryResults = new ArrayList<>();
 
-        if (decision.hasSecondaryAgents() && !Boolean.TRUE.equals(decision.getParallel())) {
+        boolean shouldRunSecondaryFirst = decision.hasSecondaryAgents()
+                && (!Boolean.TRUE.equals(decision.getParallel()) || Boolean.TRUE.equals(decision.getRequiresA2A()));
+
+        if (shouldRunSecondaryFirst) {
             log.info("[SECONDARY AGENTS] count={} | agents={}", 
                 decision.getSecondaryAgents().size(), decision.getSecondaryAgents());
             for (String secondary : decision.getSecondaryAgents()) {
@@ -231,16 +364,57 @@ public class AgentExecutor {
         return switch (normalized) {
             case "SEARCH" -> AgentType.SEARCH;
             case "SALES" -> AgentType.SALES;
-            case "RECOMMEND" -> AgentType.RECOMMEND;
-            case "CART" -> AgentType.CART;
             case "RETURNS" -> AgentType.RETURNS;
             case "COMPLAINT", "COMPLAINTS" -> AgentType.COMPLAINTS;
             case "INVENTORY" -> AgentType.INVENTORY;
             case "LOGISTICS" -> AgentType.LOGISTICS;
-            case "MARKETING" -> AgentType.MARKETING;
             default -> AgentType.SUPPORT;
         };
     }
+
+    private boolean isAffirmative(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.trim().toLowerCase();
+        return normalized.equals("có")
+                || normalized.equals("co")
+                || normalized.equals("yes")
+                || normalized.equals("y")
+                || normalized.contains("đồng ý")
+                || normalized.contains("ket noi nhan vien")
+                || normalized.contains("kết nối nhân viên");
+    }
+
+    private boolean isNegative(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.trim().toLowerCase();
+        return normalized.equals("không")
+                || normalized.equals("khong")
+                || normalized.equals("ko")
+                || normalized.equals("no")
+                || normalized.contains("không cần")
+                || normalized.contains("khong can");
+    }
+
+    private String mapPriority(RoutingDecision decision) {
+        if (decision == null) {
+            return "NORMAL";
+        }
+        if (decision.getRiskLevel() != null && decision.getRiskLevel() == RiskLevel.HIGH) {
+            return "HIGH";
+        }
+        Integer p = decision.getPriority();
+        if (p != null) {
+            if (p >= 8) return "HIGH";
+            if (p >= 6) return "NORMAL";
+        }
+        return "LOW";
+    }
+
+    private record EscalationContext(String reason, String priority, String lastMessage) {}
 
     private String normalizeAgent(String agentName) {
         if (agentName == null || agentName.isBlank()) {

@@ -1,6 +1,20 @@
-const suggestBox = document.getElementById("search-suggest");
+function getSuggestBox() {
+    return document.getElementById("search-suggest") || document.getElementById("clip-results-content");
+}
+
+function getSearchDropdown() {
+    return document.getElementById("search-results-dropdown") || document.getElementById("clip-search-results");
+}
 
 export function renderSuggest(items, keyword) {
+    const suggestBox = getSuggestBox();
+    const dropdown = getSearchDropdown();
+
+    if (!suggestBox) {
+        console.error("suggestBox not found");
+        return;
+    }
+
     // Chưa nhập gì → ẩn gợi ý
     if (!keyword || keyword.trim().length === 0) {
         hideSuggest();
@@ -15,6 +29,7 @@ export function renderSuggest(items, keyword) {
             </div>
         `;
         suggestBox.classList.remove("d-none");
+        if (dropdown) dropdown.classList.remove("d-none");
         return;
     }
 
@@ -41,20 +56,30 @@ export function renderSuggest(items, keyword) {
             `).join("")}
         </div>
 
-        <a href="/search?keyword=${encodeURIComponent(keyword)}"
+        <a href="/products?keyword=${encodeURIComponent(keyword)}"
            class="block text-center text-base font-semibold text-blue-600 py-3 bg-slate-50 border-t border-slate-200 hover:bg-blue-100 transition duration-150 ease-in-out">
             🔎 Xem tất cả kết quả
         </a>
     `;
 
     suggestBox.classList.remove("d-none");
+    if (dropdown) dropdown.classList.remove("d-none");
 }
 
 function formatPrice(price) {
+    if (!price) return "0 ₫";
     return price.toLocaleString("vi-VN") + " ₫";
 }
 
 export function hideSuggest() {
-    suggestBox.classList.add("d-none");
-    suggestBox.innerHTML = "";
+    const suggestBox = getSuggestBox();
+    const dropdown = getSearchDropdown();
+
+    if (suggestBox) {
+        suggestBox.classList.add("d-none");
+        suggestBox.innerHTML = "";
+    }
+    if (dropdown) {
+        dropdown.classList.add("d-none");
+    }
 }
