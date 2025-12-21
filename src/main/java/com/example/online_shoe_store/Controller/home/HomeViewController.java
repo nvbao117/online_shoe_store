@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class HomeViewController {
 
+    // Redirect root to /home
+    @GetMapping
+    public String root() {
+        return "redirect:/home";
+    }
+
     @GetMapping("/home")
     public String home() {
         return "/home/home";
@@ -21,11 +27,15 @@ public class HomeViewController {
         return "/products/product-list";
     }
 
-    @GetMapping("/sale-off")
-    public String saleOff() {
-        return "/products/saleOf-list";
+    @GetMapping("/about")
+    public String about() {
+        return "/about_contact/about";
     }
 
+    @GetMapping("/contact")
+    public String contact() {
+        return "/about_contact/contact";
+    }
     // gio hang duoc lay ben cart controller
 
 

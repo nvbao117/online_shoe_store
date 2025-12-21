@@ -52,7 +52,7 @@
     position: absolute;
 }
 
-.chatbot-icon.hidden {
+.chatbot-icon.cb-hidden {
     opacity: 0;
     transform: rotate(90deg) scale(0.5);
 }
@@ -192,7 +192,7 @@
     background: #f9fafb;
 }
 
-.conversation-view.hidden {
+.conversation-view.cb-hidden {
     display: none;
 }
 
@@ -365,7 +365,7 @@
     }
 }
 
-.hidden {
+.cb-hidden {
     display: none !important;
 }
 
@@ -380,4 +380,298 @@
     .conversation-view {
         height: 60vh;
     }
+}
+
+/* ==================== RICH MESSAGE FORMATTING ==================== */
+
+/* Price highlight */
+.bot-message .price {
+    color: #dc2626;
+    font-weight: 600;
+    background: linear-gradient(120deg, #fef3c7 0%, #fef3c7 100%);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Product name highlight */
+.bot-message .product-name {
+    color: var(--cb-primary);
+    font-weight: 600;
+}
+
+/* Bot list styling */
+.bot-message .bot-list {
+    margin: 8px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.bot-message .bot-list li {
+    padding: 6px 0 6px 24px;
+    position: relative;
+    border-bottom: 1px solid #f3f4f6;
+    line-height: 1.4;
+}
+
+.bot-message .bot-list li:last-child {
+    border-bottom: none;
+}
+
+.bot-message .bot-list li::before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    font-size: 14px;
+    color: var(--cb-primary);
+}
+
+/* Checked list items - no extra bullet */
+.bot-message .bot-list li.checked::before {
+    content: "";
+}
+
+/* Emoji spacing */
+.bot-message .emoji {
+    margin: 0 2px;
+}
+
+/* Strong/Bold text */
+.bot-message strong {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* Typing indicator animation */
+.bot-message.typing {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.bot-message.typing::after {
+    content: '';
+    animation: typing-dots 1.5s infinite;
+}
+
+@keyframes typing-dots {
+
+    0%,
+    20% {
+        content: '.';
+    }
+
+    40% {
+        content: '..';
+    }
+
+    60%,
+    100% {
+        content: '...';
+    }
+}
+
+/* Product card (optional - for structured responses) */
+.product-card {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    border-left: 3px solid var(--cb-primary);
+}
+
+.product-card .product-title {
+    font-weight: 600;
+    color: var(--cb-text);
+    margin-bottom: 4px;
+}
+
+.product-card .product-price {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.product-card .product-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* ==================== IMAGE CHAT STYLES ==================== */
+
+/* Image upload button */
+.chatbot-image-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: var(--cb-gray);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.chatbot-image-btn:hover {
+    background: var(--cb-light);
+    color: var(--cb-primary);
+}
+
+.chatbot-image-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* Image preview container */
+.image-preview-container {
+    padding: 8px 12px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.image-preview-wrapper {
+    position: relative;
+    max-width: 200px;
+}
+
+.image-preview-wrapper img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.image-remove-btn:hover {
+    transform: scale(1.1);
+}
+
+.image-preview-hint {
+    font-size: 12px;
+    color: var(--cb-gray);
+}
+
+/* Image messages in chat */
+.message.image-message {
+    padding: 6px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.message.image-message img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.message.image-message img:hover {
+    transform: scale(1.02);
+}
+
+.user-message.image-message {
+    background: transparent;
+}
+
+.user-message.image-message img {
+    border: 2px solid var(--cb-primary);
+}
+
+/* Product results with images */
+.product-result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.product-result-item {
+    background: #f9fafb;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.product-result-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+}
+
+.product-result-item .product-info {
+    padding: 6px 8px;
+    font-size: 12px;
+}
+
+.product-result-item .product-name {
+    font-weight: 600;
+    color: var(--cb-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-result-item .product-price {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Product thumbnails in chat messages */
+.bot-message .product-thumbnail {
+    display: inline-block;
+    margin: 8px 0;
+}
+
+.bot-message .product-thumbnail img {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.bot-message .product-thumbnail img:hover {
+    transform: scale(1.05);
+}
+
+/* Product detail links */
+.bot-message .product-link {
+    display: inline-block;
+    color: var(--cb-primary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.bot-message .product-link:hover {
+    background: rgba(99, 102, 241, 0.2);
+    text-decoration: none;
 }

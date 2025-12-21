@@ -1,7 +1,7 @@
 package com.example.online_shoe_store.Service;
 
 import com.example.online_shoe_store.Entity.Order;
-import com.example.online_shoe_store.config.PaymentConfig;
+import com.example.online_shoe_store.Config.PaymentConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-/**
- * VNPay payment gateway integration service.
- * Handles payment URL generation and callback validation using HMAC-SHA512.
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j

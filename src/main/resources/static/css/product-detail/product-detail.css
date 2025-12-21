@@ -280,6 +280,12 @@ a {
     font-size: 0.9rem;
 }
 
+#pd-desc {
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+}
+
 /* Canh lại phần mô tả cho gọn */
 .product-description-list {
     padding-left: 1.2rem;          /* lùi số thứ tự vào vừa phải */

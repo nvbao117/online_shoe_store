@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 @Controller
 public class LoginController {
@@ -53,10 +55,27 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    // ======== LOGIN (form thôi, xử lý sau) ========
+    // ======== LOGIN ========
 
     @GetMapping("/login")
-    public String showLoginForm() {
-        return "/login/login";         // trỏ tới templates/login.html
+    public String showLoginForm(Authentication authentication) {
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/home";
+        }
+
+        return "login/login";
     }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm(Authentication authentication) {
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/home";
+        }
+        return "login/forgot-password";
+    }
+
 }

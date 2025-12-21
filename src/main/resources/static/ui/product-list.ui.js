@@ -9,4 +9,5 @@ export function renderProductGrid(container, products) {
             createProductCard(p)
         );
     });
+
 }

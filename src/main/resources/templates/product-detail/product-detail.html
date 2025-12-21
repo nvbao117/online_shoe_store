@@ -1,6 +1,7 @@
 <!-- File: src/main/resources/templates/product-detail.html -->
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Chi tiết sản phẩm - 5A Store</title>
@@ -9,340 +10,190 @@
     <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons (dùng cho icon ở header) -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-    <!-- CSS header + CSS riêng cho trang chi tiết sản phẩm -->
+    <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/product-detail/header.css}">
     <link rel="stylesheet" th:href="@{/css/product-detail/product-detail.css}">
 </head>
+
 <body>
 
-<!-- ================== HEADER DÙNG CHUNG ================== -->
-<div th:replace="fragments/header :: mainHeader"></div>
+    <!-- ================== HEADER DÙNG CHUNG ================== -->
+    <div th:replace="fragments/header :: mainHeader"></div>
 
-<!-- ======================================
-     PHẦN NỘI DUNG TRANG CHI TIẾT SẢN PHẨM
-     ====================================== -->
-<main class="product-detail-page">
-    <div class="container">
+    <main class="product-detail-page">
+        <div class="container">
 
-        <!-- ========= BREADCRUMB ========= -->
-        <nav class="breadcrumb-wrapper small mb-3" aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="#">Giày cầu lông</a></li>
-                <li class="breadcrumb-item"><a href="#">Giày cầu lông Yonex</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Giày Yonex Cascade Driver 3</li>
-            </ol>
-        </nav>
+            <!-- ========= BREADCRUMB ========= -->
+            <nav class="breadcrumb-wrapper small mb-3" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="#">Danh mục</a></li>
+                    <li class="breadcrumb-item"><a href="#">Thương hiệu</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" id="pd-breadcrumb-name">Chi tiết sản phẩm
+                    </li>
+                </ol>
+            </nav>
 
-        <!-- ========= HÀNG CHÍNH: HÌNH SẢN PHẨM + THÔNG TIN ========= -->
-        <div class="row g-4">
-            <!-- Cột trái: Hình sản phẩm -->
-            <div class="col-md-5">
-                <div class="product-image-card">
-                    <img src="/data/images/products/Badminton/Yonex/yonex-cascade-driver-3/BlackGray/main.png"
-                         alt="Giày Yonex Cascade Driver 3"
-                         class="img-fluid product-main-image">
+            <!-- ========= HÀNG CHÍNH ========= -->
+            <div class="row g-4">
+                <!-- Cột trái: Hình sản phẩm -->
+                <div class="col-md-5">
+                    <div class="product-image-card">
+                        <!-- main image: JS sẽ set src -->
+                        <img id="pd-main-image" src="" alt="" class="img-fluid product-main-image">
 
-                    <div class="product-thumbnails mt-3">
-                        <img src="/data/images/products/Badminton/Yonex/yonex-cascade-driver-3/BlackGray/thumb-1.png"
-                             alt="Thumb 1"
-                             class="img-thumbnail thumb-item active">
-                        <img src="/data/images/products/Badminton/Yonex/yonex-cascade-driver-3/BlackGray/thumb-2.png"
-                             alt="Thumb 2"
-                             class="img-thumbnail thumb-item">
-                        <img src="/data/images/products/Badminton/Yonex/yonex-cascade-driver-3/BlackGray/thumb-3.png"
-                             alt="Thumb 3"
-                             class="img-thumbnail thumb-item">
-                        <img src="/data/images/products/Badminton/Yonex/yonex-cascade-driver-3/BlackGray/thumb-4.png"
-                             alt="Thumb 4"
-                             class="img-thumbnail thumb-item">
-                        <img src="/data/images/products/Badminton/Yonex/yonex-cascade-driver-3/BlackGray/thumb-5.png"
-                             alt="Thumb 5"
-                             class="img-thumbnail thumb-item">
+                        <!-- thumbnails: JS sẽ render -->
+                        <div class="product-thumbnails mt-3" id="pd-thumbs"></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Cột phải: Thông tin chi tiết sản phẩm -->
-            <div class="col-md-7">
-                <div class="product-info">
+                <!-- Cột phải: Thông tin -->
+                <div class="col-md-7">
+                    <div class="product-info">
 
-                    <h1 class="product-title">Giày Yonex Cascade Driver 3</h1>
+                        <h1 class="product-title" id="pd-name"></h1>
 
-                    <div class="product-meta small mb-2">
-                        <div>Mã: <span class="fw-bold text-danger">VNB027031</span></div>
-                        <div>Thương hiệu: <span class="fw-bold text-primary">Yonex</span> |
-                            Tình trạng: <span class="fw-bold text-danger">Còn hàng</span>
+                        <div class="product-meta small mb-2">
+                            <div>Mã: <span class="fw-bold text-danger" id="pd-code">---</span></div>
+                            <div>
+                                Thương hiệu: <span class="fw-bold text-primary" id="pd-brand">---</span> |
+                                Tình trạng: <span class="fw-bold text-danger" id="pd-status">---</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="product-price mb-3">
-                        2.450.000 đ
-                    </div>
+                        <div class="product-price mb-3" id="pd-price"></div>
 
-                    <!-- Chọn màu sắc -->
-                    <div class="mb-3">
-                        <div class="fw-semibold mb-1">Chọn: [Màu sắc]</div>
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="button"
-                                    class="btn btn-outline-secondary btn-sm color-option active"
-                                    data-color="BlackGray">
-                                Black/Gray
-                            </button>
-                            <button type="button"
-                                    class="btn btn-outline-secondary btn-sm color-option"
-                                    data-color="LightBeige">
-                                LightBeige
-                            </button>
-                            <button type="button"
-                                    class="btn btn-outline-secondary btn-sm color-option"
-                                    data-color="PeacockBlue">
-                                PeacockBlue
-                            </button>
+                        <!-- Chọn màu sắc -->
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-1">Chọn: [Màu sắc]</div>
+                            <div class="d-flex flex-wrap gap-2" id="pd-colors"></div>
                         </div>
-                    </div>
 
-                    <!-- Chọn size -->
-                    <div class="mb-3">
-                        <div class="fw-semibold mb-1">Chọn: [Size]</div>
-                        <div class="d-flex flex-wrap gap-2 product-size-list">
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option active">36</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">37</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">38</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">39</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">40</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">41</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">42</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">43</button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm size-option">44</button>
+                        <!-- Chọn size -->
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-1">Chọn: [Size]</div>
+                            <div class="d-flex flex-wrap gap-2 product-size-list" id="pd-sizes"></div>
                         </div>
-                    </div>
 
-                    <!-- Khung ưu đãi -->
-                    <div class="promotion-box mb-3">
-                        <div class="promotion-header">
-                            <span class="promo-icon">🎁</span>
-                            <span class="promo-title">ƯU ĐÃI</span>
-                        </div>
-                        <ul class="promotion-list mb-2">
-                            <li>Tặng 1 đôi vớ cầu lông 5A.</li>
-                            <li>Sản phẩm cam kết chính hãng.</li>
-                            <li>Thanh toán sau khi kiểm tra và nhận hàng.</li>
-                            <li>Bảo hành theo chính sách của hãng.</li>
-                        </ul>
-
-                        <div class="promotion-subtitle mb-1">
-                            🎁 Ưu đãi thêm khi mua sản phẩm tại <strong>5A STORE Premium</strong>
-                        </div>
-                        <ul class="promotion-list promotion-list-secondary">
-                            <li>Sơn logo mặt vợt miễn phí.</li>
-                            <li>Bảo hành lưới đan trong 72 giờ.</li>
-                            <li>Thay gen vợt miễn phí trọn đời.</li>
-                            <li>Tích lũy điểm thành viên.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Chọn số lượng -->
-                    <div class="mb-3 d-flex align-items-center gap-2">
-                        <span class="fw-semibold">Số lượng:</span>
-                        <div class="input-group input-group-sm quantity-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
-                            <input type="text" class="form-control text-center qty-input" value="1">
-                            <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Nút Mua ngay + Thêm vào giỏ -->
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        <button class="btn btn-primary flex-grow-1 btn-buy-now">
-                            MUA NGAY
-                        </button>
-                        <button class="btn btn-outline-primary flex-grow-1 btn-add-cart">
-                            THÊM VÀO GIỎ HÀNG
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- ========= TAB MÔ TẢ / THÔNG SỐ ========= -->
-        <div class="product-extra mt-4">
-
-            <ul class="nav nav-tabs custom-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active"
-                            id="desc-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#tab-desc"
-                            type="button"
-                            role="tab">
-                        MÔ TẢ SẢN PHẨM
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link"
-                            id="spec-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#tab-spec"
-                            type="button"
-                            role="tab">
-                        THÔNG SỐ KỸ THUẬT
-                    </button>
-                </li>
-            </ul>
-
-            <div class="tab-content custom-tab-content">
-                <div class="tab-pane fade show active" id="tab-desc" role="tabpanel" aria-labelledby="desc-tab">
-                    <ol class="product-description-list">
-                        <li>
-                            Giới thiệu Giày cầu lông Yonex Cascade Drive 3
-                            <p>
-                                Giày cầu lông Yonex Cascade Drive 3 là phiên bản mới nhất trong dòng “Cascade Drive”
-                                của thương hiệu Nhật Bản uy tín Yonex - không chỉ bởi thiết kế hiện đại, mà còn nhờ
-                                những công nghệ tiên tiến vượt tầm giá. Với công nghệ đế POWER CUSHION, gót chân của
-                                bạn sẽ luôn trong trạng thái êm ái và khả năng đàn hồi tuyệt vời để thực hiện những
-                                bước chạy và bật nhảy trên sân.
-                            </p>
-                            <p>
-                                Phần trên thân giày Cascade Drive 3 được thiết kế hoàn toàn mới với sự bổ sung thêm
-                                lớp bảo vệ trong suốt mang đến sự đẳng cấp cho người chơi. Lớp da tổng hợp mang đến
-                                sự mềm mại đan xen với các lỗ thoáng khí thông qua lớp vải mesh để giúp đôi chân bạn
-                                luôn được thông thoáng trong điều kiện thời tiết khô nóng khi phải hoạt động trong
-                                nhiều giờ liền trên sân.
-                            </p>
-                            <p>
-                                Thiết kế của Cascade Drive 3 mang phong cách hiện đại, khỏe khoắn với ba phối màu
-                                nổi bật: đen xám mạnh mẽ, xanh lam năng động và trắng đồng tinh tế. Đây là mẫu giày
-                                phù hợp cho cả vận động viên chuyên nghiệp lẫn người chơi phong trào yêu cầu cao về
-                                hiệu năng và độ thoải mái.
-                            </p>
-                        </li>
-                        <li>
-                            Kết cấu tổng thể Giày cầu lông Yonex Cascade Drive 3
-                            <ul>
-                                <li>Thương hiệu: Yonex</li>
-                                <li>Màu sắc: Peacock Blue, Light Beige, Black/Gray</li>
-                                <li>Chất liệu thân giày (Upper): Synthetic Fiber</li>
-                                <li>Đế giữa (Midsole): Synthetic Resin</li>
-                                <li>Đế ngoài (Outsole): Rubber Sole</li>
-                                <li>Bảng size giày Yonex:</li>
-                                <div class="pd-desc-image">
-                                    <img src="/data/images/products/Badminton/Yonex/detail/bangSize.png"
-                                         alt="Bảng size giày Yonex">
-                                </div>
+                        <!-- Khung ưu đãi (giữ tĩnh) -->
+                        <div class="promotion-box mb-3">
+                            <div class="promotion-header">
+                                <span class="promo-icon">🎁</span>
+                                <span class="promo-title">ƯU ĐÃI</span>
+                            </div>
+                            <ul class="promotion-list mb-2">
+                                <li>Tặng 1 đôi vớ cầu lông 5A.</li>
+                                <li>Sản phẩm cam kết chính hãng.</li>
+                                <li>Thanh toán sau khi kiểm tra và nhận hàng.</li>
+                                <li>Bảo hành theo chính sách của hãng.</li>
                             </ul>
-                        </li>
-                        <li>Công nghệ và các ưu điểm nổi bật trên Giày cầu lông Yonex Cascade Drive 3
-                            <ul>
-                                <li>RADIAL BLADE SOLE là công nghệ đế giày có độ bám sân mới nhất của nhà Yonex với những cải tiến vượt bậc so với loại đế lục giác. Hoa văn hình phi tiêu 4 cánh của ninja được sắp xếp một cách tỉ mỉ giúp phân tán đều trọng lượng giày và cải thiện độ bám sân thêm 3%. Công nghệ này cho phép những pha chuyển hướng đột ngột được diễn ra một cách hiệu quả hơn, giúp người chơi hạn chế khả năng chấn thương ở chân do tình trạng trượt té gây ra. Công nghệ tăng độ bám sân trong các chuyển động dọc, ngang và chéo, giúp người chơi tự tin đổi hướng di chuyển trên sân.</li>
-                                <div class="pd-desc-image">
-                                    <img src="/data/images/products/Badminton/Yonex/detail/RadialBladeSole.png"
-                                         alt="Bảng size giày Yonex">
-                                </div>
-                                <li>POWER CUSHION: Một vật liệu nhẹ, hấp thụ tác động được phát triển độc lập bởi Yonex, nhanh chóng trở lại hình dạng ban đầu sau khi chịu lực tác động, chuyển đổi năng lượng tác động đó thành năng lượng cung cấp cho các chuyển động tiếp theo để thực hiện các bước chân nhanh và nhẹ.</li>
-                                <div class="pd-desc-image">
-                                    <img src="/data/images/products/Badminton/Yonex/detail/PowerCushion.png"
-                                         alt="Bảng size giày Yonex">
-                                </div>
-                                <li>DOUBLE RACHEL MESH: là loại lưới siêu mịn được phát triển trên các đôi giày cầu lông Yonex với tính năng cực kỳ nhẹ và bền, cung cấp khả năng trao đổi không khí để giải phóng độ ẩm gấp tám lần so với vải lưới thông thường. Điều này giúp đôi chân của bạn luôn trong trạng thái thoáng khí khi phải hoạt động trong nhiều giờ liền trên sân.</li>
-                                <li>Durable Skin: Kết hợp tính linh hoạt giống như cao su với độ cứng của nhựa cứng, công nghệ DURABLE SKIN LIGHT của nhà Yonex dựa trên polyurethane đem lại một đôi giày cực nhẹ và vẫn giữ được cảm giác chắc chắn, vừa vặn.</li>
-                                <div class="pd-desc-image">
-                                    <img src="/data/images/products/Badminton/Yonex/detail/DurableSkin.png"
-                                         alt="Bảng size giày Yonex">
-                                </div>
-                                <li>Inner Bootie: Lớp vải Bootie nối giữa thân giày và lưỡi gà với nhau cho cảm giác khi mang giày cầu lông vào sẽ rất êm ái và phần cổ giày sẽ ôm khít mắt cá chân.</li>
-                                <li>Toe Assist Shape: Thiết kế tập trung vào ngón chân giúp giảm áp lực ở ngón chân cái, cũng như cung cấp sự hỗ trợ được cải thiện ở giữa bàn chân và gót chân để mang lại cảm giác vừa vặn, ổn định. Giảm tổn thất năng lượng, cho phép thực hiện các động tác chân nhanh chóng.</li>
-                                <li>ROUND SOLE là công nghệ đế giày vượt trội của Yonex được thiết kế để hỗ trợ toàn diện cho việc di chuyển nhanh chóng và trơn tru, đảm bảo chuyển động linh hoạt và truyền năng lượng tối đa cho các chuyển động liên tục.</li>
-                                <div class="pd-desc-image">
-                                    <img src="/data/images/products/Badminton/Yonex/detail/RoundSole.png"
-                                         alt="Bảng size giày Yonex">
-                                </div>
-                                <li>MEMORY FORM INSOLE là công nghệ của hãng Yonex tích hợp lên lót giày cầu lông. Phần lót giày bên trong được làm hoàn toàn bằng xốp mềm tạo độ nhẹ nhàng, linh hoạt hơn trong mỗi bước di chuyển.</li>
-                                <div class="pd-desc-image">
-                                    <img src="/data/images/products/Badminton/Yonex/detail/MemoryFormInsole.png"
-                                         alt="Bảng size giày Yonex">
-                                </div>
+
+                            <div class="promotion-subtitle mb-1">
+                                🎁 Ưu đãi thêm khi mua sản phẩm tại <strong>5A STORE Premium</strong>
+                            </div>
+                            <ul class="promotion-list promotion-list-secondary">
+                                <li>Sơn logo mặt vợt miễn phí.</li>
+                                <li>Bảo hành lưới đan trong 72 giờ.</li>
+                                <li>Thay gen vợt miễn phí trọn đời.</li>
+                                <li>Tích lũy điểm thành viên.</li>
                             </ul>
-                        </li>
-                    </ol>
-                </div>
-
-                <div class="tab-pane fade" id="tab-spec" role="tabpanel" aria-labelledby="spec-tab">
-                    <table class="product-spec-table">
-                        <tbody>
-                        <tr>
-                            <th>Phân khúc:</th>
-                            <td>Cao cấp</td>
-                        </tr>
-                        <tr>
-                            <th>Thể loại chơi:</th>
-                            <td>Trong nhà - Sân thảm</td>
-                        </tr>
-                        <tr>
-                            <th>Đối tượng:</th>
-                            <td>Cả nam lẫn nữ</td>
-                        </tr>
-                        <tr>
-                            <th>Điểm nổi bật:</th>
-                            <td>Ổn định</td>
-                        </tr>
-                        <tr>
-                            <th>Form giày:</th>
-                            <td>Unisex - Bàn chân thường</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========= KHUNG ĐÁNH GIÁ ========= -->
-        <section class="product-review mt-4">
-            <div class="review-box">
-                <div class="review-header">
-                    <span class="fw-semibold">Đánh giá và nhận xét</span>
-                </div>
-
-                <div class="row align-items-center py-3 gx-4">
-                    <div class="col-md-3 text-center mb-3 mb-md-0">
-                        <div class="review-score">0.0/5</div>
-                        <div class="review-stars">
-                            ★ ★ ★ ★ ★
                         </div>
-                        <div class="small text-muted">0 đánh giá</div>
-                    </div>
 
-                    <div class="col-md-9">
-                        <label class="form-label small mb-1">Mời bạn đánh giá sản phẩm</label>
-                        <textarea class="form-control mb-2" rows="3"
-                                  placeholder="Nhập nội dung đánh giá của bạn..."></textarea>
+                        <!-- Chọn số lượng -->
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <span class="fw-semibold">Số lượng:</span>
+                            <div class="input-group input-group-sm quantity-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
+                                <input type="text" class="form-control text-center qty-input" value="1">
+                                <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Nút Mua ngay + Thêm vào giỏ -->
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <button class="btn btn-primary flex-grow-1 btn-buy-now">
+                                MUA NGAY
+                            </button>
+                            <button class="btn btn-outline-primary flex-grow-1 btn-add-cart">
+                                THÊM VÀO GIỎ HÀNG
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
 
-            <div class="text-center mt-3">
-                <button class="btn btn-primary btn-review-now">
-                    ĐÁNH GIÁ NGAY
-                </button>
+            <!-- ========= TAB MÔ TẢ / THÔNG SỐ ========= -->
+            <div class="product-extra mt-4">
+                <ul class="nav nav-tabs custom-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#tab-desc"
+                            type="button" role="tab">
+                            MÔ TẢ SẢN PHẨM
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content custom-tab-content">
+                    <!-- MÔ TẢ: JS sẽ đổ vào đây -->
+                    <div class="tab-pane fade show active" id="tab-desc" role="tabpanel" aria-labelledby="desc-tab">
+                        <div id="pd-desc"></div>
+                    </div>
+                </div>
             </div>
-        </section>
-    </div>
-</main>
 
-<footer class="site-footer mt-5 py-3">
-    <div class="container text-center small text-muted">
-        © 2024 5A Store - Đồ án Web bán giày.
-    </div>
-</footer>
+            <!-- ========= KHUNG ĐÁNH GIÁ (Shopee Style) ========= -->
+            <section class="product-review mt-4" id="review-section">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="bi bi-star-fill text-warning me-2"></i>
+                            Đánh giá sản phẩm
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Review Summary - sẽ được render bởi JS -->
+                        <div id="review-summary">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                            </div>
+                        </div>
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/product-detail/product-detail.js}"></script>
+                        <hr>
+
+                        <!-- Reviews List - sẽ được render bởi JS -->
+                        <div id="reviews-list"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer mt-5 py-3">
+        <div class="container text-center small text-muted">
+            © 2024 5A Store - Đồ án Web bán giày.
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ✅ ProductId is extracted from URL by JavaScript (no Thymeleaf binding needed) -->
+
+    <!-- JS của trang detail -->
+    <script th:src="@{/js/product-detail/product-detail.js}"></script>
+
+    <!-- Auth status loader -->
+    <script type="module" src="/pages/header-auth.page.js"></script>
+
+    <!-- Product Review module -->
+    <script type="module" src="/pages/product-review.page.js"></script>
 
 </body>
+
 </html>

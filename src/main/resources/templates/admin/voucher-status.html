@@ -1,108 +1,26 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/admin-layout :: head('Quản lý Voucher', '/css/admin/voucher.css')}">
     <title>Quản lý Voucher</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- CSS riêng cho voucher (Thymeleaf) -->
-    <link rel="stylesheet" th:href="@{/css/admin/voucher.css}">
-    <!-- Nếu không dùng Thymeleaf thì: -->
-    <!-- <link rel="stylesheet" href="/css/admin/voucher.css"> -->
 </head>
 <body>
-<div class="layout-wrapper">
-    <!-- ===== SIDEBAR TRÁI ===== -->
-    <aside class="sidebar">
-        <div>
-            <!-- Avatar tròn trên cùng -->
-            <div class="sidebar-avatar"></div>
+<div class="min-h-screen">
+    <!-- Sidebar dùng layout chung -->
+    <aside th:replace="~{fragments/admin-layout :: sidebar}"></aside>
 
-            <!-- Menu chính -->
-            <div class="sidebar-menu-title">Menu</div>
-            <ul class="sidebar-menu">
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-speedometer2 sidebar-icon"></i>
-                        <span>Dashboard</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-bag-check sidebar-icon"></i>
-                        <span>Sản phẩm</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-box-seam sidebar-icon"></i>
-                        <span>Kho hàng</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-receipt-cutoff sidebar-icon"></i>
-                        <span>Đơn hàng</span>
-                    </div>
-                </li>
-                <li>
-                    <!-- DÒNG ĐANG CHỌN: Voucher -->
-                    <div class="sidebar-link active">
-                        <i class="bi bi-ticket-perforated-fill sidebar-icon"></i>
-                        <span>Voucher</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-people sidebar-icon"></i>
-                        <span>Khách hàng</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-graph-up sidebar-icon"></i>
-                        <span>Báo cáo</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="sidebar-link">
-                        <i class="bi bi-gear sidebar-icon"></i>
-                        <span>Cài đặt</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Phần thông tin user dưới cùng -->
-        <div class="sidebar-user">
-            <div class="sidebar-user-avatar"></div>
-            <div class="sidebar-user-info">
-                <span>Nguyễn Vũ Bảo</span>
-                <span class="sidebar-user-role">admin</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ===== NỘI DUNG CHÍNH ===== -->
-    <main class="content-wrapper">
+    <!-- Nội dung chính trong khung dashboard -->
+    <main class="lg:ml-64 p-4 lg:p-8 min-h-screen bg-gray-50">
         <!-- Tiêu đề trang -->
-        <div class="page-title">Quản lý Voucher</div>
+        <div class="mb-4">
+            <h1 class="text-2xl font-bold text-slate-800">Quản lý Voucher</h1>
+        </div>
 
         <!-- CARD TRUNG TÂM QUẢN LÝ VOUCHER -->
         <div class="voucher-card">
             <!-- Header: Logo + Tiêu đề -->
             <div class="voucher-card-header">
                 <div class="voucher-logo">
-                    <!-- Logo: Thymeleaf -->
                     <img th:src="@{/images/logo-shop/logo-sneaker.png}" alt="logo-sneaker">
-                    <!-- Nếu test nhanh không dùng Thymeleaf: -->
-                    <!-- <img src="/images/admin/logo-sneaker.png" alt="logo-sneaker"> -->
                 </div>
 
                 <div class="voucher-title">
@@ -127,50 +45,25 @@
                         <th class="text-center">Status</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td>Winter Sale</td>
-                        <td>WS25</td>
-                        <td>25% off</td>
-                        <td class="text-center">
-                            <button class="status-badge status-active">Active</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Black Friday</td>
-                        <td>BF30</td>
-                        <td>30% off</td>
-                        <td class="text-center">
-                            <button class="status-badge status-expired">Expired</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Summer Sale</td>
-                        <td>SS20</td>
-                        <td>20% off</td>
-                        <td class="text-center">
-                            <button class="status-badge status-inactive">Inactive</button>
-                        </td>
-                    </tr>
+                    <tbody id="voucherTableBody">
                     </tbody>
                 </table>
             </div>
 
+            <div class="voucher-empty" id="voucherEmptyState" hidden>
+                Chưa có voucher nào. Hãy tạo voucher đầu tiên!
+            </div>
+
             <!-- Nút Create & Save -->
             <div class="voucher-actions">
-                <!-- Link sang form tạo voucher -->
-                <a th:href="@{/admin/voucher-create}" class="voucher-primary-btn">Create</a>
-                <!-- Nút Save (sau này gắn backend) -->
-                <button type="button" class="voucher-secondary-btn" id="btnSaveVoucher">Save</button>
+                <a th:href="@{/admin/vouchers/create}" class="voucher-primary-btn" id="btnCreateVoucher">Create</a>
+                <button type="button" class="voucher-secondary-btn" id="btnSaveVoucher" disabled>Save</button>
             </div>
         </div>
     </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- JS riêng cho voucher -->
+<div th:replace="~{fragments/admin-layout :: scripts}"></div>
 <script th:src="@{/js/admin/voucher.js}"></script>
-
 </body>
 </html>

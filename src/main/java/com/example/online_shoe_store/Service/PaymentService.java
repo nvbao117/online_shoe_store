@@ -44,6 +44,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final VNPayService vnPayService;
     private final NotificationService notificationService;
+    private final CheckoutService checkoutService;
     private final Map<String, Object> paymentLocks = new ConcurrentHashMap<>();
 
     @Transactional
@@ -132,7 +133,7 @@ public class PaymentService {
                     payment.setPaymentDate(LocalDateTime.now());
                     paymentRepository.save(payment);
 
-                    order.setStatus(OrderStatus.CONFIRMED);
+                    order.setStatus(OrderStatus.PENDING);
                     order.setConfirmedAt(LocalDateTime.now());
                     orderRepository.save(order);
 
@@ -169,6 +170,7 @@ public class PaymentService {
             }
         }
     }
+
     @Transactional
     public PaymentResponse processVNPayCallback(Map<String, String> params){
         log.info("Processing VNPay callback with params: {}", params);
@@ -241,6 +243,9 @@ public class PaymentService {
                     orderRepository.save(order);
 
                     log.info("VNPay payment completed for order: {}", order.getOrderId());
+
+                    // Soft delete cart items after successful payment
+                    checkoutService.softDeleteCartItemsByOrderId(order.getOrderId());
 
                     notificationService.sendPaymentSuccessNotification(order, payment);
                 }else{
@@ -514,5 +519,4 @@ public class PaymentService {
                 return "Lỗi không xác định. Mã lỗi: " + responseCode;
         }
     }
-
 }
