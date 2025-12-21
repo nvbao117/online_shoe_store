@@ -24,5 +24,8 @@ public class ChatResponse {
     private List<String> suggestedActions;
     private Boolean escalationTriggered;
     private Long processingTimeMs;
+
+    // Image search results
+    private List<String> imageUrls;
 }
 

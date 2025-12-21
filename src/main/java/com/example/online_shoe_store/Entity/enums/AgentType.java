@@ -3,26 +3,29 @@ package com.example.online_shoe_store.Entity.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Các loại agent trong hệ thống multi-agent
- */
 @Getter
 @RequiredArgsConstructor
 public enum AgentType {
-    SALES("sales_agent", "Hỗ trợ mua hàng"),
-    RECOMMEND("recommend_agent", "Gợi ý sản phẩm"),
-    CART("cart_agent", "Quản lý giỏ hàng"),
+    // Current active agents
+    PRODUCT("product_agent", "Tìm kiếm & tư vấn sản phẩm"),
+    SUPPORT_SERVICES("support_services_agent", "Hỗ trợ, kiểm kho, vận chuyển"),
+    AGGREGATION("aggregation_agent", "Tổng hợp & tóm tắt"),
+    ORCHESTRATOR("orchestrator_agent", "Điều phối agent"),
+    
+    // Legacy values (kept for database compatibility)
     SEARCH("search_agent", "Tìm kiếm sản phẩm"),
-    SUPPORT("support_agent", "Hỗ trợ chung,FAQ"),
-    COMPLAINTS("complaints_agent", "Xử lý khiếu nại"),
-    INVENTORY("inventory_agent", "Kiểm tra tồn kho"),
+    SALES("sales_agent", "Tư vấn bán hàng"),
+    INVENTORY("inventory_agent", "Kiểm kho"),
+    COMPLAINTS("complaints_agent", "Khiếu nại"),
+    SUPPORT("support_agent", "Hỗ trợ"),
+    FAQ("faq_agent", "FAQ"),
+    MARKETING("marketing_agent", "Marketing"),
     RETURNS("returns_agent", "Đổi trả hoàn tiền"),
-    LOGISTICS("logistics_agent", "Tracking giao hàng"),
-    MARKETING("marketing_agent", "Marketing và chiến dịch");
+    LOGISTICS("logistics_agent", "Tracking giao hàng");
+
 
     private final String code;
     private final String description;
-
 
     public static AgentType fromCode(String code) {
         for (AgentType type : values()) {
@@ -30,15 +33,10 @@ public enum AgentType {
                 return type;
             }
         }
-        return SUPPORT;
+        return SUPPORT_SERVICES; // Default mới
     }
 
-    /**
-     * Kiểm tra agent có liên quan đến dữ liệu nhạy cảm không
-     */
     public boolean isSensitive() {
-        return this == COMPLAINTS || this == RETURNS || this == SALES;
+        return this == RETURNS || this == SUPPORT_SERVICES;
     }
-
-
-}
+    }

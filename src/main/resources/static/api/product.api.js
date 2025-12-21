@@ -1,6 +1,6 @@
 // /api/product.api.js
 
-import {renderProductGrid} from "../ui/product-list.ui.js"
+import { renderProductGrid } from "../ui/product-list.ui.js"
 export async function fetchProducts() {
     const res = await fetch("/api/products", {
         credentials: "include"
@@ -60,3 +60,27 @@ export async function fetchFilteredProducts(options = {}) {
 //     const productContainer = document.getElementById("product-container");
 //     renderProductGrid(productContainer,products);
 // }
+
+// Fetch products by list of IDs (for image search results)
+export async function fetchProductsByIds(productIds) {
+    if (!productIds || productIds.length === 0) return [];
+
+    // Fetch each product and combine results
+    const products = await Promise.all(
+        productIds.map(async (id) => {
+            try {
+                const res = await fetch(`/api/products/${id}`, {
+                    credentials: "include"
+                });
+                if (!res.ok) return null;
+                return res.json();
+            } catch (e) {
+                console.warn(`Failed to fetch product ${id}`, e);
+                return null;
+            }
+        })
+    );
+
+    // Filter out nulls and maintain order
+    return products.filter(p => p !== null);
+}

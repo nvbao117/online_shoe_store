@@ -22,40 +22,31 @@ public class InventoryTools {
 
     @Tool("Kiểm tra tồn kho của sản phẩm theo ID và size")
     public String checkStock(String productId, String size) {
-        log.info("[InventoryTools] Checking stock for product {} size {}", productId, size);
-        
         List<ProductVariant> variants = variantRepository.findByProductProductId(productId);
-        
         if (variants.isEmpty()) {
             return "Không tìm thấy sản phẩm với ID: " + productId;
         }
-        
         for (ProductVariant v : variants) {
             if (v.getSize().equalsIgnoreCase(size)) {
                 int stock = v.getStock();
                 if (stock > 10) {
-                    return String.format("✅ Size %s còn %d đôi", size, stock);
+                    return String.format("Size %s còn %d đôi", size, stock);
                 } else if (stock > 0) {
-                    return String.format("⚠️ Size %s chỉ còn %d đôi. Đặt ngay!", size, stock);
+                    return String.format("Size %s chỉ còn %d đôi. Đặt ngay!", size, stock);
                 } else {
-                    return String.format("❌ Size %s đã hết hàng", size);
+                    return String.format("Size %s đã hết hàng", size);
                 }
             }
         }
-        
         return "Không tìm thấy size " + size + " cho sản phẩm này";
     }
 
     @Tool("Lấy danh sách size còn hàng của sản phẩm")
     public String getAvailableSizes(String productId) {
-        log.info("[InventoryTools] Getting available sizes for product {}", productId);
-        
         List<ProductVariant> variants = variantRepository.findByProductProductId(productId);
-        
         if (variants.isEmpty()) {
             return "Không tìm thấy sản phẩm";
         }
-        
         String availableSizes = variants.stream()
                 .filter(v -> v.getStock() > 0)
                 .map(v -> String.format("%s (%d)", v.getSize(), v.getStock()))
@@ -64,24 +55,21 @@ public class InventoryTools {
         if (availableSizes.isEmpty()) {
             return "Sản phẩm hiện đã hết hàng tất cả size";
         }
-        
         return "Size còn hàng: " + availableSizes;
     }
 
     @Tool("Kiểm tra sản phẩm sắp hết hàng (low stock alert)")
-    public String getLowStockProducts() {
-        log.info("[InventoryTools] Getting low stock products");
-        
+    public String getLowStockProducts() {        
         List<ProductVariant> lowStockVariants = variantRepository.findAll().stream()
                 .filter(v -> v.getStock() > 0 && v.getStock() <= 10)
                 .limit(10)
                 .toList();
         
         if (lowStockVariants.isEmpty()) {
-            return "✅ Tất cả sản phẩm đều đủ hàng!";
+            return "Tất cả sản phẩm đều hết hàng!";
         }
         
-        StringBuilder sb = new StringBuilder("⚠️ SẢN PHẨM SẮP HẾT HÀNG:\n\n");
+        StringBuilder sb = new StringBuilder("SẢN PHẨM SẮP HẾT HÀNG:\n\n");
         for (ProductVariant v : lowStockVariants) {
             sb.append(String.format("- %s | Size %s | Còn %d đôi\n",
                 v.getProduct().getName(),
@@ -93,9 +81,7 @@ public class InventoryTools {
     }
 
     @Tool("Kiểm tra màu sắc còn hàng của sản phẩm")
-    public String getAvailableColors(String productId) {
-        log.info("[InventoryTools] Getting available colors for product {}", productId);
-        
+    public String getAvailableColors(String productId) {        
         List<ProductVariant> variants = variantRepository.findByProductProductId(productId);
         
         if (variants.isEmpty()) {
@@ -112,23 +98,21 @@ public class InventoryTools {
     }
 
     @Tool("Lấy danh sách sản phẩm cần nhập hàng khẩn cấp (critical low)")
-    public String getCriticalLowStock() {
-        log.info("[InventoryTools] Getting critical low stock products");
-        
+    public String getCriticalLowStock() {        
         List<ProductVariant> criticalVariants = variantRepository.findAll().stream()
                 .filter(v -> v.getStock() <= 3)
                 .toList();
         
         if (criticalVariants.isEmpty()) {
-            return "✅ Không có sản phẩm nào ở mức critical!";
+            return "Không có sản phẩm nào ở mức critical!";
         }
         
-        StringBuilder sb = new StringBuilder("🚨 SẢN PHẨM CẦN NHẬP HÀNG KHẨN CẤP:\n\n");
+        StringBuilder sb = new StringBuilder("SẢN PHẨM CẦN NHẬP HÀNG KHẨN CẤP:\n\n");
         long outOfStock = criticalVariants.stream().filter(v -> v.getStock() == 0).count();
         long criticalLow = criticalVariants.size() - outOfStock;
         
-        sb.append(String.format("❌ Hết hàng: %d variants\n", outOfStock));
-        sb.append(String.format("⚠️ Sắp hết (≤3): %d variants\n\n", criticalLow));
+        sb.append(String.format("Hết hàng: %d variants\n", outOfStock));
+        sb.append(String.format("Sắp hết (≤3): %d variants\n\n", criticalLow));
         
         criticalVariants.stream().limit(5).forEach(v -> 
             sb.append(String.format("- %s | Size %s | Stock: %d\n",
@@ -155,10 +139,10 @@ public class InventoryTools {
                 .toList();
         
         if (lowStock.isEmpty()) {
-            return "✅ Hiện tại không cần nhập thêm hàng. Tồn kho đủ dùng!";
+            return "Hiện tại không cần nhập thêm hàng. Tồn kho đủ dùng!";
         }
         
-        StringBuilder sb = new StringBuilder("📦 GỢI Ý NHẬP HÀNG:\n\n");
+        StringBuilder sb = new StringBuilder("GỢI Ý NHẬP HÀNG:\n\n");
         
         for (ProductVariant v : lowStock) {
             int suggestedQty = v.getStock() == 0 ? 50 : 30;

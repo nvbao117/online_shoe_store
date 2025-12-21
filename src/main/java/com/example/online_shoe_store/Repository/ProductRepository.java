@@ -26,6 +26,15 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
     """)
     Optional<Product> findDetailById(@Param("id") String id);
 
+    @Query("""
+        select distinct p
+        from Product p
+        left join fetch p.brand b
+        left join fetch p.category c
+        where p.status = com.example.online_shoe_store.Entity.enums.ProductStatus.ACTIVE
+    """)
+    List<Product> findAllActiveWithBrandCategory();
+
     List<Product> findByCategoryCategoryId(String categoryId);
 
     List<Product> findByNameContainingIgnoreCase(String name);

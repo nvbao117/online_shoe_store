@@ -2,17 +2,24 @@ package com.example.online_shoe_store.Service;
 
 import com.example.online_shoe_store.Entity.Order;
 import com.example.online_shoe_store.Entity.Payment;
+import com.example.online_shoe_store.Service.notification.OrderConfirmationEmailService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class NotificationService {
 
+    private final OrderConfirmationEmailService orderConfirmationEmailService;
+
     public void sendPaymentSuccessNotification(Order order, Payment payment) {
-        // TODO: Implement actual notification (email, SMS, push notification, etc.)
         log.info("✅ Payment successful notification sent for order: {}", order.getOrderId());
         log.info("💰 Amount: {}, Transaction: {}", payment.getAmount(), payment.getTransactionId());
+        
+        // Send order confirmation email to customer
+        orderConfirmationEmailService.sendOrderConfirmationEmail(order, payment);
     }
 
     public void sendPaymentFailureNotification(Order order, Payment payment) {

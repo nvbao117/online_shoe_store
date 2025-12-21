@@ -12,18 +12,13 @@ public enum IntentType {
     // Primary Intents - Mua sắm
     SEARCH("search", "Tìm kiếm sản phẩm"),
     PURCHASE("purchase", "Muốn mua hàng"),
-    RECOMMENDATION("recommendation", "Gợi ý sản phẩm"),
-    
-    // Primary Intents - Hỗ trợ
+
     SUPPORT("support", "Hỗ trợ chung"),
     COMPLAINT("complaint", "Khiếu nại"),
     
-    // Primary Intents - Đơn hàng
-    TRACK_ORDER("track_order", "Theo dõi đơn hàng"),
     REFUND("refund", "Yêu cầu hoàn tiền"),
     RETURN("return", "Đổi trả hàng"),
     
-    // Primary Intents - Thông tin
     FEEDBACK("feedback", "Đánh giá sản phẩm"),
     PRICE_CHECK("price_check", "Hỏi giá/khuyến mãi"),
     SIZE_ADVICE("size_advice", "Tư vấn size"),
@@ -44,17 +39,12 @@ public enum IntentType {
         }
         return UNKNOWN;
     }
-    
-    /**
-     * Kiểm tra intent có yêu cầu escalation không
-     */
+
     public boolean requiresEscalation() {
         return this == COMPLAINT || this == REFUND;
     }
     
-    /**
-     * Kiểm tra intent có high priority không
-     */
+
     public boolean isHighPriority() {
         return this == COMPLAINT || this == REFUND || this == RETURN || this == PURCHASE;
     }

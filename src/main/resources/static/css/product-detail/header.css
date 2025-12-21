@@ -6,7 +6,8 @@
 
 /* Nền xanh nhạt cho hàng trên (giống header home hình 2) */
 .header-top-wrapper {
-    background-color: #f0f8ff;      /* xanh rất nhạt */
+    background-color: #f0f8ff;
+    /* xanh rất nhạt */
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -37,7 +38,8 @@
 .hotline-number {
     font-size: 17px;
     font-weight: 800;
-    color: #ff3b3b;  /* màu đỏ nổi bật */
+    color: #ff3b3b;
+    /* màu đỏ nổi bật */
 }
 
 /* ================== SEARCH ================== */
@@ -47,10 +49,12 @@
     margin: 0 auto;
     display: flex;
     align-items: center;
-    border-radius: 18px;           /* bo nhẹ, không quá tròn */
+    border-radius: 18px;
+    /* bo nhẹ, không quá tròn */
     border: 1px solid #e5e7eb;
     background-color: #ffffff;
-    overflow: hidden;              /* cắt góc con cho đều */
+    overflow: hidden;
+    /* cắt góc con cho đều */
 }
 
 .search-input {
@@ -76,8 +80,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;          /* bình thường trong suốt */
-    color: #3b82f6;                   /* icon xanh */
+    background: transparent;
+    /* bình thường trong suốt */
+    color: #3b82f6;
+    /* icon xanh */
     padding: 0;
 }
 
@@ -86,7 +92,85 @@
 }
 
 .search-btn:hover {
-    background: #eff6ff;              /* hover lên nền xanh nhạt */
+    background: #eff6ff;
+    /* hover lên nền xanh nhạt */
+}
+
+/* Image search button */
+.search-image-btn {
+    border: none;
+    border-radius: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #10b981;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-image-btn i {
+    font-size: 18px;
+}
+
+.search-image-btn:hover {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+/* Image search result item */
+.image-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+
+.image-result-item:hover {
+    background: #fef2f2;
+}
+
+.image-result-item img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.image-result-item .info {
+    flex: 1;
+    min-width: 0;
+}
+
+.image-result-item .name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.image-result-item .price {
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.image-result-item .similarity {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
 }
 
 /* ================== ICONS BÊN PHẢI ================== */
@@ -99,8 +183,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4b5563;          /* xám đậm */
-    background-color: #e5e7eb;   /* vòng tròn xám giống hình 2 */
+    color: #4b5563;
+    /* xám đậm */
+    background-color: #e5e7eb;
+    /* vòng tròn xám giống hình 2 */
 }
 
 .icon-circle i {
@@ -125,7 +211,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ef4444; /* đỏ badge */
+    background-color: #ef4444;
+    /* đỏ badge */
 }
 
 /* ================== USER PROFILE DROPDOWN ================== */
@@ -195,7 +282,8 @@
 /* ================== THANH MENU DƯỚI ================== */
 
 .header-nav {
-    background-color: #ffffff;  /* nền trắng giống header home */
+    background-color: #ffffff;
+    /* nền trắng giống header home */
     border-top: 1px solid #e2e8f0;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
@@ -219,7 +307,8 @@
     padding: 10px 0;
     font-size: 14px;
     font-weight: 600;
-    color: #1d4ed8;                /* xanh giống chữ menu ở hình 2 */
+    color: #1d4ed8;
+    /* xanh giống chữ menu ở hình 2 */
     text-decoration: none;
     text-transform: uppercase;
 }
@@ -230,7 +319,8 @@
 
 .nav-item.active a {
     color: #1e40af;
-    border-bottom: 2px solid #1d4ed8; /* gạch chân xanh dưới item active */
+    border-bottom: 2px solid #1d4ed8;
+    /* gạch chân xanh dưới item active */
 }
 
 /* ================== RESPONSIVE NHẸ ================== */
