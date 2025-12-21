@@ -1,6 +1,7 @@
 <!-- File: src/main/resources/templates/product-detail.html -->
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Chi tiết sản phẩm - 5A Store</title>
@@ -10,195 +11,189 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/product-detail/header.css}">
     <link rel="stylesheet" th:href="@{/css/product-detail/product-detail.css}">
 </head>
+
 <body>
 
-<!-- ================== HEADER DÙNG CHUNG ================== -->
-<div th:replace="fragments/header :: mainHeader"></div>
+    <!-- ================== HEADER DÙNG CHUNG ================== -->
+    <div th:replace="fragments/header :: mainHeader"></div>
 
-<main class="product-detail-page">
-    <div class="container">
+    <main class="product-detail-page">
+        <div class="container">
 
-        <!-- ========= BREADCRUMB ========= -->
-        <nav class="breadcrumb-wrapper small mb-3" aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="#">Danh mục</a></li>
-                <li class="breadcrumb-item"><a href="#">Thương hiệu</a></li>
-                <li class="breadcrumb-item active" aria-current="page" id="pd-breadcrumb-name">Chi tiết sản phẩm</li>
-            </ol>
-        </nav>
+            <!-- ========= BREADCRUMB ========= -->
+            <nav class="breadcrumb-wrapper small mb-3" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="#">Danh mục</a></li>
+                    <li class="breadcrumb-item"><a href="#">Thương hiệu</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" id="pd-breadcrumb-name">Chi tiết sản phẩm
+                    </li>
+                </ol>
+            </nav>
 
-        <!-- ========= HÀNG CHÍNH ========= -->
-        <div class="row g-4">
-            <!-- Cột trái: Hình sản phẩm -->
-            <div class="col-md-5">
-                <div class="product-image-card">
-                    <!-- main image: JS sẽ set src -->
-                    <img id="pd-main-image"
-                         src=""
-                         alt=""
-                         class="img-fluid product-main-image">
+            <!-- ========= HÀNG CHÍNH ========= -->
+            <div class="row g-4">
+                <!-- Cột trái: Hình sản phẩm -->
+                <div class="col-md-5">
+                    <div class="product-image-card">
+                        <!-- main image: JS sẽ set src -->
+                        <img id="pd-main-image" src="" alt="" class="img-fluid product-main-image">
 
-                    <!-- thumbnails: JS sẽ render -->
-                    <div class="product-thumbnails mt-3" id="pd-thumbs"></div>
+                        <!-- thumbnails: JS sẽ render -->
+                        <div class="product-thumbnails mt-3" id="pd-thumbs"></div>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Thông tin -->
+                <div class="col-md-7">
+                    <div class="product-info">
+
+                        <h1 class="product-title" id="pd-name"></h1>
+
+                        <div class="product-meta small mb-2">
+                            <div>Mã: <span class="fw-bold text-danger" id="pd-code">---</span></div>
+                            <div>
+                                Thương hiệu: <span class="fw-bold text-primary" id="pd-brand">---</span> |
+                                Tình trạng: <span class="fw-bold text-danger" id="pd-status">---</span>
+                            </div>
+                        </div>
+
+                        <div class="product-price mb-3" id="pd-price"></div>
+
+                        <!-- Chọn màu sắc -->
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-1">Chọn: [Màu sắc]</div>
+                            <div class="d-flex flex-wrap gap-2" id="pd-colors"></div>
+                        </div>
+
+                        <!-- Chọn size -->
+                        <div class="mb-3">
+                            <div class="fw-semibold mb-1">Chọn: [Size]</div>
+                            <div class="d-flex flex-wrap gap-2 product-size-list" id="pd-sizes"></div>
+                        </div>
+
+                        <!-- Khung ưu đãi (giữ tĩnh) -->
+                        <div class="promotion-box mb-3">
+                            <div class="promotion-header">
+                                <span class="promo-icon">🎁</span>
+                                <span class="promo-title">ƯU ĐÃI</span>
+                            </div>
+                            <ul class="promotion-list mb-2">
+                                <li>Tặng 1 đôi vớ cầu lông 5A.</li>
+                                <li>Sản phẩm cam kết chính hãng.</li>
+                                <li>Thanh toán sau khi kiểm tra và nhận hàng.</li>
+                                <li>Bảo hành theo chính sách của hãng.</li>
+                            </ul>
+
+                            <div class="promotion-subtitle mb-1">
+                                🎁 Ưu đãi thêm khi mua sản phẩm tại <strong>5A STORE Premium</strong>
+                            </div>
+                            <ul class="promotion-list promotion-list-secondary">
+                                <li>Sơn logo mặt vợt miễn phí.</li>
+                                <li>Bảo hành lưới đan trong 72 giờ.</li>
+                                <li>Thay gen vợt miễn phí trọn đời.</li>
+                                <li>Tích lũy điểm thành viên.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Chọn số lượng -->
+                        <div class="mb-3 d-flex align-items-center gap-2">
+                            <span class="fw-semibold">Số lượng:</span>
+                            <div class="input-group input-group-sm quantity-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
+                                <input type="text" class="form-control text-center qty-input" value="1">
+                                <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Nút Mua ngay + Thêm vào giỏ -->
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <button class="btn btn-primary flex-grow-1 btn-buy-now">
+                                MUA NGAY
+                            </button>
+                            <button class="btn btn-outline-primary flex-grow-1 btn-add-cart">
+                                THÊM VÀO GIỎ HÀNG
+                            </button>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
-            <!-- Cột phải: Thông tin -->
-            <div class="col-md-7">
-                <div class="product-info">
-
-                    <h1 class="product-title" id="pd-name"></h1>
-
-                    <div class="product-meta small mb-2">
-                        <div>Mã: <span class="fw-bold text-danger" id="pd-code">---</span></div>
-                        <div>
-                            Thương hiệu: <span class="fw-bold text-primary" id="pd-brand">---</span> |
-                            Tình trạng: <span class="fw-bold text-danger" id="pd-status">---</span>
-                        </div>
-                    </div>
-
-                    <div class="product-price mb-3" id="pd-price"></div>
-
-                    <!-- Chọn màu sắc -->
-                    <div class="mb-3">
-                        <div class="fw-semibold mb-1">Chọn: [Màu sắc]</div>
-                        <div class="d-flex flex-wrap gap-2" id="pd-colors"></div>
-                    </div>
-
-                    <!-- Chọn size -->
-                    <div class="mb-3">
-                        <div class="fw-semibold mb-1">Chọn: [Size]</div>
-                        <div class="d-flex flex-wrap gap-2 product-size-list" id="pd-sizes"></div>
-                    </div>
-
-                    <!-- Khung ưu đãi (giữ tĩnh) -->
-                    <div class="promotion-box mb-3">
-                        <div class="promotion-header">
-                            <span class="promo-icon">🎁</span>
-                            <span class="promo-title">ƯU ĐÃI</span>
-                        </div>
-                        <ul class="promotion-list mb-2">
-                            <li>Tặng 1 đôi vớ cầu lông 5A.</li>
-                            <li>Sản phẩm cam kết chính hãng.</li>
-                            <li>Thanh toán sau khi kiểm tra và nhận hàng.</li>
-                            <li>Bảo hành theo chính sách của hãng.</li>
-                        </ul>
-
-                        <div class="promotion-subtitle mb-1">
-                            🎁 Ưu đãi thêm khi mua sản phẩm tại <strong>5A STORE Premium</strong>
-                        </div>
-                        <ul class="promotion-list promotion-list-secondary">
-                            <li>Sơn logo mặt vợt miễn phí.</li>
-                            <li>Bảo hành lưới đan trong 72 giờ.</li>
-                            <li>Thay gen vợt miễn phí trọn đời.</li>
-                            <li>Tích lũy điểm thành viên.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Chọn số lượng -->
-                    <div class="mb-3 d-flex align-items-center gap-2">
-                        <span class="fw-semibold">Số lượng:</span>
-                        <div class="input-group input-group-sm quantity-group" style="width: 130px;">
-                            <button class="btn btn-outline-secondary btn-qty-minus" type="button">-</button>
-                            <input type="text" class="form-control text-center qty-input" value="1">
-                            <button class="btn btn-outline-secondary btn-qty-plus" type="button">+</button>
-                        </div>
-                    </div>
-
-                    <!-- Nút Mua ngay + Thêm vào giỏ -->
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        <button class="btn btn-primary flex-grow-1 btn-buy-now">
-                            MUA NGAY
+            <!-- ========= TAB MÔ TẢ / THÔNG SỐ ========= -->
+            <div class="product-extra mt-4">
+                <ul class="nav nav-tabs custom-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#tab-desc"
+                            type="button" role="tab">
+                            MÔ TẢ SẢN PHẨM
                         </button>
-                        <button class="btn btn-outline-primary flex-grow-1 btn-add-cart">
-                            THÊM VÀO GIỎ HÀNG
-                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content custom-tab-content">
+                    <!-- MÔ TẢ: JS sẽ đổ vào đây -->
+                    <div class="tab-pane fade show active" id="tab-desc" role="tabpanel" aria-labelledby="desc-tab">
+                        <div id="pd-desc"></div>
                     </div>
-
                 </div>
             </div>
-        </div>
 
-        <!-- ========= TAB MÔ TẢ / THÔNG SỐ ========= -->
-        <div class="product-extra mt-4">
-            <ul class="nav nav-tabs custom-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active"
-                            id="desc-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#tab-desc"
-                            type="button"
-                            role="tab">
-                        MÔ TẢ SẢN PHẨM
-                    </button>
-                </li>
-            </ul>
-
-            <div class="tab-content custom-tab-content">
-                <!-- MÔ TẢ: JS sẽ đổ vào đây -->
-                <div class="tab-pane fade show active" id="tab-desc" role="tabpanel" aria-labelledby="desc-tab">
-                    <div id="pd-desc"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========= KHUNG ĐÁNH GIÁ (giữ tĩnh) ========= -->
-        <section class="product-review mt-4">
-            <div class="review-box">
-                <div class="review-header">
-                    <span class="fw-semibold">Đánh giá và nhận xét</span>
-                </div>
-
-                <div class="row align-items-center py-3 gx-4">
-                    <div class="col-md-3 text-center mb-3 mb-md-0">
-                        <div class="review-score">0.0/5</div>
-                        <div class="review-stars">
-                            ★ ★ ★ ★ ★
+            <!-- ========= KHUNG ĐÁNH GIÁ (Shopee Style) ========= -->
+            <section class="product-review mt-4" id="review-section">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 fw-semibold">
+                            <i class="bi bi-star-fill text-warning me-2"></i>
+                            Đánh giá sản phẩm
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Review Summary - sẽ được render bởi JS -->
+                        <div id="review-summary">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="small text-muted">0 đánh giá</div>
-                    </div>
 
-                    <div class="col-md-9">
-                        <label class="form-label small mb-1">Mời bạn đánh giá sản phẩm</label>
-                        <textarea class="form-control mb-2" rows="3"
-                                  placeholder="Nhập nội dung đánh giá của bạn..."></textarea>
+                        <hr>
+
+                        <!-- Reviews List - sẽ được render bởi JS -->
+                        <div id="reviews-list"></div>
                     </div>
                 </div>
-            </div>
+            </section>
+        </div>
+    </main>
 
-            <div class="text-center mt-3">
-                <button class="btn btn-primary btn-review-now">
-                    ĐÁNH GIÁ NGAY
-                </button>
-            </div>
-        </section>
-    </div>
-</main>
+    <footer class="site-footer mt-5 py-3">
+        <div class="container text-center small text-muted">
+            © 2024 5A Store - Đồ án Web bán giày.
+        </div>
+    </footer>
 
-<footer class="site-footer mt-5 py-3">
-    <div class="container text-center small text-muted">
-        © 2024 5A Store - Đồ án Web bán giày.
-    </div>
-</footer>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ✅ ProductId is extracted from URL by JavaScript (no Thymeleaf binding needed) -->
 
-<!-- ✅ ProductId is extracted from URL by JavaScript (no Thymeleaf binding needed) -->
+    <!-- JS của trang detail -->
+    <script th:src="@{/js/product-detail/product-detail.js}"></script>
 
-<!-- JS của trang detail -->
-<script th:src="@{/js/product-detail/product-detail.js}"></script>
+    <!-- Auth status loader -->
+    <script type="module" src="/pages/header-auth.page.js"></script>
 
-<!-- Auth status loader -->
-<script type="module" src="/pages/header-auth.page.js"></script>
+    <!-- Product Review module -->
+    <script type="module" src="/pages/product-review.page.js"></script>
 
 </body>
+
 </html>

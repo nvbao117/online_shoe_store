@@ -4,6 +4,7 @@ import com.example.online_shoe_store.Entity.User;
 import com.example.online_shoe_store.Repository.UserRepository;
 import com.example.online_shoe_store.Service.ReviewService;
 import com.example.online_shoe_store.dto.response.PendingReviewResponse;
+import com.example.online_shoe_store.dto.response.ProductReviewSummaryResponse;
 import com.example.online_shoe_store.dto.response.ReviewResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,34 @@ public class ReviewAPIController {
 
         List<PendingReviewResponse> pendingItems = reviewService.getPendingReviewItems(user);
         return ResponseEntity.ok(pendingItems);
+    }
+
+    /**
+     * Lấy danh sách đánh giá của sản phẩm (public - không cần đăng nhập)
+     * 
+     * @param productId ID của sản phẩm
+     * @param rating    (optional) Lọc theo số sao (1-5)
+     */
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<ReviewResponse>> getProductReviews(
+            @PathVariable String productId,
+            @RequestParam(required = false) Integer rating) {
+
+        List<ReviewResponse> reviews = reviewService.getReviewsByProduct(productId, rating);
+        return ResponseEntity.ok(reviews);
+    }
+
+    /**
+     * Lấy tổng quan đánh giá sản phẩm (public - không cần đăng nhập)
+     * 
+     * @param productId ID của sản phẩm
+     */
+    @GetMapping("/product/{productId}/summary")
+    public ResponseEntity<ProductReviewSummaryResponse> getProductReviewSummary(
+            @PathVariable String productId) {
+
+        ProductReviewSummaryResponse summary = reviewService.getReviewSummary(productId);
+        return ResponseEntity.ok(summary);
     }
 
     /**
