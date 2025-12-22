@@ -65,6 +65,7 @@ public class SecurityConfig {
                                 "/register",
                                 "/forgot-password",
                                 "/register/send-otp",
+                                "/forgot-password/send-otp",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
                                 "/",
