@@ -315,7 +315,9 @@ function initVoucherCreatePage() {
         if (scopeBrand) {
             productSelect.value = "";
             if (hasCategory) {
-                filterBrandsByCategory(categorySelect.value);
+                if (!brandSelect.value){
+                    filterBrandsByCategory(categorySelect.value);
+                }
             } else {
                 filterBrandsByCategory("");
             }
@@ -325,9 +327,11 @@ function initVoucherCreatePage() {
 
         if (scopeProduct) {
             if (hasCategory) {
-                filterBrandsByCategory(categorySelect.value);
+                if (!brandSelect.value) {
+                    filterBrandsByCategory(categorySelect.value);
+                }
                 if (brandSelect.value) {
-                    filterProductsByBrand(brandSelect.value);
+                    filterProductsByBrand(brandSelect.value, categorySelect.value);
                 } else {
                     filterProductsByCategory(categorySelect.value);
                 }
