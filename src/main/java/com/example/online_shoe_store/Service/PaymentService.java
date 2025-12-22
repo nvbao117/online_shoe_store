@@ -3,6 +3,7 @@ package com.example.online_shoe_store.Service;
 import com.example.online_shoe_store.Entity.Order;
 import com.example.online_shoe_store.Entity.Payment;
 import com.example.online_shoe_store.Entity.PaymentMethod;
+import com.example.online_shoe_store.Entity.enums.NotificationType;
 import com.example.online_shoe_store.Entity.enums.OrderStatus;
 import com.example.online_shoe_store.Entity.enums.PaymentStatus;
 import com.example.online_shoe_store.Entity.enums.PaymentType;
@@ -44,6 +45,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final VNPayService vnPayService;
     private final NotificationService notificationService;
+    private final UserNotificationService userNotificationService;
     private final CheckoutService checkoutService;
     private final Map<String, Object> paymentLocks = new ConcurrentHashMap<>();
 
@@ -58,8 +60,10 @@ public class PaymentService {
                         .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
                 validateOrderForPayment(order);
-                PaymentMethod paymentMethod = paymentMethodRepository.findByMethodName(request.getPaymentMethod().toUpperCase())
-                        .orElseThrow(() -> new PaymentMethodNotFoundException("PaymentMethod not found: " + request.getPaymentMethod()));
+                PaymentMethod paymentMethod = paymentMethodRepository
+                        .findByMethodName(request.getPaymentMethod().toUpperCase())
+                        .orElseThrow(() -> new PaymentMethodNotFoundException(
+                                "PaymentMethod not found: " + request.getPaymentMethod()));
 
                 if (!paymentMethod.getIsActive()) {
                     throw new PaymentMethodNotActiveException("Payment method is not active");
@@ -116,8 +120,7 @@ public class PaymentService {
                             payment.getPaymentId(),
                             request.getBankCode(),
                             request.getLanguage(),
-                            ipAddress
-                    );
+                            ipAddress);
 
                     if (paymentUrl != null && !paymentUrl.isEmpty()) {
                         payment.setPaymentUrl(paymentUrl);
@@ -140,6 +143,16 @@ public class PaymentService {
                     log.info("COD payment auto-confirmed for order: {}", order.getOrderId());
 
                     notificationService.sendPaymentSuccessNotification(order, payment);
+
+                    // Tạo thông báo in-app cho người dùng
+                    userNotificationService.createNotification(
+                            order.getUser(),
+                            NotificationType.ORDER_UPDATE,
+                            "Đặt hàng thành công",
+                            "Đơn hàng #" + order.getOrderId().substring(0, 8)
+                                    + "... đã được đặt thành công. Chúng tôi sẽ xác nhận và giao hàng sớm nhất!",
+                            "🛒",
+                            order.getOrderId());
 
                     return PaymentResponse.builder()
                             .success(true)
@@ -165,14 +178,14 @@ public class PaymentService {
                         .paymentId(payment.getPaymentId())
                         .status(payment.getPaymentStatus())
                         .build();
-            }finally {
+            } finally {
                 paymentLocks.remove(orderId);
             }
         }
     }
 
     @Transactional
-    public PaymentResponse processVNPayCallback(Map<String, String> params){
+    public PaymentResponse processVNPayCallback(Map<String, String> params) {
         log.info("Processing VNPay callback with params: {}", params);
 
         String vnp_TxnRef = params.get("vnp_TxnRef");
@@ -184,8 +197,8 @@ public class PaymentService {
         }
 
         synchronized (paymentLocks.computeIfAbsent(vnp_TxnRef, k -> new Object())) {
-            try{
-                if(!vnPayService.validateCallBack(new HashMap<>(params))){
+            try {
+                if (!vnPayService.validateCallBack(new HashMap<>(params))) {
                     log.error("VNPay callback signature validation failed for payment: {}", vnp_TxnRef);
                     throw new InvalidPaymentException("Invalid signature");
                 }
@@ -236,7 +249,6 @@ public class PaymentService {
                     payment.setCardType(params.get("vnp_CardType"));
                     paymentRepository.save(payment);
 
-
                     order.setStatus(OrderStatus.CONFIRMED);
                     order.setConfirmedAt(LocalDateTime.now());
                     order.setPaidAt(LocalDateTime.now());
@@ -248,7 +260,17 @@ public class PaymentService {
                     checkoutService.softDeleteCartItemsByOrderId(order.getOrderId());
 
                     notificationService.sendPaymentSuccessNotification(order, payment);
-                }else{
+
+                    // Tạo thông báo in-app cho người dùng
+                    userNotificationService.createNotification(
+                            order.getUser(),
+                            NotificationType.ORDER_UPDATE,
+                            "Thanh toán thành công",
+                            "Đơn hàng #" + order.getOrderId().substring(0, 8)
+                                    + "... đã thanh toán thành công qua VNPay. Chúng tôi sẽ chuẩn bị hàng và giao sớm nhất!",
+                            "✅",
+                            order.getOrderId());
+                } else {
                     payment.setPaymentStatus(PaymentStatus.FAILED);
                     payment.setResponseCode(vnp_ResponseCode);
                     payment.setFailureReason(getVNPayErrorDescription(vnp_ResponseCode));
@@ -261,12 +283,22 @@ public class PaymentService {
                             order.getOrderId(), vnp_ResponseCode);
 
                     notificationService.sendPaymentFailureNotification(order, payment);
+
+                    // Thông báo in-app khi thanh toán thất bại
+                    userNotificationService.createNotification(
+                            order.getUser(),
+                            NotificationType.ORDER_UPDATE,
+                            "Thanh toán thất bại",
+                            "Thanh toán cho đơn hàng #" + order.getOrderId().substring(0, 8)
+                                    + "... không thành công. Vui lòng thử lại!",
+                            "❌",
+                            order.getOrderId());
                 }
 
                 return PaymentResponse.builder()
                         .success(isSuccess)
-                        .message(isSuccess ? "Payment successful" :
-                                "Payment failed: " + getVNPayErrorDescription(vnp_ResponseCode))
+                        .message(isSuccess ? "Payment successful"
+                                : "Payment failed: " + getVNPayErrorDescription(vnp_ResponseCode))
                         .paymentId(payment.getPaymentId())
                         .transactionId(params.get("vnp_TransactionNo"))
                         .status(payment.getPaymentStatus())
@@ -286,7 +318,7 @@ public class PaymentService {
 
         if (payment.getPaymentStatus() == PaymentStatus.PENDING &&
                 order.getPaymentExpiryAt() != null &&
-                order.getPaymentExpiryAt().isBefore(LocalDateTime.now())){
+                order.getPaymentExpiryAt().isBefore(LocalDateTime.now())) {
             payment.setPaymentStatus(PaymentStatus.EXPIRED);
             paymentRepository.save(payment);
 
@@ -310,7 +342,7 @@ public class PaymentService {
         String orderId = request.getOrderId();
 
         synchronized (paymentLocks.computeIfAbsent(orderId, k -> new Object())) {
-            try{
+            try {
                 Order order = orderRepository.findById(orderId)
                         .orElseThrow(() -> new OrderNotFoundException("Order not found: " + orderId));
 
@@ -346,7 +378,6 @@ public class PaymentService {
                         .parentPaymentId(originalPayment.getPaymentId())
                         .build();
 
-
                 refundPayment = paymentRepository.save(refundPayment);
                 boolean refundSuccess = false;
                 String transactionId = null;
@@ -360,11 +391,11 @@ public class PaymentService {
                     refundSuccess = "00".equals(refundResult.get("vnp_ResponseCode"));
                     transactionId = refundResult.get("vnp_TransactionNo");
 
-                }else if ("COD".equals(originalPayment.getPaymentMethod().getMethodName())){
+                } else if ("COD".equals(originalPayment.getPaymentMethod().getMethodName())) {
                     // COD refund - manual processing
                     refundSuccess = true;
                 }
-                if (refundSuccess){
+                if (refundSuccess) {
                     refundPayment.setPaymentStatus(PaymentStatus.COMPLETED);
                     refundPayment.setPaymentDate(LocalDateTime.now());
                     refundPayment.setTransactionId(transactionId);
@@ -399,7 +430,7 @@ public class PaymentService {
                         .transactionId(transactionId)
                         .status(refundPayment.getPaymentStatus())
                         .build();
-            }finally {
+            } finally {
                 paymentLocks.remove(orderId);
             }
         }
