@@ -126,23 +126,24 @@
             <div class="max-w-2xl space-y-6">
               <div class="grid grid-cols-4 items-center">
                 <label class="text-gray-500 text-sm italic">Tên đăng nhập</label>
-                <div class="col-span-3 font-medium text-gray-700">
+                <div id="profile-username" class="col-span-3 font-medium text-gray-700">
                   nguyenvana123
                 </div>
               </div>
 
               <div class="grid grid-cols-4 items-center">
                 <label class="text-gray-500 text-sm italic">Tên</label>
-                <input type="text"
+                <input type="text" id="profile-name"
                   class="col-span-3 border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
-                  value="Nguyễn Văn A" />
+                  placeholder="Nhập tên hiển thị" />
               </div>
 
               <div class="grid grid-cols-4 items-center">
                 <label class="text-gray-500 text-sm italic">Email</label>
-                <div class="col-span-3 text-gray-700">
-                  van***@gmail.com
-                  <button class="text-blue-600 text-sm underline ml-2 hover:text-blue-800">
+                <div class="col-span-3 text-gray-700 flex items-center gap-2">
+                  <span id="profile-email-display">van***@gmail.com</span>
+                  <input type="email" id="profile-email-input" class="hidden border rounded px-2 py-1 text-sm w-64" />
+                  <button id="btn-edit-email" class="text-blue-600 text-sm underline hover:text-blue-800">
                     Thay đổi
                   </button>
                 </div>
@@ -150,9 +151,10 @@
 
               <div class="grid grid-cols-4 items-center">
                 <label class="text-gray-500 text-sm italic">Số điện thoại</label>
-                <div class="col-span-3 text-gray-700">
-                  *******890
-                  <button class="text-blue-600 text-sm underline ml-2 hover:text-blue-800">
+                <div class="col-span-3 text-gray-700 flex items-center gap-2">
+                  <span id="profile-phone-display">*******890</span>
+                  <input type="text" id="profile-phone-input" class="hidden border rounded px-2 py-1 text-sm w-64" />
+                  <button id="btn-edit-phone" class="text-blue-600 text-sm underline hover:text-blue-800">
                     Thay đổi
                   </button>
                 </div>
@@ -170,7 +172,7 @@
               </div>
 
               <div class="pt-4">
-                <button
+                <button id="btn-save-profile"
                   class="bg-blue-600 text-white px-10 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-md shadow-blue-100 font-medium">
                   Lưu thay đổi
                 </button>
@@ -198,24 +200,25 @@
             <div class="max-w-md space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
-                <input type="password"
+                <input type="password" id="password-current"
                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
                   placeholder="Nhập mật khẩu cũ" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
-                <input type="password"
+                <input type="password" id="password-new"
                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
                   placeholder="Nhập mật khẩu mới" />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu</label>
-                <input type="password"
+                <input type="password" id="password-confirm"
                   class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none border-gray-200"
                   placeholder="Nhập lại mật khẩu mới" />
               </div>
               <div class="pt-4 flex gap-3">
-                <button class="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                <button id="btn-confirm-change-password"
+                  class="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
                   Xác nhận
                 </button>
                 <button onclick="togglePasswordView(false)"
@@ -229,17 +232,35 @@
         <!--thông báo-->
         <section id="content-notifications"
           class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-            <h3 class="font-semibold text-gray-700">Thông báo của bạn</h3>
-            <button id="mark-all-read-btn" class="text-sm text-blue-600 font-medium hover:text-blue-800 transition">
+          <div class="p-4 bg-gray-50 border-b text-right">
+            <button class="text-sm text-blue-600 font-medium">
               Đánh dấu tất cả đã đọc
             </button>
           </div>
-          <div id="notifications-container">
-            <!-- Loading state -->
-            <div class="flex items-center justify-center py-16">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span class="ml-3 text-gray-500">Đang tải thông báo...</span>
+          <div class="divide-y divide-gray-100">
+            <div class="p-4 flex gap-4 hover:bg-blue-50/50 transition bg-blue-50/30">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                🚚
+              </div>
+              <div class="flex-1">
+                <h4 class="font-bold text-gray-800">Cập nhật đơn hàng</h4>
+                <p class="text-sm text-gray-600">
+                  Đơn hàng #DH12345 đã được giao thành công cho khách hàng.
+                </p>
+                <span class="text-xs text-gray-400 mt-1 block">15:30 15/12/2023</span>
+              </div>
+            </div>
+            <div class="p-4 flex gap-4 hover:bg-gray-50 transition">
+              <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                🎁
+              </div>
+              <div class="flex-1">
+                <h4 class="font-bold text-gray-800">Ưu đãi độc quyền</h4>
+                <p class="text-sm text-gray-600">
+                  Giảm giá 50k cho đơn hàng từ 500k khi nhập mã "HELLO".
+                </p>
+                <span class="text-xs text-gray-400 mt-1 block">08:00 14/12/2023</span>
+              </div>
             </div>
           </div>
         </section>
@@ -531,6 +552,8 @@
   <script type="module" src="/pages/pending-order.page.js"></script>
   <script type="module" src="/pages/header-auth.page.js"></script>
   <script type="module" src="/pages/notification.page.js"></script>
+  <script type="module" src="/pages/profile.page.js"></script>
+  <script type="module" src="/pages/header-auth.page.js"></script>
 
 </body>
 

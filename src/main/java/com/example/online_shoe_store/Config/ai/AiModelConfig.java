@@ -34,7 +34,7 @@ public class AiModelConfig {
                 .apiKey(anthropicpiKey)
                 .modelName(orchestratorModel)
                 .maxTokens(1024)
-                .temperature(1.0)
+                .temperature(0.0)
                 .timeout(Duration.ofSeconds(30))
                 .build();
     }

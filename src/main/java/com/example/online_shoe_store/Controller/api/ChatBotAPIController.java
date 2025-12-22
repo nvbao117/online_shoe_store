@@ -1,5 +1,6 @@
 package com.example.online_shoe_store.Controller.api;
 
+import com.example.online_shoe_store.Service.ai.agent.shop.ShopChatAgent;
 import com.example.online_shoe_store.dto.request.ChatRequest;
 import com.example.online_shoe_store.dto.response.ChatResponse;
 import com.example.online_shoe_store.Service.ChatBotService;
@@ -15,26 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ChatBotAPIController {
 
+
     private final ChatBotService chatBotService;
 
     @PostMapping("/send")
     public ResponseEntity<ChatResponse> sendMessage(@RequestBody ChatRequest request) {
-        log.info("Received chat request: message='{}', sessionId='{}'", 
-                 request.getMessage(), request.getSessionId());
+        log.info("Received chat request: message='{}', sessionId='{}'",
+                request.getMessage(), request.getSessionId());
         ChatResponse response = chatBotService.processMessage(request);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/send-image")
-    public ResponseEntity<ChatResponse> sendImage(
-            @RequestParam("image") MultipartFile image,
-            @RequestParam(value = "message", required = false) String message,
-            @RequestParam(value = "sessionId", required = false) String sessionId
-    ) {
-        log.info("Received image chat request: filename='{}', size={}, message='{}', sessionId='{}'",
-                image.getOriginalFilename(), image.getSize(), message, sessionId);
-        
-        ChatResponse response = chatBotService.processImageMessage(image, message, sessionId);
         return ResponseEntity.ok(response);
     }
 }

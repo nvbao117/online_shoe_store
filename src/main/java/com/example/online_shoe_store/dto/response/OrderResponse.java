@@ -25,6 +25,7 @@ public class OrderResponse {
     @Data
     @Builder
     public static class OrderItemResponse {
+        private String productId;
         private String productName;
         private String productEmoji; // Optional, if you have it
         private String color;

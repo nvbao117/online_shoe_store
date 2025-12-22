@@ -107,13 +107,13 @@ public class OrderAPIController {
         String imageUrl = "/images/placeholder.png";
         if (item.getProductVariant() != null && item.getProductVariant().getImageUrl() != null) {
              imageUrl = item.getProductVariant().getImageUrl();
-             // Clean up path if it still has src/data prefix (though we fixed it in DB, good to be safe)
              if (imageUrl.startsWith("src/data")) {
                  imageUrl = imageUrl.replace("src/data", "");
              }
         }
 
         return OrderResponse.OrderItemResponse.builder()
+                .productId(item.getProductVariant().getProduct().getProductId())
                 .productName(item.getProductVariant().getProduct().getName())
                 .color(item.getProductVariant().getColor())
                 .size(item.getProductVariant().getSize())
