@@ -5,6 +5,7 @@ import com.example.online_shoe_store.Entity.enums.OrderStatus;
 import com.example.online_shoe_store.Repository.*;
 import com.example.online_shoe_store.Service.ReviewService;
 import com.example.online_shoe_store.dto.response.PendingReviewResponse;
+import com.example.online_shoe_store.dto.response.ProductReviewSummaryResponse;
 import com.example.online_shoe_store.dto.response.ReviewResponse;
 import com.example.online_shoe_store.mapper.ReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -69,7 +72,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewResponse createReview(User user, String variantId, Integer rating, String comment,
-                                       List<MultipartFile> images) {
+            List<MultipartFile> images) {
         // Tìm variant
         ProductVariant variant = productVariantRepository.findById(variantId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
@@ -96,6 +99,49 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         return reviewMapper.toReviewResponse(review);
+    }
+
+    @Override
+    public List<ReviewResponse> getReviewsByProduct(String productId, Integer rating) {
+        List<Review> reviews;
+        if (rating != null && rating >= 1 && rating <= 5) {
+            reviews = reviewRepository.findByProductIdAndRatingOrderByReviewDateDesc(productId, rating);
+        } else {
+            reviews = reviewRepository.findByProductIdOrderByReviewDateDesc(productId);
+        }
+        return reviewMapper.toReviewResponseList(reviews);
+    }
+
+    @Override
+    public ProductReviewSummaryResponse getReviewSummary(String productId) {
+        // Lấy số lượng đánh giá theo từng mức rating
+        List<Object[]> ratingCounts = reviewRepository.countByProductIdGroupByRating(productId);
+
+        // Map rating -> count
+        Map<Integer, Long> countMap = new HashMap<>();
+        long total = 0;
+        double sum = 0;
+
+        for (Object[] row : ratingCounts) {
+            Integer rating = (Integer) row[0];
+            Long count = (Long) row[1];
+            countMap.put(rating, count);
+            total += count;
+            sum += rating * count;
+        }
+
+        // Tính điểm trung bình
+        Double avg = total > 0 ? Math.round(sum / total * 10.0) / 10.0 : 0.0;
+
+        return ProductReviewSummaryResponse.builder()
+                .averageRating(avg)
+                .totalReviews((int) total)
+                .fiveStarCount(countMap.getOrDefault(5, 0L).intValue())
+                .fourStarCount(countMap.getOrDefault(4, 0L).intValue())
+                .threeStarCount(countMap.getOrDefault(3, 0L).intValue())
+                .twoStarCount(countMap.getOrDefault(2, 0L).intValue())
+                .oneStarCount(countMap.getOrDefault(1, 0L).intValue())
+                .build();
     }
 
     private List<ReviewImage> uploadReviewImages(Review review, List<MultipartFile> images) {

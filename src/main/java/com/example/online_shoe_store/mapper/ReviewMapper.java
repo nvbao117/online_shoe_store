@@ -24,6 +24,7 @@ public interface ReviewMapper {
     @Mapping(target = "variantSize", source = "productVariant.size", defaultValue = "")
     @Mapping(target = "productImage", source = "productVariant.imageUrl", qualifiedByName = "formatImageUrl")
     @Mapping(target = "imageUrls", source = "reviewImages", qualifiedByName = "mapReviewImages")
+    @Mapping(target = "username", source = "user.username", defaultValue = "Ẩn danh")
     ReviewResponse toReviewResponse(Review review);
 
     /**

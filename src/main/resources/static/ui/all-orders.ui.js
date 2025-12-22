@@ -31,6 +31,9 @@ function renderOrderCard(order) {
   // mimic the screenshot: show return label for completed-like states
   const showReturnPill = order?.status === 'DELIVERED' || order?.status === 'COMPLETED';
 
+  // Show review button only for delivered/completed orders
+  const showReviewBtn = order?.status === 'DELIVERED' || order?.status === 'COMPLETED';
+
   return `
     <div class="border border-gray-100 rounded-xl bg-white p-4 md:p-6 hover:shadow-md transition-shadow" data-order-id="${escapeAttr(order?.orderId)}">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
@@ -83,9 +86,12 @@ function renderOrderCard(order) {
           <button class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
             Yêu cầu Trả hàng/Hoàn tiền
           </button>
-          <button class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
+          ${showReviewBtn ? `
+          <button onclick="navigateToReviewsTab()" 
+                  class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
             Đánh Giá
           </button>
+          ` : ''}
           <button class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
             Mua Lại
           </button>
@@ -94,6 +100,16 @@ function renderOrderCard(order) {
     </div>
   `;
 }
+
+// Navigate to Reviews tab when clicking review button from orders
+window.navigateToReviewsTab = function () {
+  // Click on reviews tab button
+  const reviewsTabBtn = document.querySelector('[data-tab="reviews"]');
+  if (reviewsTabBtn) {
+    reviewsTabBtn.click();
+  }
+};
+
 
 function normalizeImageUrl(url) {
   if (!url) return url;
