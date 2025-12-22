@@ -120,4 +120,51 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return true;
     }
+
+    @Override
+    public boolean resetPassword(com.example.online_shoe_store.dto.request.ForgotPasswordRequest request, StringBuilder errorMessage) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            errorMessage.append("Email không được để trống");
+            return false;
+        }
+
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if (user == null) {
+            errorMessage.append("Email không tồn tại trong hệ thống");
+            return false;
+        }
+
+        if (!otpService.validateOtp(request.getEmail(), request.getOtp())) {
+            errorMessage.append("OTP không hợp lệ hoặc đã hết hạn");
+            return false;
+        }
+
+        if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            errorMessage.append("Mật khẩu mới không được để trống");
+            return false;
+        }
+
+        // Kiểm tra password rules: >= 8 ký tự, có chữ và số
+        String newPassword = request.getNewPassword();
+        if (newPassword.length() < 8) {
+            errorMessage.append("Mật khẩu phải có ít nhất 8 ký tự");
+            return false;
+        }
+        
+        boolean hasLetter = newPassword.matches(".*[a-zA-Z].*");
+        boolean hasDigit = newPassword.matches(".*[0-9].*");
+        if (!hasLetter || !hasDigit) {
+            errorMessage.append("Mật khẩu phải chứa ít nhất một chữ cái và một chữ số");
+            return false;
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            errorMessage.append("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            return false;
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return true;
+    }
 }

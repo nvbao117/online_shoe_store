@@ -42,6 +42,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
         boolean isRegister = uri.startsWith("/register");
         boolean isLogin = uri.equals("/login");    // ✅ bỏ qua cả GET và POST
+        boolean isForgotPassword = uri.startsWith("/forgot-password"); // ✅ bỏ qua forgot password
         boolean isError = uri.equals("/error");
         boolean isOauth2 = uri.startsWith("/oauth2") || uri.startsWith("/login/oauth2");
         
@@ -52,7 +53,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
                 uri.startsWith("/ui/")
         );
 
-        if (isStatic || isRegister || isLogin || isError || isOauth2 || isStaticJs) {
+        if (isStatic || isRegister || isLogin || isForgotPassword || isError || isOauth2 || isStaticJs) {
             chain.doFilter(req, res);
             return;
         }
