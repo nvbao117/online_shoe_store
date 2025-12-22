@@ -1,15 +1,19 @@
 package com.example.online_shoe_store.Controller.api;
 
 import com.example.online_shoe_store.Service.VoucherService;
+import com.example.online_shoe_store.dto.request.VoucherApplyRequest;
 import com.example.online_shoe_store.dto.request.VoucherCreateRequest;
 import com.example.online_shoe_store.dto.request.VoucherStatusUpdateRequest;
+import com.example.online_shoe_store.dto.response.VoucherApplyResponse;
 import com.example.online_shoe_store.dto.response.VoucherAdminListResponse;
 import com.example.online_shoe_store.dto.response.VoucherMetadataResponse;
+import com.example.online_shoe_store.dto.response.VoucherValidResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,24 @@ public class VoucherApiController {
     @GetMapping("/metadata")
     public ResponseEntity<VoucherMetadataResponse> getVoucherMetadata() {
         return ResponseEntity.ok(voucherService.getMetadata());
+    }
+
+    @GetMapping("/valid")
+    public ResponseEntity<List<VoucherValidResponse>> getValidVouchers(
+            @RequestParam(value = "subtotal", required = false) BigDecimal subtotal,
+            @RequestParam(value = "productIds", required = false) List<String> productIds
+    ) {
+        return ResponseEntity.ok(voucherService.getValidVouchers(subtotal, productIds));
+    }
+
+    @PostMapping("/apply")
+    public ResponseEntity<?> applyVoucher(@RequestBody VoucherApplyRequest request) {
+        try {
+            VoucherApplyResponse response = voucherService.applyVoucher(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        }
     }
 
     @PostMapping

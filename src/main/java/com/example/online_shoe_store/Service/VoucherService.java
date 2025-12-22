@@ -9,11 +9,15 @@ import com.example.online_shoe_store.Repository.BrandRepository;
 import com.example.online_shoe_store.Repository.CategoryRepository;
 import com.example.online_shoe_store.Repository.ProductRepository;
 import com.example.online_shoe_store.Repository.VoucherRepository;
+import com.example.online_shoe_store.dto.request.VoucherApplyRequest;
+import com.example.online_shoe_store.dto.request.VoucherApplyRequestItem;
 import com.example.online_shoe_store.dto.request.VoucherCreateRequest;
 import com.example.online_shoe_store.dto.request.VoucherStatusUpdateRequest;
 import com.example.online_shoe_store.dto.response.OptionItemResponse;
+import com.example.online_shoe_store.dto.response.VoucherApplyResponse;
 import com.example.online_shoe_store.dto.response.VoucherAdminListResponse;
 import com.example.online_shoe_store.dto.response.VoucherMetadataResponse;
+import com.example.online_shoe_store.dto.response.VoucherValidResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -24,7 +28,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.math.RoundingMode;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +47,67 @@ public class VoucherService {
         return voucherRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
                 .stream()
                 .map(voucher -> mapToAdminResponse(voucher, now))
-                .toList();
+                .collect(Collectors.toList());
+    }
+
+    public List<VoucherValidResponse> getValidVouchers(BigDecimal subtotal, List<String> productIds) {
+        BigDecimal safeSubtotal = subtotal != null ? subtotal : BigDecimal.ZERO;
+        LocalDateTime now = LocalDateTime.now();
+        List<Product> products = loadProducts(productIds);
+
+        // Chỉ lấy voucher ACTIVE và còn hiệu lực theo thời gian
+        return voucherRepository.findByStatusIgnoreCaseAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                        "ACTIVE",
+                        now,
+                        now
+                )
+                .stream()
+                .filter(voucher -> isSubtotalEligible(voucher, safeSubtotal))
+                .filter(voucher -> isScopeEligible(voucher, products))
+                .map(this::mapToValidResponse)
+                .collect(Collectors.toList());
+    }
+
+    public VoucherApplyResponse applyVoucher(VoucherApplyRequest request) {
+        String code = request != null ? request.getVoucherCode() : null;
+        BigDecimal subtotal = request != null ? request.getSubtotal() : null;
+        List<VoucherApplyRequestItem> items = request != null ? request.getItems() : null;
+        if (!StringUtils.hasText(code) || subtotal == null) {
+            throw new IllegalArgumentException("Mã không tồn tại");
+        }
+
+        // B1: kiểm tra tồn tại + trạng thái
+        Voucher voucher = voucherRepository.findByCodeIgnoreCase(code.trim())
+                .orElseThrow(() -> new IllegalArgumentException("Mã không tồn tại"));
+
+        if (!"ACTIVE".equals(normalizeStatus(voucher.getStatus()))) {
+            throw new IllegalArgumentException("Mã không tồn tại");
+        }
+
+        // B2: kiểm tra thời gian hiệu lực
+        LocalDateTime now = LocalDateTime.now();
+        if (!isWithinActiveWindow(voucher, now)) {
+            throw new IllegalArgumentException("Mã đã hết hạn");
+        }
+
+        // B3: kiểm tra giá trị tối thiểu
+        BigDecimal eligibleSubtotal = resolveEligibleSubtotal(voucher, items, subtotal);
+        if (eligibleSubtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Voucher không áp dụng cho sản phẩm này");
+        }
+
+        if (!isSubtotalEligible(voucher, usesScopedSubtotal(voucher) ? eligibleSubtotal : subtotal)) {
+            throw new IllegalArgumentException("Đơn hàng chưa đủ giá trị tối thiểu");
+        }
+
+        // B4: tính giá trị giảm giá theo loại voucher
+        BigDecimal discountAmount = calculateDiscountAmount(voucher, eligibleSubtotal);
+        BigDecimal finalTotal = subtotal.subtract(discountAmount).max(BigDecimal.ZERO);
+
+        return VoucherApplyResponse.builder()
+                .discountAmount(discountAmount)
+                .finalTotal(finalTotal)
+                .build();
     }
 
     @Transactional
@@ -88,20 +155,40 @@ public class VoucherService {
     public VoucherMetadataResponse getMetadata() {
         List<OptionItemResponse> categories = categoryRepository.findAll(Sort.by("name"))
                 .stream()
-                .map(category -> new OptionItemResponse(category.getCategoryId(), category.getName(), null))
-                .toList();
+                .map(category -> new OptionItemResponse(category.getCategoryId(), category.getName(), null, null))
+                .collect(Collectors.toList());
 
-        List<OptionItemResponse> brands = brandRepository.findAll(Sort.by("name"))
-                .stream()
-                .map(brand -> new OptionItemResponse(brand.getBrandId(), brand.getName(),
-                        brand.getCategory() != null ? brand.getCategory().getCategoryId() : null))
-                .toList();
+        List<Product> allProducts = productRepository.findAll(Sort.by("name"));
+        Map<String, Map<String, Brand>> categoryBrandMap = new HashMap<>();
 
-        List<OptionItemResponse> products = productRepository.findAll(Sort.by("name"))
+        for (Product product : allProducts) {
+            if (product.getCategory() == null || product.getBrand() == null) {
+                continue;
+            }
+            String categoryId = product.getCategory().getCategoryId();
+            String brandId = product.getBrand().getBrandId();
+            categoryBrandMap.computeIfAbsent(categoryId, key -> new HashMap<>())
+                    .putIfAbsent(brandId, product.getBrand());
+        }
+
+        List<OptionItemResponse> brands = new ArrayList<>();
+        for (Map.Entry<String, Map<String, Brand>> categoryEntry : categoryBrandMap.entrySet()) {
+            String categoryId = categoryEntry.getKey();
+            for (Brand brand : categoryEntry.getValue().values()) {
+                brands.add(new OptionItemResponse(brand.getBrandId(), brand.getName(), categoryId, categoryId));
+            }
+        }
+        brands.sort(Comparator.comparing(OptionItemResponse::getName, String.CASE_INSENSITIVE_ORDER));
+
+        List<OptionItemResponse> products = allProducts
                 .stream()
-                .map(product -> new OptionItemResponse(product.getProductId(), product.getName(),
-                        product.getBrand() != null ? product.getBrand().getBrandId() : null))
-                .toList();
+                .map(product -> new OptionItemResponse(
+                        product.getProductId(),
+                        product.getName(),
+                        product.getBrand() != null ? product.getBrand().getBrandId() : null,
+                        product.getCategory() != null ? product.getCategory().getCategoryId() : null
+                ))
+                .collect(Collectors.toList());
 
         return VoucherMetadataResponse.builder()
                 .categories(categories)
@@ -199,15 +286,25 @@ public class VoucherService {
         boolean expired = isExpired(voucher, now);
         String normalizedStatus = normalizeStatus(voucher.getStatus());
         String displayStatus = expired ? "EXPIRED" : normalizedStatus;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         return VoucherAdminListResponse.builder()
                 .voucherId(voucher.getVoucherId())
                 .name(voucher.getName())
                 .code(voucher.getCode())
                 .discountLabel(formatDiscountLabel(voucher))
+                .startDate(formatDate(voucher.getStartDate(), formatter))
+                .endDate(formatDate(voucher.getEndDate(), formatter))
                 .status(displayStatus)
                 .expired(expired)
                 .build();
+    }
+
+    private String formatDate(LocalDateTime date, DateTimeFormatter formatter) {
+        if (date == null) {
+            return "-";
+        }
+        return formatter.format(date);
     }
 
     private String formatDiscountLabel(Voucher voucher) {
@@ -226,6 +323,141 @@ public class VoucherService {
     private boolean isExpired(Voucher voucher, LocalDateTime now) {
         return voucher.getEndDate() != null && voucher.getEndDate().isBefore(now);
     }
+
+    private boolean isWithinActiveWindow(Voucher voucher, LocalDateTime now) {
+        if (voucher.getStartDate() == null || voucher.getEndDate() == null) {
+            return false;
+        }
+        return !now.isBefore(voucher.getStartDate()) && !now.isAfter(voucher.getEndDate());
+    }
+
+    private boolean isSubtotalEligible(Voucher voucher, BigDecimal subtotal) {
+        BigDecimal minOrder = voucher.getMinOrderValue() != null ? voucher.getMinOrderValue() : BigDecimal.ZERO;
+        return subtotal.compareTo(minOrder) >= 0;
+    }
+
+    private VoucherValidResponse mapToValidResponse(Voucher voucher) {
+        return VoucherValidResponse.builder()
+                .code(voucher.getCode())
+                .discountType(mapDiscountType(voucher.getDiscountType()))
+                .discountValue(voucher.getDiscountValue())
+                .description(voucher.getDescription())
+                .maxDiscountAmount(voucher.getMaxDiscountValue())
+                .build();
+    }
+
+    private String mapDiscountType(DiscountType discountType) {
+        if (discountType == DiscountType.FIXED_AMOUNT) {
+            return "FIXED";
+        }
+        return "PERCENT";
+    }
+
+    private BigDecimal calculateDiscountAmount(Voucher voucher, BigDecimal subtotal) {
+        BigDecimal discountValue = voucher.getDiscountValue() != null ? voucher.getDiscountValue() : BigDecimal.ZERO;
+        BigDecimal discountAmount;
+
+        if (voucher.getDiscountType() == DiscountType.FIXED_AMOUNT) {
+            discountAmount = discountValue;
+        } else {
+            discountAmount = subtotal.multiply(discountValue)
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            if (voucher.getMaxDiscountValue() != null) {
+                discountAmount = discountAmount.min(voucher.getMaxDiscountValue());
+            }
+        }
+
+        if (discountAmount.compareTo(subtotal) > 0) {
+            return subtotal;
+        }
+        return discountAmount;
+    }
+
+    private List<Product> loadProducts(List<String> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> cleaned = productIds.stream()
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .collect(Collectors.toList());
+        if (cleaned.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return productRepository.findAllById(cleaned);
+    }
+
+    private boolean isScopeEligible(Voucher voucher, List<Product> products) {
+        if (products == null || products.isEmpty()) {
+            return "all".equals(voucher.getAppliesToType());
+        }
+        return products.stream().anyMatch(product -> matchesScope(voucher, product));
+    }
+
+    private boolean usesScopedSubtotal(Voucher voucher) {
+        return voucher != null && !"all".equals(voucher.getAppliesToType());
+    }
+
+    private BigDecimal resolveEligibleSubtotal(Voucher voucher, List<VoucherApplyRequestItem> items, BigDecimal subtotal) {
+        if (voucher == null) {
+            return BigDecimal.ZERO;
+        }
+
+        if ("all".equals(voucher.getAppliesToType())) {
+            return subtotal != null ? subtotal : BigDecimal.ZERO;
+        }
+
+        if (items == null || items.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        Map<String, Product> productMap = productRepository.findAllById(
+                        items.stream()
+                                .map(VoucherApplyRequestItem::getProductId)
+                                .filter(StringUtils::hasText)
+                                .collect(Collectors.toList())
+                )
+                .stream()
+                .collect(Collectors.toMap(Product::getProductId, product -> product));
+
+        BigDecimal eligibleSubtotal = BigDecimal.ZERO;
+        for (VoucherApplyRequestItem item : items) {
+            if (item == null || !StringUtils.hasText(item.getProductId())) {
+                continue;
+            }
+            Product product = productMap.get(item.getProductId());
+            if (product == null) {
+                continue;
+            }
+            if (!matchesScope(voucher, product)) {
+                continue;
+            }
+            BigDecimal lineTotal = item.getLineTotal() != null ? item.getLineTotal() : BigDecimal.ZERO;
+            eligibleSubtotal = eligibleSubtotal.add(lineTotal);
+        }
+        return eligibleSubtotal;
+    }
+
+    private boolean matchesScope(Voucher voucher, Product product) {
+        String scope = voucher.getAppliesToType();
+        if ("all".equals(scope)) {
+            return true;
+        }
+        if ("category".equals(scope)) {
+            return product.getCategory() != null
+                    && Objects.equals(product.getCategory().getCategoryId(), voucher.getAppliesToCategoryId());
+        }
+        if ("brand".equals(scope)) {
+            return product.getBrand() != null
+                    && Objects.equals(product.getBrand().getBrandId(), voucher.getAppliesToBrandId());
+        }
+        if ("product".equals(scope)) {
+            return Objects.equals(product.getProductId(), voucher.getAppliesToProductId());
+        }
+        return false;
+    }
+
 
     private String normalizeStatus(String status) {
         if (!StringUtils.hasText(status)) {

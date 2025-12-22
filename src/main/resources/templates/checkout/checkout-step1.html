@@ -215,9 +215,17 @@
                         <!-- Coupon Section -->
                         <div class="coupon-section">
                             <h4 class="coupon-title">Mã giảm giá</h4>
+                            <<div class="coupon-input-wrapper">
                             <div class="coupon-input-group">
-                                <input type="text" class="form-control" placeholder="Nhập mã giảm giá">
-                                <button class="btn-coupon">Áp dụng</button>
+                                <input type="text"
+                                       id="voucherInput"
+                                       class="form-control"
+                                       placeholder="Chọn mã giảm giá"
+                                       readonly>
+                                <button type="button" class="btn-coupon" id="applyVoucherBtn">Áp dụng</button>
+                            </div>
+                            <div class="voucher-list" id="voucherList" hidden></div>
+                            <div class="voucher-message" id="voucherMessage" hidden></div>
                             </div>
                         </div>
 
@@ -226,6 +234,10 @@
                             <div class="price-row">
                                 <span>Tạm tính</span>
                                 <span id="subtotal">0đ</span>
+                            </div>
+                            <div class="price-row discount" id="discountRow" hidden>
+                                <span>Giảm giá</span>
+                                <span class="price-value" id="discountAmount">-0đ</span>
                             </div>
                             <div class="price-row">
                                 <span>Phí vận chuyển</span>
