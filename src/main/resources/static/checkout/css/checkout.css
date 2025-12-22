@@ -434,8 +434,13 @@ body {
     margin-bottom: 10px;
 }
 
+.coupon-input-wrapper {
+    position: relative;
+}
+
 .coupon-input-group .form-control {
     flex: 1;
+    cursor: pointer;
 }
 
 .btn-coupon {
@@ -446,6 +451,59 @@ body {
     border-radius: 6px;
     font-weight: 500;
     font-size: 13px;
+}
+
+.voucher-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    z-index: 10;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+
+.voucher-item {
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.voucher-item:hover {
+    background: #f8fafc;
+}
+
+.voucher-item-code {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.voucher-item-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.voucher-item-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.voucher-item-disabled:hover {
+    background: transparent;
+}
+
+.voucher-message {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--danger);
 }
 
 .coupon-suggestions {

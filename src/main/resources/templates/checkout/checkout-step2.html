@@ -118,8 +118,11 @@
                     <div class="coupon-section">
                         <h3 class="coupon-title">Mã khuyến mãi</h3>
                         <div class="coupon-input-group">
-                            <input type="text" class="form-control" placeholder="Mã giảm giá">
-                            <button class="btn btn-coupon">Sử dụng</button>
+                            <input type="text"
+                                   id="voucherInputStep2"
+                                   class="form-control"
+                                   placeholder="Mã giảm giá"
+                                   readonly>
                         </div>
                     </div>
 
@@ -128,6 +131,10 @@
                         <div class="price-row">
                             <span>Tạm tính</span>
                             <span id="subtotal" class="price-value">0₫</span>
+                        </div>
+                        <div class="price-row discount" id="discountRow" hidden>
+                            <span>Giảm giá</span>
+                            <span class="price-value" id="discountAmount">-0đ</span>
                         </div>
                         <div class="price-row">
                             <span>Phí vận chuyển</span>
@@ -178,6 +185,11 @@
                         shippingMethod: shippingMethod
                     };
 
+                    const voucherData = JSON.parse(sessionStorage.getItem('checkoutVoucherData') || 'null');
+                    if (voucherData?.voucherCode) {
+                        requestData.voucherCode = voucherData.voucherCode;
+                    }
+
                     const response = await fetch('/api/checkout/place-order', {
                         method: 'POST',
                         headers: {
@@ -191,6 +203,7 @@
                     if (result.success) {
                         // Clear session storage
                         sessionStorage.removeItem('checkoutShippingData');
+                        // sessionStorage.removeItem('checkoutVoucherData');
 
                         if (result.paymentUrl) {
                             // Redirect to payment gateway
@@ -227,6 +240,7 @@
                 // Populate cart items
                 populateCartItems(data.cartItems);
                 populatePriceSummary(data.subtotal, data.total);
+                applyStoredVoucher(data.total);
 
                 // Init method selection
                 initMethodSelection();
@@ -243,6 +257,31 @@
                         <a href="/checkout/step1" class="btn btn-outline-primary">Quay lại</a>
                     `;
                 }
+            }
+        }
+
+        function applyStoredVoucher(defaultTotal) {
+            const voucherInput = document.getElementById('voucherInputStep2');
+            const discountRow = document.getElementById('discountRow');
+            const discountAmountEl = document.getElementById('discountAmount');
+            const totalEl = document.getElementById('total');
+            const subtotalEl = document.getElementById('subtotal');
+            const voucherData = JSON.parse(localStorage.getItem('checkoutVoucherData') || sessionStorage.getItem('checkoutVoucherData') || 'null');
+
+            if (!voucherData?.voucherCode) {
+                if (voucherInput) voucherInput.value = '';
+                if (discountRow) discountRow.hidden = true;
+                if (discountAmountEl) discountAmountEl.textContent = '-0đ';
+                if (totalEl) totalEl.textContent = formatPrice(defaultTotal);
+                return;
+            }
+
+            if (voucherInput) voucherInput.value = voucherData.voucherCode;
+            if (discountRow) discountRow.hidden = !voucherData.discountAmount || voucherData.discountAmount <= 0;
+            if (discountAmountEl) discountAmountEl.textContent = `-${formatPrice(voucherData.discountAmount)}`;
+            if (totalEl) totalEl.textContent = formatPrice(voucherData.finalTotal ?? defaultTotal);
+            if (subtotalEl && voucherData.subtotal !== undefined) {
+                subtotalEl.textContent = formatPrice(voucherData.subtotal);
             }
         }
     </script>
