@@ -4,102 +4,97 @@
 <!-- Admin Layout Fragment -->
 
 <head th:fragment="head(title, extraCss)">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:text="${title}">Admin Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Admin Panel</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Extra CSS per-page (e.g. voucher styles) -->
-  <link th:if="${extraCss}" rel="stylesheet" th:href="${extraCss}">
-  <style>
+    <!-- Extra CSS per-page (e.g. voucher styles) -->
+    <link th:if="${extraCss}" rel="stylesheet" th:href="${extraCss}">
+    <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
+    
     * {
       font-family: 'Inter', sans-serif;
     }
-
+    
     /* Smooth scrollbar */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
-
+    
     ::-webkit-scrollbar-track {
       background: #f1f5f9;
     }
-
+    
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
-
+    
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
-
+    
     /* Custom animations */
     @keyframes slideIn {
       from {
         opacity: 0;
         transform: translateX(-20px);
       }
-
       to {
         opacity: 1;
         transform: translateX(0);
       }
     }
-
+    
     @keyframes fadeIn {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
+    
     @keyframes pulse {
-
-      0%,
-      100% {
+      0%, 100% {
         opacity: 1;
       }
-
       50% {
         opacity: 0.5;
       }
     }
-
+    
     .animate-slide-in {
       animation: slideIn 0.3s ease-out;
     }
-
+    
     .animate-fade-in {
       animation: fadeIn 0.4s ease-out;
     }
-
+    
     .stat-card {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
+    
     .stat-card:hover {
       transform: translateY(-4px);
     }
-
+    
     .nav-link {
       transition: all 0.2s ease;
       position: relative;
     }
-
+    
     .nav-link::before {
       content: '';
       position: absolute;
@@ -112,45 +107,45 @@
       border-radius: 0 2px 2px 0;
       transition: height 0.3s ease;
     }
-
+    
     .nav-link:hover::before {
       height: 60%;
     }
-
+    
     .nav-link.active::before {
       height: 80%;
     }
-
+    
     .chart-bar {
       transition: all 0.3s ease;
       cursor: pointer;
     }
-
+    
     .chart-bar:hover {
       opacity: 0.8;
       transform: translateY(-2px);
     }
-
+    
     /* Sidebar toggle */
     .sidebar {
       transition: transform 0.3s ease;
     }
-
+    
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
       }
-
+      
       .sidebar.open {
         transform: translateX(0);
       }
     }
-
+    
     /* Time button active state */
     .time-btn {
       transition: all 0.2s ease;
     }
-
+    
     .time-btn.active {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: white;
@@ -162,199 +157,180 @@
 
 
 <!-- Premium Admin Sidebar -->
-<aside th:fragment="sidebar" id="sidebar"
-  class="sidebar fixed left-0 top-0 h-screen w-64 bg-white shadow-xl z-40 flex flex-col">
-  <a href="/home" class="block">
-    <div class="p-6 border-b border-slate-200 flex items-center gap-3">
-      <div class="flex items-center justify-center">
-        <img src="/images/logo-shop/logo-sneaker.png" alt="Logo" class="w-12 h-12 object-contain">
-      </div>
-      <span class="text-xl font-bold text-slate-800">5A Store</span>
+<aside th:fragment="sidebar" id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 bg-white shadow-xl z-40 flex flex-col">
+    <a href="/home" class="block">
+        <div class="p-6 border-b border-slate-200 flex items-center gap-3">
+            <div class="flex items-center justify-center">
+                <img
+                        src="/images/logo-shop/logo-sneaker.png"
+                        alt="Logo"
+                        class="w-12 h-12 object-contain"
+                >
+            </div>
+            <span class="text-xl font-bold text-slate-800">5A Store</span>
+        </div>
+    </a>
+
+
+    <!-- Menu Title -->
+    <div class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+      Menu
     </div>
-  </a>
+    
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 space-y-1">
+      <a href="/admin/dashboard" class="nav-link active flex items-center gap-3 px-4 py-3 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      
+      <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span>Sản phẩm</span>
+      </a>
+      
+      <a href="/admin/orders" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        <span>Đơn hàng</span>
+      </a>
 
+      <a href="/admin/users" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5m10 0V10m0 10h-6m6 0h6M7 20h6"></path>
+        </svg>
+        <span>Khách hàng</span>
+      </a>
 
-  <!-- Menu Title -->
-  <div class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-    Menu
-  </div>
+      <a href="/admin/vouchers" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>Voucher</span>
+      </a>
 
-  <!-- Navigation -->
-  <nav class="flex-1 px-3 space-y-1">
-    <a href="/admin/dashboard"
-      class="nav-link active flex items-center gap-3 px-4 py-3 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-        </path>
-      </svg>
-      <span>Dashboard</span>
-    </a>
-
-    <a href="/admin/products"
-      class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-      </svg>
-      <span>Sản phẩm</span>
-    </a>
-
-    <a href="/admin/orders"
-      class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-        </path>
-      </svg>
-      <span>Đơn hàng</span>
-    </a>
-
-    <a href="/admin/users"
-      class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M17 20h5V4H2v16h5m10 0V10m0 10h-6m6 0h6M7 20h6"></path>
-      </svg>
-      <span>Khách hàng</span>
-    </a>
-
-    <a href="/admin/vouchers"
-      class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-        </path>
-      </svg>
-      <span>Voucher</span>
-    </a>
-
-    <a href="#"
-      class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-        </path>
-      </svg>
-      <span>Báo cáo</span>
-    </a>
-
-    <a href="#"
-      class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-        </path>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-        </path>
-      </svg>
-      <span>Cài đặt</span>
-    </a>
-  </nav>
-
-  <!-- User Profile -->
-  <div class="p-4 border-t border-slate-200 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div
-        class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold shadow">
-        AD
+      <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <span>Báo cáo</span>
+      </a>
+      
+      <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-xl">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        <span>Cài đặt</span>
+      </a>
+    </nav>
+    
+    <!-- User Profile -->
+    <div class="p-4 border-t border-slate-200 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-semibold shadow">
+          AD
+        </div>
+        <div class="flex-1">
+          <div class="text-sm font-semibold text-slate-800">Admin User</div>
+          <div class="text-xs text-slate-500">Administrator</div>
+        </div>
       </div>
-      <div class="flex-1">
-        <div class="text-sm font-semibold text-slate-800">Admin User</div>
-        <div class="text-xs text-slate-500">Administrator</div>
-      </div>
+      <button class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+      </button>
     </div>
-    <button class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-      </svg>
-    </button>
-  </div>
-</aside>
+  </aside>
 
 <div class="flex min-h-screen">
-  <div class="hidden lg:block w-64 lg:w-72 flex-shrink-0">
-  </div>
-  <main class="flex-grow bg-gray-50 p-6 ml-64 lg:ml-72">
-    <h1 class="text-2xl font-bold text-gray-800">Nội dung Trang Quản Trị</h1>
-    <p>Thanh Sidebar đã được đặt cố định.</p>
-  </main>
+    <div class="hidden lg:block w-64 lg:w-72 flex-shrink-0">
+    </div>
+    <main class="flex-grow bg-gray-50 p-6 ml-64 lg:ml-72">
+        <h1 class="text-2xl font-bold text-gray-800">Nội dung Trang Quản Trị</h1>
+        <p>Thanh Sidebar đã được đặt cố định.</p>
+    </main>
 </div>
 <!-- Scripts Fragment -->
 <div th:fragment="scripts">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </div>
 <script>
-  // Mobile menu toggle
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const sidebar = document.getElementById('sidebar');
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
 
-  mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-  });
-
-  // Close sidebar when clicking outside on mobile
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth < 1024 &&
-      !sidebar.contains(e.target) &&
-      !mobileMenuBtn.contains(e.target) &&
-      sidebar.classList.contains('open')) {
-      sidebar.classList.remove('open');
-    }
-  });
-
-  // Time filter buttons
-  const timeButtons = document.querySelectorAll('.time-btn');
-
-  timeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      timeButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      // You can add AJAX call here to fetch data based on selected time period
-      console.log('[v0] Time filter changed to:', btn.dataset.value);
+    mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
     });
-  });
 
-  // Chart bar hover effect - could add tooltip here
-  const chartBars = document.querySelectorAll('.chart-bar');
-  chartBars.forEach(bar => {
-    bar.addEventListener('mouseenter', () => {
-      console.log('[v0] Chart bar hovered');
-      // Could show tooltip with detailed data
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth < 1024 &&
+            !sidebar.contains(e.target) &&
+            !mobileMenuBtn.contains(e.target) &&
+            sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
     });
-  });
 
-  // Add fade-in animation on load
-  document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.stat-card');
-    cards.forEach((card, index) => {
-      setTimeout(() => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-          card.style.transition = 'all 0.4s ease-out';
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        }, 50);
-      }, index * 100);
+    // Time filter buttons
+    const timeButtons = document.querySelectorAll('.time-btn');
+
+    timeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            timeButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // You can add AJAX call here to fetch data based on selected time period
+            console.log('[v0] Time filter changed to:', btn.dataset.value);
+        });
     });
-  });
 
-  // Highlight active nav item based on current path
-  const navLinks = document.querySelectorAll('.nav-link');
-  const currentPath = window.location.pathname;
-  navLinks.forEach(link => {
-    const href = link.getAttribute('href');
-    if (!href || href === '#') return;
+    // Chart bar hover effect - could add tooltip here
+    const chartBars = document.querySelectorAll('.chart-bar');
+    chartBars.forEach(bar => {
+        bar.addEventListener('mouseenter', () => {
+            console.log('[v0] Chart bar hovered');
+            // Could show tooltip with detailed data
+        });
+    });
 
-    const linkPath = new URL(href, window.location.origin).pathname;
-    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
-      navLinks.forEach(l => l.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
-      link.classList.add('active', 'bg-blue-50', 'text-blue-600');
-    }
-  });
+    // Add fade-in animation on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.stat-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease-out';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }, index * 100);
+        });
+    });
+
+    // Highlight active nav item based on current path
+    const navLinks = document.querySelectorAll('.nav-link');
+    const currentPath = window.location.pathname;
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href || href === '#') return;
+
+        const linkPath = new URL(href, window.location.origin).pathname;
+        if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
+            navLinks.forEach(l => l.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
+            link.classList.add('active', 'bg-blue-50', 'text-blue-600');
+        }
+    });
 </script>
 
 </html>
