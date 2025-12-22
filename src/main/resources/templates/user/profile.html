@@ -232,35 +232,17 @@
         <!--thông báo-->
         <section id="content-notifications"
           class="tab-content hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-4 bg-gray-50 border-b text-right">
-            <button class="text-sm text-blue-600 font-medium">
+          <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+            <h3 class="font-semibold text-gray-700">Thông báo của bạn</h3>
+            <button id="mark-all-read-btn" class="text-sm text-blue-600 font-medium hover:text-blue-800 transition">
               Đánh dấu tất cả đã đọc
             </button>
           </div>
-          <div class="divide-y divide-gray-100">
-            <div class="p-4 flex gap-4 hover:bg-blue-50/50 transition bg-blue-50/30">
-              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                🚚
-              </div>
-              <div class="flex-1">
-                <h4 class="font-bold text-gray-800">Cập nhật đơn hàng</h4>
-                <p class="text-sm text-gray-600">
-                  Đơn hàng #DH12345 đã được giao thành công cho khách hàng.
-                </p>
-                <span class="text-xs text-gray-400 mt-1 block">15:30 15/12/2023</span>
-              </div>
-            </div>
-            <div class="p-4 flex gap-4 hover:bg-gray-50 transition">
-              <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                🎁
-              </div>
-              <div class="flex-1">
-                <h4 class="font-bold text-gray-800">Ưu đãi độc quyền</h4>
-                <p class="text-sm text-gray-600">
-                  Giảm giá 50k cho đơn hàng từ 500k khi nhập mã "HELLO".
-                </p>
-                <span class="text-xs text-gray-400 mt-1 block">08:00 14/12/2023</span>
-              </div>
+          <div id="notifications-container">
+            <!-- Loading state - sẽ được thay thế bởi JavaScript -->
+            <div class="flex items-center justify-center py-16">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span class="ml-3 text-gray-500">Đang tải thông báo...</span>
             </div>
           </div>
         </section>
