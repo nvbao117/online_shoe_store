@@ -2,6 +2,7 @@ package com.example.online_shoe_store.Controller.profile;
 
 import com.example.online_shoe_store.Entity.User;
 import com.example.online_shoe_store.Repository.UserRepository;
+import com.example.online_shoe_store.Service.UserService;
 import com.example.online_shoe_store.dto.response.UserProfileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,8 @@ import org.springframework.security.core.Authentication;
 public class UserProfileController {
 
     UserRepository userRepository;
+    UserService userService;
+
     @GetMapping("/api/me")
     public UserProfileResponse me(Authentication authentication) {
 
@@ -35,6 +38,36 @@ public class UserProfileController {
                 .phone(user.getPhone())
                 .name(user.getName())
                 .build();
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/api/me")
+    public org.springframework.http.ResponseEntity<?> updateProfile(
+            @org.springframework.web.bind.annotation.RequestBody @jakarta.validation.Valid com.example.online_shoe_store.dto.request.UserProfileUpdateRequest request,
+            org.springframework.validation.BindingResult bindingResult,
+            Authentication authentication) {
+        if (bindingResult.hasErrors()) {
+            return org.springframework.http.ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
+        }
+        StringBuilder error = new StringBuilder();
+        if (userService.updateProfile(authentication.getName(), request, error)) {
+            return org.springframework.http.ResponseEntity.ok("Cập nhật thành công");
+        }
+        return org.springframework.http.ResponseEntity.badRequest().body(error.toString());
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/api/me/password")
+    public org.springframework.http.ResponseEntity<?> changePassword(
+            @org.springframework.web.bind.annotation.RequestBody @jakarta.validation.Valid com.example.online_shoe_store.dto.request.ChangePasswordRequest request,
+            org.springframework.validation.BindingResult bindingResult,
+            Authentication authentication) {
+        if (bindingResult.hasErrors()) {
+            return org.springframework.http.ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
+        }
+        StringBuilder error = new StringBuilder();
+        if (userService.changePassword(authentication.getName(), request, error)) {
+            return org.springframework.http.ResponseEntity.ok("Đổi mật khẩu thành công");
+        }
+        return org.springframework.http.ResponseEntity.badRequest().body(error.toString());
     }
 
 
