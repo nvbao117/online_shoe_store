@@ -93,29 +93,70 @@ const checkBuyNowParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const buyNowId = urlParams.get('buyNowItem');
     const buyNowSize = urlParams.get('size');
+    const buyAgainParam = urlParams.get('buyAgain'); // Format: pid:size,pid2:size2
 
-    if (buyNowId) {
+    // Parse buyAgain list
+    let buyAgainTargets = [];
+    if (buyAgainParam) {
+        try {
+            const rawParam = decodeURIComponent(buyAgainParam);
+            buyAgainTargets = rawParam.split(',').map(pair => {
+                const parts = pair.split(':');
+                if (parts.length >= 2) {
+                    return { pid: parts[0].trim(), size: parts[1].trim() };
+                }
+                return null;
+            }).filter(x => x);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    if (buyNowId || buyAgainTargets.length > 0) {
         const checkboxes = document.querySelectorAll('.item-checkbox');
         let found = false;
 
         checkboxes.forEach(chk => {
             const pId = chk.getAttribute('data-pid');
             const pSize = chk.getAttribute('data-size');
-            const isMatch = (pId === buyNowId) && (!buyNowSize || pSize == buyNowSize);
+
+            let isMatch = false;
+
+            // 1. Check Buy Now (Original Logic)
+            if (buyNowId) {
+                // Original used strict for ID and loose for size
+                if (pId === buyNowId && (!buyNowSize || pSize == buyNowSize)) {
+                    isMatch = true;
+                }
+            }
+
+            // 2. Check Buy Again (Separate Logic)
+            if (!isMatch && buyAgainTargets.length > 0) {
+                const matchInList = buyAgainTargets.some(t => {
+                    // Use loose comparison to be safe like Buy Now
+                    return t.pid == pId && t.size == pSize;
+                });
+                if (matchInList) isMatch = true;
+            }
 
             if (isMatch) {
                 chk.checked = true;
                 found = true;
-                chk.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
                 const row = chk.closest('.bg-white');
                 if (row) {
                     row.style.transition = "background-color 0.5s";
                     row.style.backgroundColor = "#e0f2fe";
-                    setTimeout(() => { row.style.backgroundColor = "#ffffff"; }, 1000);
+                    setTimeout(() => { row.style.backgroundColor = "#ffffff"; }, 1500);
                 }
             }
         });
-        if (found) calculateTotal();
+
+        if (found) {
+            calculateTotal();
+            const container = document.getElementById('cartItemsContainer');
+            if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 };
 
