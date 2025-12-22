@@ -315,14 +315,18 @@ class ShoeStoreChatbot {
             .replace(/Ảnh:\s*(src\/data\/images\/products\/[^\s<>\n]+(?:\.jpg|\.jpeg|\.png|\.gif|\.webp))/gi,
                 'Ảnh: /$1')
 
-                // Image URLs: "Ảnh: ..." -> display as thumbnail (supports /images/... and http(s) links)
-                .replace(/Ảnh:\s*((?:https?:\/\/|\/)[^\s<>\n]+(?:\.jpg|\.jpeg|\.png|\.gif|\.webp))(?:\s|$)/gi,
-                    '<div class="product-thumbnail"><img src="$1" alt="Sản phẩm" onerror="this.parentElement.style.display=\'none\'"></div>')
+            // Image URLs: "Ảnh: ..." -> display as thumbnail (supports /images/... and http(s) links)
+            .replace(/Ảnh:\s*((?:https?:\/\/|\/)[^\s<>\n]+(?:\.jpg|\.jpeg|\.png|\.gif|\.webp))(?:\s|$)/gi,
+                '<div class="product-thumbnail"><img src="$1" alt="Sản phẩm" onerror="this.parentElement.style.display=\'none\'"></div>')
 
-            // Product detail links: "Xem chi tiết: /product-detail/..." -> clickable link
-                // Product detail links: accept "Xem chi tiết:" or "Chi tiết:" and make it clickable
-                .replace(/(?:Xem\s+chi\s+tiết|Chi\s+tiết):\s*(\/product-detail\/[^\s<>\n]+)/gi,
-                    '<a href="$1" class="product-link" target="_blank">👉 Xem chi tiết</a>')
+            // Product detail links: accept various formats and make them clickable
+            // Handles: "Xem chi tiết:", "Chi tiết:", "🔗 Xem & Mua:", etc.
+            .replace(/(?:🔗\s*)?(?:Xem\s*[&và]\s*Mua|Xem\s+chi\s+tiết|Chi\s+tiết):\s*(\/product-detail\/[^\s<>\n]+)/gi,
+                '<a href="$1" class="product-link" target="_self">🔗 Xem & Mua ngay</a>')
+
+            // Also handle standalone product-detail links that aren't already wrapped
+            .replace(/(?<![href="])(\/product-detail\/[a-zA-Z0-9_-]+)(?![^<]*>)/gi,
+                '<a href="$1" class="product-link" target="_self">$1</a>')
 
             // Handle common emojis with proper spacing
             .replace(/(👟|💰|🏷️|📦|✨|⭐|🔥|💯|🎉|📷|💡|🔍|👆|💬|📊|😔|✅|❌|☑️|⚡|🛒|❤️|👍)/g, '<span class="emoji">$1</span>')
