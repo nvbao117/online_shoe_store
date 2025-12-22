@@ -29,56 +29,56 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class ConversationService {
-    
+
     private final ConversationRepository conversationRepository;
     private final ConversationMessageRepository messageRepository;
     private final ObjectMapper objectMapper;
-    
+
     /**
      * Lấy hoặc tạo conversation cho session
      */
     @Transactional
     public Conversation getOrCreateConversation(String sessionId) {
         return conversationRepository.findBySessionIdAndIsActiveTrue(sessionId)
-            .orElseGet(() -> {
-                log.info("Creating new conversation for session: {}", sessionId);
-                Conversation conversation = Conversation.builder()
-                    .sessionId(sessionId)
-                    .isActive(true)
-                    .messageCount(0)
-                    .build();
-                return conversationRepository.save(conversation);
-            });
+                .orElseGet(() -> {
+                    log.info("Creating new conversation for session: {}", sessionId);
+                    Conversation conversation = Conversation.builder()
+                            .sessionId(sessionId)
+                            .isActive(true)
+                            .messageCount(0)
+                            .build();
+                    return conversationRepository.save(conversation);
+                });
     }
-    
+
     /**
      * Lấy N messages gần nhất của conversation (cho context)
      */
     public List<String> getRecentHistory(String sessionId, int count) {
         try {
             Conversation conversation = conversationRepository
-                .findBySessionIdAndIsActiveTrue(sessionId)
-                .orElse(null);
-            
+                    .findBySessionIdAndIsActiveTrue(sessionId)
+                    .orElse(null);
+
             if (conversation == null) {
                 return new ArrayList<>();
             }
-            
+
             List<ConversationMessage> messages = messageRepository
-                .findRecentMessages(conversation.getId(), PageRequest.of(0, count));
-            
+                    .findRecentMessages(conversation.getId(), PageRequest.of(0, count));
+
             Collections.reverse(messages);
-            
+
             return messages.stream()
-                .map(m -> m.getRole() + ": " + m.getContent())
-                .collect(Collectors.toList());
-                
+                    .map(m -> m.getRole() + ": " + m.getContent())
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
             log.error("Error getting conversation history: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
-    
+
     /**
      * Lưu cặp user message + assistant response
      */
@@ -89,95 +89,95 @@ public class ConversationService {
                             IntentClassificationResult classification,
                             RoutingDecision routing,
                             long processingTimeMs) {
-        
+
         try {
             Conversation conversation = getOrCreateConversation(sessionId);
-            
+
             // Save user message
             ConversationMessage userMsg = ConversationMessage.builder()
-                .conversation(conversation)
-                .role(MessageRole.USER)
-                .content(userMessage)
-                .primaryIntent(classification.getPrimaryIntent())
-                .subIntent(classification.hasSecondaryIntents() 
-                    ? classification.getSecondaryIntents().get(0).name() 
-                    : null)
-                .extractedEntities(serializeEntities(classification.getEntities()))
-                .confidence(classification.getConfidence())
-                .urgency(classification.getUrgency())
-                .primaryAgent(parseAgentType(routing.getTargetAgent()))
-                .secondaryAgents(formatSecondaryAgents(routing.getSecondaryAgents()))
-                .wasParallel(routing.getParallel())
-                .riskLevel(routing.getRiskLevel())
-                .requiredEscalation(routing.getRequiresEscalation())
-                .processingTimeMs((int) processingTimeMs)
-                .build();
-            
+                    .conversation(conversation)
+                    .role(MessageRole.USER)
+                    .content(userMessage)
+                    .primaryIntent(classification.getPrimaryIntent())
+                    .subIntent(classification.hasSecondaryIntents()
+                            ? classification.getSecondaryIntents().get(0).name()
+                            : null)
+                    .extractedEntities(serializeEntities(classification.getEntities()))
+                    .confidence(classification.getConfidence())
+                    .urgency(classification.getUrgency())
+                    .primaryAgent(parseAgentType(routing.getTargetAgent()))
+                    .secondaryAgents(formatSecondaryAgents(routing.getSecondaryAgents()))
+                    .wasParallel(routing.getParallel())
+                    .riskLevel(routing.getRiskLevel())
+                    .requiredEscalation(routing.getRequiresEscalation())
+                    .processingTimeMs((int) processingTimeMs)
+                    .build();
+
             messageRepository.save(userMsg);
-            
+
             // Save assistant response
             ConversationMessage assistantMsg = ConversationMessage.builder()
-                .conversation(conversation)
-                .role(MessageRole.ASSISTANT)
-                .content(assistantResponse)
-                .build();
-            
+                    .conversation(conversation)
+                    .role(MessageRole.ASSISTANT)
+                    .content(assistantResponse)
+                    .build();
+
             messageRepository.save(assistantMsg);
-            
+
             // Update conversation
             conversation.setLastMessageAt(LocalDateTime.now());
             conversation.setLastPrimaryIntent(classification.getPrimaryIntent());
             conversation.setMessageCount(conversation.getMessageCount() + 2);
-            
+
             if (routing.getRequiresEscalation()) {
                 conversation.markEscalation();
             }
-            
+
             conversationRepository.save(conversation);
-            
+
             log.debug("Saved messages for session: {}", sessionId);
-            
+
         } catch (Exception e) {
             log.error("Error saving conversation: {}", e.getMessage());
         }
     }
-    
+
     /**
      * Async version của saveMessage cho performance
      */
     @Async
     @Transactional
     public void saveMessageAsync(String sessionId,
-                                  String userMessage,
-                                  String assistantResponse,
-                                  IntentClassificationResult classification,
-                                  RoutingDecision routing,
-                                  long processingTimeMs) {
+                                 String userMessage,
+                                 String assistantResponse,
+                                 IntentClassificationResult classification,
+                                 RoutingDecision routing,
+                                 long processingTimeMs) {
         saveMessage(sessionId, userMessage, assistantResponse, classification, routing, processingTimeMs);
     }
-    
+
     /**
      * Lấy tất cả messages của conversation
      */
     public List<ConversationMessage> getConversationMessages(String sessionId) {
         return conversationRepository.findBySessionIdAndIsActiveTrue(sessionId)
-            .map(c -> messageRepository.findByConversationIdOrderByCreatedAtAsc(c.getId()))
-            .orElse(new ArrayList<>());
+                .map(c -> messageRepository.findByConversationIdOrderByCreatedAtAsc(c.getId()))
+                .orElse(new ArrayList<>());
     }
-    
+
     /**
      * Đóng conversation
      */
     @Transactional
     public void closeConversation(String sessionId) {
         conversationRepository.findBySessionIdAndIsActiveTrue(sessionId)
-            .ifPresent(c -> {
-                c.deactivate();
-                conversationRepository.save(c);
-                log.info("Closed conversation for session: {}", sessionId);
-            });
+                .ifPresent(c -> {
+                    c.deactivate();
+                    conversationRepository.save(c);
+                    log.info("Closed conversation for session: {}", sessionId);
+                });
     }
-    
+
     /**
      * Cleanup stale conversations (inactive for > 30 minutes)
      */
@@ -185,18 +185,18 @@ public class ConversationService {
     public int cleanupStaleConversations() {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(30);
         List<Conversation> stale = conversationRepository.findStaleConversations(threshold);
-        
+
         stale.forEach(Conversation::deactivate);
         conversationRepository.saveAll(stale);
-        
+
         log.info("Cleaned up {} stale conversations", stale.size());
         return stale.size();
     }
-    
+
     // ═══════════════════════════════════════════
     // HELPER METHODS
     // ═══════════════════════════════════════════
-    
+
     private String serializeEntities(ExtractedEntities entities) {
         if (entities == null) return null;
         try {
@@ -206,12 +206,12 @@ public class ConversationService {
             return null;
         }
     }
-    
+
     private String formatSecondaryAgents(List<String> agents) {
         if (agents == null || agents.isEmpty()) return null;
         return String.join(",", agents);
     }
-    
+
     private AgentType parseAgentType(String agentName) {
         if (agentName == null || agentName.isBlank()) {
             return AgentType.SUPPORT_SERVICES;

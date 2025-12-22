@@ -21,4 +21,14 @@ public class AdminViewController {
     public String adminUserDetail() {
         return "/admin/user-detail";
     }
+
+    @GetMapping("/products")
+    public String adminProducts() {
+        return "/admin/products";
+    }
+
+    @GetMapping("/orders")
+    public String adminOrders() {
+        return "/admin/orders";
+    }
 }

@@ -91,6 +91,7 @@ public class OrderConfirmService {
         }
 
         return OrderResponse.OrderItemResponse.builder()
+                .productId(item.getProductVariant().getProduct().getProductId())
                 .productName(item.getProductVariant().getProduct().getName())
                 .color(item.getProductVariant().getColor())
                 .size(item.getProductVariant().getSize())

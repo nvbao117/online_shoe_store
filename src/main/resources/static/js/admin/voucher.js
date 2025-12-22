@@ -105,6 +105,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const discountCell = document.createElement("td");
                 discountCell.textContent = voucher.discountLabel;
 
+                const startDateCell = document.createElement("td");
+                startDateCell.textContent = voucher.startDate || "-";
+
+                const endDateCell = document.createElement("td");
+                endDateCell.textContent = voucher.endDate || "-";
+
                 const statusCell = document.createElement("td");
                 statusCell.classList.add("text-center");
                 const statusButton = document.createElement("button");
@@ -138,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 statusCell.appendChild(statusButton);
 
-                [nameCell, codeCell, discountCell, statusCell].forEach(cell => row.appendChild(cell));
+                [nameCell, codeCell, discountCell, startDateCell, endDateCell, statusCell].forEach(cell => row.appendChild(cell));
                 tableBody.appendChild(row);
             });
         };
@@ -247,6 +253,7 @@ function initVoucherCreatePage() {
             option.value = item.id;
             option.textContent = item.name;
             option.dataset.parentId = item.parentId || "";
+            option.dataset.categoryId = item.categoryId || "";
             select.appendChild(option);
         });
     };
@@ -257,9 +264,23 @@ function initVoucherCreatePage() {
         populateSelect(brandSelect, filtered, "Name of Brand");
     };
 
-    const filterProductsByBrand = (brandId) => {
+    const filterProductsByBrand = (brandId, categoryId) => {
         if (!productSelect) return;
-        const filtered = brandId ? metadata.products.filter(p => p.parentId === brandId) : metadata.products;
+        const filtered = metadata.products.filter(product => {
+            const matchesBrand = brandId ? product.parentId === brandId : true;
+            const matchesCategory = categoryId ? product.categoryId === categoryId : true;
+            return matchesBrand && matchesCategory;
+        });
+        populateSelect(productSelect, filtered, "Name of Product");
+    };
+
+    const filterProductsByCategory = (categoryId) => {
+        if (!productSelect) return;
+        if (!categoryId) {
+            populateSelect(productSelect, metadata.products, "Name of Product");
+            return;
+        }
+        const filtered = metadata.products.filter(product => product.categoryId === categoryId);
         populateSelect(productSelect, filtered, "Name of Product");
     };
 
@@ -268,20 +289,56 @@ function initVoucherCreatePage() {
         const scopeCategory = scopeCategoryRadio && scopeCategoryRadio.checked;
         const scopeBrand = scopeBrandRadio && scopeBrandRadio.checked;
         const scopeProduct = scopeProductRadio && scopeProductRadio.checked;
+        const hasCategory = categorySelect && categorySelect.value;
 
         if (categorySelect) categorySelect.disabled = scopeAll;
-        if (brandSelect) brandSelect.disabled = scopeAll || scopeCategory;
-        if (productSelect) productSelect.disabled = !(scopeProduct);
+        if (brandSelect) brandSelect.disabled = scopeAll || scopeCategory || ((scopeBrand || scopeProduct) && !hasCategory);
+        if (productSelect) productSelect.disabled = !scopeProduct || !brandSelect.value;
 
         if (scopeAll) {
             categorySelect.value = "";
             brandSelect.value = "";
             productSelect.value = "";
-        } else if (scopeCategory) {
+            filterBrandsByCategory("");
+            filterProductsByBrand("");
+            return;
+        }
+
+        if (scopeCategory) {
             brandSelect.value = "";
             productSelect.value = "";
-        } else if (scopeBrand) {
+            filterBrandsByCategory("");
+            filterProductsByBrand("");
+            return;
+        }
+
+        if (scopeBrand) {
             productSelect.value = "";
+            if (hasCategory) {
+                if (!brandSelect.value){
+                    filterBrandsByCategory(categorySelect.value);
+                }
+            } else {
+                filterBrandsByCategory("");
+            }
+            filterProductsByBrand("");
+            return;
+        }
+
+        if (scopeProduct) {
+            if (hasCategory) {
+                if (!brandSelect.value) {
+                    filterBrandsByCategory(categorySelect.value);
+                }
+                if (brandSelect.value) {
+                    filterProductsByBrand(brandSelect.value, categorySelect.value);
+                } else {
+                    filterProductsByCategory(categorySelect.value);
+                }
+            } else {
+                filterBrandsByCategory("");
+                filterProductsByBrand("");
+            }
         }
     };
 
@@ -387,14 +444,27 @@ function initVoucherCreatePage() {
 
     if (categorySelect) {
         categorySelect.addEventListener("change", (event) => {
+            brandSelect.value = "";
+            productSelect.value = "";
             filterBrandsByCategory(event.target.value);
-            filterProductsByBrand("");
+            if (scopeBrandRadio && scopeBrandRadio.checked) {
+                filterProductsByBrand("");
+            } else if (scopeProductRadio && scopeProductRadio.checked) {
+                filterProductsByCategory(event.target.value);
+            } else {
+                filterProductsByBrand("");
+            }
+            updateDetailFields();
         });
     }
 
     if (brandSelect) {
         brandSelect.addEventListener("change", (event) => {
-            filterProductsByBrand(event.target.value);
+            productSelect.value = "";
+            if (scopeProductRadio && scopeProductRadio.checked) {
+                filterProductsByBrand(event.target.value, categorySelect.value);
+            }
+            updateDetailFields();
         });
     }
 

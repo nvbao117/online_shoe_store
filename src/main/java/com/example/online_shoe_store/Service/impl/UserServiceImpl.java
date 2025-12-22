@@ -69,4 +69,55 @@ public class UserServiceImpl implements UserService {
 
         return true;
     }
+
+    @Override
+    public boolean updateProfile(String username, com.example.online_shoe_store.dto.request.UserProfileUpdateRequest request, StringBuilder errorMessage) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            errorMessage.append("Người dùng không tồn tại");
+            return false;
+        }
+
+        // Check if email is used by another user
+        if (!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            errorMessage.append("Email đã được sử dụng bởi tài khoản khác");
+            return false;
+        }
+
+        // Check if phone is used by another user
+        if (request.getPhone() != null && !request.getPhone().equals(user.getPhone()) && userRepository.existsByPhone(request.getPhone())) {
+            errorMessage.append("Số điện thoại đã được sử dụng bởi tài khoản khác");
+            return false;
+        }
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(String username, com.example.online_shoe_store.dto.request.ChangePasswordRequest request, StringBuilder errorMessage) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            errorMessage.append("Người dùng không tồn tại");
+            return false;
+        }
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            errorMessage.append("Mật khẩu hiện tại không đúng");
+            return false;
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            errorMessage.append("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            return false;
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return true;
+    }
 }

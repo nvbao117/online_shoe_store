@@ -21,6 +21,9 @@ public class ReviewResponse {
     private String comment;
     private LocalDateTime reviewDate;
 
+    // User info
+    private String username;
+
     // Product info
     private String variantId;
     private String productName;

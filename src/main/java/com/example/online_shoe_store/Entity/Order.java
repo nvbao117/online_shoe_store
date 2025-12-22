@@ -203,21 +203,26 @@ public class Order {
         // State machine logic
         switch (from) {
             case PENDING:
-                return List.of(OrderStatus.CONFIRMED, OrderStatus.CANCELLED,
+                return List.of(OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.CANCELLED,
                         OrderStatus.AWAITING_PAYMENT, OrderStatus.EXPIRED).contains(to);
             case AWAITING_PAYMENT:
-                return List.of(OrderStatus.CONFIRMED, OrderStatus.PAYMENT_FAILED,
+                return List.of(OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.PAYMENT_FAILED,
                         OrderStatus.CANCELLED, OrderStatus.EXPIRED).contains(to);
             case PAYMENT_FAILED:
                 return List.of(OrderStatus.AWAITING_PAYMENT, OrderStatus.CANCELLED).contains(to);
             case CONFIRMED:
-                return List.of(OrderStatus.PROCESSING, OrderStatus.CANCELLED,
+                return List.of(OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.CANCELLED,
                         OrderStatus.REFUNDED).contains(to);
             case PROCESSING:
-                return List.of(OrderStatus.READY_FOR_SHIPMENT, OrderStatus.CANCELLED).contains(to);
+                return List.of(OrderStatus.READY_FOR_SHIPMENT, OrderStatus.SHIPPED, OrderStatus.CANCELLED).contains(to);
             case SHIPPED:
-                return List.of(OrderStatus.IN_TRANSIT, OrderStatus.DELIVERED,
+                return List.of(OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED, OrderStatus.COMPLETED,
                         OrderStatus.RETURN_REQUESTED).contains(to);
+            case IN_TRANSIT:
+                return List.of(OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED, OrderStatus.COMPLETED,
+                        OrderStatus.RETURN_REQUESTED).contains(to);
+            case OUT_FOR_DELIVERY:
+                return List.of(OrderStatus.DELIVERED, OrderStatus.COMPLETED, OrderStatus.RETURN_REQUESTED).contains(to);
             case DELIVERED:
                 return List.of(OrderStatus.COMPLETED, OrderStatus.RETURN_REQUESTED).contains(to);
             default:
