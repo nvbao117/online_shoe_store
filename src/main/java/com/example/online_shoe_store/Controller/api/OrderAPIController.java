@@ -107,7 +107,6 @@ public class OrderAPIController {
         String imageUrl = "/images/placeholder.png";
         if (item.getProductVariant() != null && item.getProductVariant().getImageUrl() != null) {
              imageUrl = item.getProductVariant().getImageUrl();
-             // Clean up path if it still has src/data prefix (though we fixed it in DB, good to be safe)
              if (imageUrl.startsWith("src/data")) {
                  imageUrl = imageUrl.replace("src/data", "");
              }
