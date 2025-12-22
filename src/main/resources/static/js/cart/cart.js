@@ -14,6 +14,7 @@ const loadCart = () => {
 
         // Xử lý logic Mua ngay sau khi render xong
         checkBuyNowParams();
+        checkBuyAgainParams();
     });
 };
 
@@ -89,75 +90,96 @@ const renderCartItems = (items) => {
     calculateTotal();
 };
 
+// --- 1. XỬ LÝ MUA NGAY (Logic cũ, dùng URL param) ---
 const checkBuyNowParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const buyNowId = urlParams.get('buyNowItem');
     const buyNowSize = urlParams.get('size');
-    const buyAgainParam = urlParams.get('buyAgain'); // Format: pid:size,pid2:size2
 
-    // Parse buyAgain list
-    let buyAgainTargets = [];
-    if (buyAgainParam) {
-        try {
-            const rawParam = decodeURIComponent(buyAgainParam);
-            buyAgainTargets = rawParam.split(',').map(pair => {
-                const parts = pair.split(':');
-                if (parts.length >= 2) {
-                    return { pid: parts[0].trim(), size: parts[1].trim() };
-                }
-                return null;
-            }).filter(x => x);
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    if (buyNowId || buyAgainTargets.length > 0) {
-        const checkboxes = document.querySelectorAll('.item-checkbox');
+    if (buyNowId) {
         let found = false;
-
-        checkboxes.forEach(chk => {
+        document.querySelectorAll('.item-checkbox').forEach(chk => {
             const pId = chk.getAttribute('data-pid');
             const pSize = chk.getAttribute('data-size');
 
-            let isMatch = false;
-
-            // 1. Check Buy Now (Original Logic)
-            if (buyNowId) {
-                // Original used strict for ID and loose for size
-                if (pId === buyNowId && (!buyNowSize || pSize == buyNowSize)) {
-                    isMatch = true;
-                }
-            }
-
-            // 2. Check Buy Again (Separate Logic)
-            if (!isMatch && buyAgainTargets.length > 0) {
-                const matchInList = buyAgainTargets.some(t => {
-                    // Use loose comparison to be safe like Buy Now
-                    return t.pid == pId && t.size == pSize;
-                });
-                if (matchInList) isMatch = true;
-            }
-
-            if (isMatch) {
+            // Logic cũ: ID chính xác, Size lỏng
+            if (String(pId) === String(buyNowId) && (!buyNowSize || String(pSize) == String(buyNowSize))) {
                 chk.checked = true;
                 found = true;
-
-                const row = chk.closest('.bg-white');
-                if (row) {
-                    row.style.transition = "background-color 0.5s";
-                    row.style.backgroundColor = "#e0f2fe";
-                    setTimeout(() => { row.style.backgroundColor = "#ffffff"; }, 1500);
-                }
+                highlightRow(chk);
             }
         });
 
         if (found) {
             calculateTotal();
-            const container = document.getElementById('cartItemsContainer');
-            if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            scrollToCart();
         }
     }
+};
+
+// --- 2. XỬ LÝ MUA LẠI (Logic mới, dùng LocalStorage) ---
+const checkBuyAgainParams = () => {
+    // 1. Lấy dữ liệu từ LocalStorage
+    const stored = localStorage.getItem('cart_selected_items');
+    if (!stored) return;
+
+    let targets = [];
+    try {
+        targets = JSON.parse(stored);
+        console.log("Load từ LocalStorage:", targets);
+
+        // Xóa ngay để tránh load lại khi F5
+        localStorage.removeItem('cart_selected_items');
+    } catch (e) {
+        console.error("Lỗi parse LocalStorage:", e);
+        return;
+    }
+
+    if (!targets || targets.length === 0) return;
+
+    let found = false;
+    document.querySelectorAll('.item-checkbox').forEach(chk => {
+        const rawPid = chk.getAttribute('data-pid');
+        const rawSize = chk.getAttribute('data-size');
+
+        // Normalize
+        const pId = String(rawPid).trim().toLowerCase();
+        const pSize = String(rawSize).trim().toLowerCase();
+
+        // Check match trong list targets
+        const isMatch = targets.some(t => {
+            const tPid = String(t.productId || t.pid).trim().toLowerCase();
+            const tSize = String(t.size).trim().toLowerCase();
+            return tPid === pId && tSize === pSize;
+        });
+
+        if (isMatch) {
+            chk.checked = true;
+            found = true;
+            highlightRow(chk);
+        }
+    });
+
+    if (found) {
+        calculateTotal();
+        scrollToCart();
+    }
+};
+
+// Helper: Hiệu ứng highlight
+const highlightRow = (checkbox) => {
+    const row = checkbox.closest('.bg-white');
+    if (row) {
+        row.style.transition = "background-color 0.5s";
+        row.style.backgroundColor = "#e0f2fe";
+        setTimeout(() => { row.style.backgroundColor = "#ffffff"; }, 1500);
+    }
+};
+
+// Helper: Scroll
+const scrollToCart = () => {
+    const container = document.getElementById('cartItemsContainer');
+    if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 document.addEventListener("DOMContentLoaded", function () {

@@ -51,14 +51,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     await addToCartBatch(items);
 
-                    // Construct query param string: pid:size,pid2:size2
-                    const buyAgainParam = items.map(item => `${item.productId}:${item.size}`).join(',');
-                    const redirectUrl = `/templates/cart?buyAgain=${encodeURIComponent(buyAgainParam)}`;
-                    console.log("Redirecting to:", redirectUrl);
+                    // LOGIC MỚI: Dùng LocalStorage để chuyển danh sách cần chọn sang trang cart
+                    // Cách này ổn định hơn URL param vì không bị giới hạn độ dài và ký tự
+                    const itemsToSelect = items.map(item => ({ productId: item.productId, size: item.size }));
+                    localStorage.setItem('cart_selected_items', JSON.stringify(itemsToSelect));
 
-                    // Show success feedback
-                    // alert('Đã thêm sản phẩm vào giỏ hàng!'); <-- User requested direct redirect with checked items
-                    window.location.href = redirectUrl;
+                    console.log("Đã lưu vào LocalStorage:", itemsToSelect);
+
+                    // Redirect sang trang giỏ hàng (không cần query param nữa)
+                    window.location.href = `/templates/cart`;
                 } catch (err) {
                     console.error(err);
                     alert('Có lỗi xảy ra khi thêm vào giỏ hàng.');

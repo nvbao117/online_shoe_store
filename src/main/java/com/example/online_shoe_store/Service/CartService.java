@@ -78,7 +78,16 @@ public class CartService {
 
         if (existingItemOpt.isPresent()) {
             CartItem existingItem = existingItemOpt.get();
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            
+            // Logic mới: Nếu sản phẩm đang bị ẩn (đã xóa), thì coi như thêm mới -> Reset số lượng
+            // Nếu sản phẩm đang hiện (đang mua), thì cộng dồn số lượng
+            if (Boolean.FALSE.equals(existingItem.getIsActive())) {
+                 existingItem.setQuantity(quantity);
+                 existingItem.setIsActive(true);
+            } else {
+                 existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            }
+            
             cartItemRepository.save(existingItem);
         } else {
             CartItem newItem = new CartItem();
