@@ -58,6 +58,29 @@ public class OrderAPIController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{orderId}/received")
+    public ResponseEntity<?> confirmReceived(@PathVariable String orderId) {
+        User user = getCurrentUser();
+        if (user == null) return ResponseEntity.status(401).build();
+
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    if (!order.getUser().getUserId().equals(user.getUserId())) {
+                        return ResponseEntity.status(403).body("Không có quyền truy cập");
+                    }
+                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.SHIPPED 
+                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.CONFIRMED
+                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.IN_TRANSIT) {
+                        
+                        order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.COMPLETED, "Khách đã nhận hàng", user.getName());
+                        orderRepository.save(order);
+                        return ResponseEntity.ok().body("Đã xác nhận nhận hàng");
+                    }
+                    return ResponseEntity.badRequest().body("Trạng thái đơn hàng không hợp lệ để xác nhận");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     private OrderResponse mapToOrderResponse(Order order) {
         ShipDetail shipDetail = order.getShipDetail();
         String formattedAddress = "N/A";

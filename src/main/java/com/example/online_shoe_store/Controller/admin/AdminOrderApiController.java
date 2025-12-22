@@ -42,7 +42,7 @@ public class AdminOrderApiController {
         if (order == null) {
             return ResponseEntity.badRequest().body("Đơn hàng không tồn tại");
         }
-        order.updateStatus(OrderStatus.CONFIRMED, "Admin confirmed", "ADMIN");
+        order.updateStatus(OrderStatus.SHIPPED, "Admin confirmed & shipped", "ADMIN");
         orderRepository.save(order);
         return ResponseEntity.ok("Đã xác nhận đơn hàng");
     }

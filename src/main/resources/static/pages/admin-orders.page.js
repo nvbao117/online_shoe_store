@@ -39,11 +39,14 @@ const AdminOrderPage = {
                 statusText = 'Đã xác nhận';
             } else if (order.status === 'PENDING') {
                 statusClass = 'bg-yellow-100 text-yellow-700';
-                statusText = 'Chưa xác nhận';
+                statusText = 'Chờ xác nhận';
+            } else if (['SHIPPED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(order.status)) {
+                statusClass = 'bg-orange-100 text-orange-700';
+                statusText = 'Vận chuyển';
             } else if (order.status === 'CANCELLED') {
                 statusClass = 'bg-red-100 text-red-700';
                 statusText = 'Đã hủy';
-            } else if (order.status === 'COMPLETED') {
+            } else if (order.status === 'COMPLETED' || order.status === 'DELIVERED') {
                 statusClass = 'bg-green-100 text-green-700';
                 statusText = 'Hoàn thành';
             }
