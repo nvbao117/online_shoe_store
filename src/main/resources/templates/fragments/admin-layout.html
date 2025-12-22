@@ -284,77 +284,80 @@
 <!-- Scripts Fragment -->
 <div th:fragment="scripts">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</div>
-<script>
-  // Mobile menu toggle
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const sidebar = document.getElementById('sidebar');
 
-  mobileMenuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-  });
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
 
-  // Close sidebar when clicking outside on mobile
-  document.addEventListener('click', (e) => {
-    if (window.innerWidth < 1024 &&
-      !sidebar.contains(e.target) &&
-      !mobileMenuBtn.contains(e.target) &&
-      sidebar.classList.contains('open')) {
-      sidebar.classList.remove('open');
+    if (mobileMenuBtn && sidebar) {
+      mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth < 1024 &&
+          !sidebar.contains(e.target) &&
+          !mobileMenuBtn.contains(e.target) &&
+          sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+        }
+      });
     }
-  });
 
-  // Time filter buttons
-  const timeButtons = document.querySelectorAll('.time-btn');
+    // Time filter buttons
+    const timeButtons = document.querySelectorAll('.time-btn');
 
-  timeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      timeButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    timeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        timeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-      // You can add AJAX call here to fetch data based on selected time period
-      console.log('[v0] Time filter changed to:', btn.dataset.value);
+        // You can add AJAX call here to fetch data based on selected time period
+        console.log('[v0] Time filter changed to:', btn.dataset.value);
+      });
     });
-  });
 
-  // Chart bar hover effect - could add tooltip here
-  const chartBars = document.querySelectorAll('.chart-bar');
-  chartBars.forEach(bar => {
-    bar.addEventListener('mouseenter', () => {
-      console.log('[v0] Chart bar hovered');
-      // Could show tooltip with detailed data
+    // Chart bar hover effect - could add tooltip here
+    const chartBars = document.querySelectorAll('.chart-bar');
+    chartBars.forEach(bar => {
+      bar.addEventListener('mouseenter', () => {
+        console.log('[v0] Chart bar hovered');
+        // Could show tooltip with detailed data
+      });
     });
-  });
 
-  // Add fade-in animation on load
-  document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.stat-card');
-    cards.forEach((card, index) => {
-      setTimeout(() => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
+    // Add fade-in animation on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.stat-card');
+      cards.forEach((card, index) => {
         setTimeout(() => {
-          card.style.transition = 'all 0.4s ease-out';
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        }, 50);
-      }, index * 100);
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          setTimeout(() => {
+            card.style.transition = 'all 0.4s ease-out';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 50);
+        }, index * 100);
+      });
     });
-  });
 
-  // Highlight active nav item based on current path
-  const navLinks = document.querySelectorAll('.nav-link');
-  const currentPath = window.location.pathname;
-  navLinks.forEach(link => {
-    const href = link.getAttribute('href');
-    if (!href || href === '#') return;
+    // Highlight active nav item based on current path
+    const navLinks = document.querySelectorAll('.nav-link');
+    const currentPath = window.location.pathname;
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (!href || href === '#') return;
 
-    const linkPath = new URL(href, window.location.origin).pathname;
-    if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
-      navLinks.forEach(l => l.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
-      link.classList.add('active', 'bg-blue-50', 'text-blue-600');
-    }
-  });
-</script>
+      const linkPath = new URL(href, window.location.origin).pathname;
+      if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
+        navLinks.forEach(l => l.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
+        link.classList.add('active', 'bg-blue-50', 'text-blue-600');
+      }
+    });
+  </script>
+</div>
 
 </html>
