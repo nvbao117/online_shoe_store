@@ -83,16 +83,15 @@ function renderOrderCard(order) {
         </div>
 
         <div class="flex flex-wrap gap-3 md:justify-end">
-          <button class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
-            Yêu cầu Trả hàng/Hoàn tiền
-          </button>
+
           ${showReviewBtn ? `
           <button onclick="navigateToReviewsTab()" 
                   class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
             Đánh Giá
           </button>
           ` : ''}
-          <button class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
+          <button onclick="reorderProduct('${escapeAttr(first.productId)}')"
+                  class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
             Mua Lại
           </button>
         </div>
@@ -110,6 +109,14 @@ window.navigateToReviewsTab = function () {
   }
 };
 
+// Reorder product - navigate to product detail page
+window.reorderProduct = function (productId) {
+  if (!productId) {
+    alert('Không tìm thấy thông tin sản phẩm');
+    return;
+  }
+  window.location.href = `/product-detail/${productId}`;
+};
 
 function normalizeImageUrl(url) {
   if (!url) return url;

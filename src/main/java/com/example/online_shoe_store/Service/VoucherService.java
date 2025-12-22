@@ -3,11 +3,14 @@ package com.example.online_shoe_store.Service;
 import com.example.online_shoe_store.Entity.Brand;
 import com.example.online_shoe_store.Entity.Category;
 import com.example.online_shoe_store.Entity.Product;
+import com.example.online_shoe_store.Entity.User;
 import com.example.online_shoe_store.Entity.Voucher;
 import com.example.online_shoe_store.Entity.enums.DiscountType;
+import com.example.online_shoe_store.Entity.enums.NotificationType;
 import com.example.online_shoe_store.Repository.BrandRepository;
 import com.example.online_shoe_store.Repository.CategoryRepository;
 import com.example.online_shoe_store.Repository.ProductRepository;
+import com.example.online_shoe_store.Repository.UserRepository;
 import com.example.online_shoe_store.Repository.VoucherRepository;
 import com.example.online_shoe_store.dto.request.VoucherCreateRequest;
 import com.example.online_shoe_store.dto.request.VoucherStatusUpdateRequest;
@@ -34,6 +37,8 @@ public class VoucherService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final UserNotificationService userNotificationService;
 
     public List<VoucherAdminListResponse> getAdminVouchers() {
         LocalDateTime now = LocalDateTime.now();
@@ -60,7 +65,8 @@ public class VoucherService {
         LocalDateTime now = LocalDateTime.now();
         for (Voucher voucher : vouchers) {
             if (isExpired(voucher, now)) {
-                throw new IllegalStateException("Voucher " + voucher.getCode() + " đã hết hạn và không thể thay đổi trạng thái.");
+                throw new IllegalStateException(
+                        "Voucher " + voucher.getCode() + " đã hết hạn và không thể thay đổi trạng thái.");
             }
 
             String newStatus = updateMap.get(voucher.getVoucherId());
@@ -145,6 +151,12 @@ public class VoucherService {
             targetProduct.getVouchers().add(saved);
             productRepository.save(targetProduct);
         }
+
+        // Gửi thông báo khuyến mãi đến tất cả users khi voucher ACTIVE
+        if ("active".equalsIgnoreCase(saved.getStatus())) {
+            sendPromotionNotificationToAllUsers(saved);
+        }
+
         return mapToAdminResponse(saved, LocalDateTime.now());
     }
 
@@ -285,11 +297,33 @@ public class VoucherService {
         if (Objects.equals(scope, "category") && !StringUtils.hasText(request.getCategoryId())) {
             throw new IllegalArgumentException("Vui lòng chọn danh mục áp dụng");
         }
-        if (Objects.equals(scope, "brand") && (!StringUtils.hasText(request.getBrandId()) || !StringUtils.hasText(request.getCategoryId()))) {
+        if (Objects.equals(scope, "brand")
+                && (!StringUtils.hasText(request.getBrandId()) || !StringUtils.hasText(request.getCategoryId()))) {
             throw new IllegalArgumentException("Vui lòng chọn danh mục và thương hiệu áp dụng");
         }
         if (Objects.equals(scope, "product") && !StringUtils.hasText(request.getProductId())) {
             throw new IllegalArgumentException("Vui lòng chọn sản phẩm áp dụng");
+        }
+    }
+
+    private void sendPromotionNotificationToAllUsers(Voucher voucher) {
+        List<User> allUsers = userRepository.findAll();
+        String discountLabel = formatDiscountLabel(voucher);
+        String message = String.format(
+                "Mã giảm giá %s - %s! Sử dụng mã: %s. Đơn tối thiểu: %s đ",
+                discountLabel,
+                voucher.getName(),
+                voucher.getCode(),
+                voucher.getMinOrderValue() != null ? voucher.getMinOrderValue().toPlainString() : "0");
+
+        for (User user : allUsers) {
+            userNotificationService.createNotification(
+                    user,
+                    NotificationType.PROMOTION,
+                    "🎁 Voucher mới: " + voucher.getName(),
+                    message,
+                    "🎁",
+                    null);
         }
     }
 }
