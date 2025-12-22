@@ -307,7 +307,9 @@
 
                 // Format currency
                 const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-                document.getElementById('totalAmount').textContent = formatter.format(order.finalAmount);
+                const storedVoucher = JSON.parse(localStorage.getItem('checkoutVoucherData') || 'null');
+                const totalAmount = storedVoucher?.finalTotal ?? order.finalAmount;
+                document.getElementById('totalAmount').textContent = formatter.format(totalAmount);
 
                 // We don't have email in response yet, let's just leave it or fetch user info separately if needed. 
                 // For now, let's assume email is not critical or was passed in model (which we are moving away from).
@@ -315,6 +317,8 @@
                 // Re-checking OrderResponse... I didn't add Email. 
                 // I will update the HTML to generic text or hide email if null.
                 document.getElementById('email').textContent = 'bạn';
+
+                localStorage.removeItem('checkoutVoucherData');
 
             } catch (error) {
                 console.error(error);

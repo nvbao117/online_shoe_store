@@ -10,6 +10,8 @@ public class VoucherAdminListResponse {
     private String name;
     private String code;
     private String discountLabel;
+    private String startDate;
+    private String endDate;
     private String status;
     private boolean expired;
 }
