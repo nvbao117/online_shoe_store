@@ -35,6 +35,9 @@ public class CheckoutService {
 
         Set<String> selectedIds = new HashSet<>(selectedCartItemIds != null ? selectedCartItemIds : List.of());
 
+        // Check if user has no default address yet
+        boolean hasNoDefaultAddress = shipDetailRepository.findByUserUserIdAndIsDefaultTrue(user.getUserId()).isEmpty();
+
         ShipDetail shipDetail = ShipDetail.builder()
                 .user(user)
                 .recipientName(request.getFullName())
@@ -43,6 +46,7 @@ public class CheckoutService {
                 .district(request.getDistrict())
                 .ward(request.getWard())
                 .detail(request.getAddress())
+                .isDefault(hasNoDefaultAddress) // Set as default if user has no default address
                 .build();
 
         shipDetail = shipDetailRepository.save(shipDetail);
