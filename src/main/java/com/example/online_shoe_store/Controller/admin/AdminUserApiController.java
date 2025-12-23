@@ -2,10 +2,14 @@ package com.example.online_shoe_store.Controller.admin;
 
 import com.example.online_shoe_store.Entity.Order;
 import com.example.online_shoe_store.Entity.Payment;
+import com.example.online_shoe_store.Entity.Review;
 import com.example.online_shoe_store.Entity.User;
 import com.example.online_shoe_store.Entity.enums.Role;
 import com.example.online_shoe_store.Repository.OrderRepository;
+import com.example.online_shoe_store.Repository.ReviewRepository;
 import com.example.online_shoe_store.Repository.UserRepository;
+import com.example.online_shoe_store.dto.response.ReviewResponse;
+import com.example.online_shoe_store.mapper.ReviewMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,28 +30,33 @@ public class AdminUserApiController {
 
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewMapper reviewMapper;
 
     @GetMapping
     public List<UserSummary> listUsers(@RequestParam(value = "search", required = false) String search,
-                                       @RequestParam(value = "role", required = false) String role,
-                                       @RequestParam(value = "active", required = false) Boolean active,
-                                       @RequestParam(value = "sort", required = false, defaultValue = "createdAt") String sort,
-                                       @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "active", required = false) Boolean active,
+            @RequestParam(value = "sort", required = false, defaultValue = "createdAt") String sort,
+            @RequestParam(value = "dir", required = false, defaultValue = "desc") String dir) {
         return userRepository.findAll().stream()
                 .map(UserSummary::from)
                 .filter(u -> {
-                    if (search == null || search.isBlank()) return true;
+                    if (search == null || search.isBlank())
+                        return true;
                     String kw = search.toLowerCase();
                     return (u.getUsername() != null && u.getUsername().toLowerCase().contains(kw)) ||
                             (u.getEmail() != null && u.getEmail().toLowerCase().contains(kw)) ||
                             (u.getPhone() != null && u.getPhone().toLowerCase().contains(kw));
                 })
                 .filter(u -> {
-                    if (role == null || role.isBlank()) return true;
+                    if (role == null || role.isBlank())
+                        return true;
                     return role.equalsIgnoreCase(u.getRole());
                 })
                 .filter(u -> {
-                    if (active == null) return true;
+                    if (active == null)
+                        return true;
                     return Boolean.TRUE.equals(active) == Boolean.TRUE.equals(u.getIsActive());
                 })
                 .sorted((a, b) -> {
@@ -58,9 +67,12 @@ public class AdminUserApiController {
                         case "email":
                             return multiplier * nullSafeCompare(a.getEmail(), b.getEmail());
                         default: // createdAt
-                            if (a.getCreatedAt() == null && b.getCreatedAt() == null) return 0;
-                            if (a.getCreatedAt() == null) return 1;
-                            if (b.getCreatedAt() == null) return -1;
+                            if (a.getCreatedAt() == null && b.getCreatedAt() == null)
+                                return 0;
+                            if (a.getCreatedAt() == null)
+                                return 1;
+                            if (b.getCreatedAt() == null)
+                                return -1;
                             return multiplier * a.getCreatedAt().compareTo(b.getCreatedAt());
                     }
                 })
@@ -92,6 +104,16 @@ public class AdminUserApiController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Lấy danh sách đánh giá của user
+     */
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<ReviewResponse>> getUserReviews(@PathVariable("id") String userId) {
+        List<Review> reviews = reviewRepository.findByUserIdOrderByReviewDateDesc(userId);
+        List<ReviewResponse> responses = reviewMapper.toReviewResponseList(reviews);
+        return ResponseEntity.ok(responses);
+    }
+
     @PatchMapping("/{id}/toggle-active")
     public ResponseEntity<?> toggleActive(@PathVariable("id") String userId) {
         return userRepository.findById(userId)
@@ -100,15 +122,14 @@ public class AdminUserApiController {
                     userRepository.save(user);
                     return ResponseEntity.ok(Map.of(
                             "userId", user.getUserId(),
-                            "isActive", user.getIsActive()
-                    ));
+                            "isActive", user.getIsActive()));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/role")
     public ResponseEntity<?> updateRole(@PathVariable("id") String userId,
-                                        @RequestBody RoleUpdateRequest request) {
+            @RequestBody RoleUpdateRequest request) {
         if (request == null || request.getRole() == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "role is required"));
         }
@@ -125,8 +146,7 @@ public class AdminUserApiController {
                     userRepository.save(user);
                     return ResponseEntity.ok(Map.of(
                             "userId", user.getUserId(),
-                            "role", user.getRole().name()
-                    ));
+                            "role", user.getRole().name()));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -193,19 +213,23 @@ public class AdminUserApiController {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             stats.setTotalSpend(spend);
 
-                stats.setAverageOrderValue(spend.divide(BigDecimal.valueOf(orders.size()), 2, RoundingMode.HALF_UP));
+            stats.setAverageOrderValue(spend.divide(BigDecimal.valueOf(orders.size()), 2, RoundingMode.HALF_UP));
 
-                int items = orders.stream()
+            int items = orders.stream()
                     .flatMap(o -> o.getOrderItems() != null ? o.getOrderItems().stream() : Stream.empty())
                     .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 0)
                     .sum();
             stats.setTotalItems(items);
 
-            stats.setCompletedOrders((int) orders.stream().filter(o -> o.getStatus() != null && o.getStatus().name().equalsIgnoreCase("COMPLETED")).count());
-            stats.setPendingOrders((int) orders.stream().filter(o -> o.getStatus() != null && o.getStatus().name().equalsIgnoreCase("PENDING")).count());
+            stats.setCompletedOrders((int) orders.stream()
+                    .filter(o -> o.getStatus() != null && o.getStatus().name().equalsIgnoreCase("COMPLETED")).count());
+            stats.setPendingOrders((int) orders.stream()
+                    .filter(o -> o.getStatus() != null && o.getStatus().name().equalsIgnoreCase("PENDING")).count());
 
-            stats.setLastOrderAt(orders.stream().map(Order::getOrderDate).filter(d -> d != null).max(LocalDateTime::compareTo).orElse(null));
-            stats.setFirstOrderAt(orders.stream().map(Order::getOrderDate).filter(d -> d != null).min(LocalDateTime::compareTo).orElse(null));
+            stats.setLastOrderAt(orders.stream().map(Order::getOrderDate).filter(d -> d != null)
+                    .max(LocalDateTime::compareTo).orElse(null));
+            stats.setFirstOrderAt(orders.stream().map(Order::getOrderDate).filter(d -> d != null)
+                    .min(LocalDateTime::compareTo).orElse(null));
             return stats;
         }
     }
@@ -247,9 +271,12 @@ public class AdminUserApiController {
     }
 
     private int nullSafeCompare(String a, String b) {
-        if (a == null && b == null) return 0;
-        if (a == null) return 1;
-        if (b == null) return -1;
+        if (a == null && b == null)
+            return 0;
+        if (a == null)
+            return 1;
+        if (b == null)
+            return -1;
         return a.compareToIgnoreCase(b);
     }
 

@@ -3,7 +3,7 @@
  * Xử lý fetch dữ liệu và render UI cho phần đánh giá trong trang profile
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Khởi tạo khi tab reviews được click
     const reviewsTabBtn = document.querySelector('[data-tab="reviews"]');
     if (reviewsTabBtn) {
@@ -220,8 +220,9 @@ function renderCompletedReview(review) {
 
 /**
  * Mở modal đánh giá cho sản phẩm cụ thể
+ * Gán vào window để có thể gọi từ onclick trong HTML
  */
-function openReviewModalForItem(variantId, productName, color, size, imageUrl) {
+window.openReviewModalForItem = function (variantId, productName, color, size, imageUrl) {
     const modal = document.getElementById('reviewModal');
 
     // Lưu variantId vào form
