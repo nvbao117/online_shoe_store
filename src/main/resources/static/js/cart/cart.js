@@ -51,9 +51,16 @@ const renderCartItems = (items) => {
                        onchange="calculateTotal()">
 
                 <div class="flex gap-4 flex-1">
-                    <img src="${item.imageUrl}" class="w-24 h-24 object-cover border border-gray-200 rounded-md">
+                    <a href="/product-detail/${item.productId}"
+   class="shrink-0 no-underline text-inherit hover:text-inherit visited:text-inherit focus:outline-none active:text-inherit">
+    <img src="${item.imageUrl}"
+         class="w-24 h-24 object-cover border border-gray-200 rounded-md">
+</a>
                     <div class="flex flex-col justify-between py-1">
-                        <h3 class="text-gray-800 font-medium line-clamp-2 text-base">${item.productName}</h3>
+                        <a href="/product-detail/${item.productId}"
+   class="no-underline text-inherit hover:text-inherit visited:text-inherit focus:outline-none active:text-inherit">
+                            <h3 class="text-gray-800 font-medium line-clamp-2 text-base">${item.productName}</h3>
+                        </a>
                         <div class="relative group cursor-pointer w-fit" onclick="openVariantModal('${item.productName}', '${item.productId}', '${item.cartItemId}')">
                             <div class="flex items-center gap-1 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 border border-transparent hover:border-gray-300 transition">
                                 <span>Phân loại: <b>Size ${item.size}, ${item.color}</b></span>
