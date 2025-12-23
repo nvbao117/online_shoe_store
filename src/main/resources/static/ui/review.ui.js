@@ -116,8 +116,8 @@ export function renderReviewItem(review) {
         minute: '2-digit'
     });
 
-    // Mask username for privacy
-    const maskedUsername = maskUsername(username);
+    // Hiển thị tên đầy đủ hoặc "Ẩn danh" nếu không có
+    const displayName = username || 'Ẩn danh';
 
     // Review images
     let imagesHtml = '';
@@ -148,7 +148,7 @@ export function renderReviewItem(review) {
                 
                 <!-- Content -->
                 <div class="flex-grow-1">
-                    <div class="fw-semibold">${maskedUsername}</div>
+                    <div class="fw-semibold">${displayName}</div>
                     <div class="mb-1">${renderStars(rating)}</div>
                     <div class="text-muted small mb-2">
                         ${formattedDate} | Phân loại: ${variantColor || ''} - Size ${variantSize || ''}

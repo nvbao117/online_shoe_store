@@ -10,33 +10,38 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${app.storage.products}")
-    private String productsDir;
+        @Value("${app.storage.products}")
+        private String productsDir;
 
-    @Value("${app.storage.categories}")
-    private String categoriesDir;
+        @Value("${app.storage.categories}")
+        private String categoriesDir;
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String productsLocation = "file:" + (productsDir.endsWith("/") ? productsDir : productsDir + "/");
-        String categoriesLocation = "file:" + (categoriesDir.endsWith("/") ? categoriesDir : categoriesDir + "/");
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                String productsLocation = "file:" + (productsDir.endsWith("/") ? productsDir : productsDir + "/");
+                String categoriesLocation = "file:"
+                                + (categoriesDir.endsWith("/") ? categoriesDir : categoriesDir + "/");
 
-        registry.addResourceHandler("/images/products/**")
-                .addResourceLocations(productsLocation);
+                registry.addResourceHandler("/images/products/**")
+                                .addResourceLocations(productsLocation);
 
-        registry.addResourceHandler("/images/categories/**")
-                .addResourceLocations(categoriesLocation);
+                registry.addResourceHandler("/images/categories/**")
+                                .addResourceLocations(categoriesLocation);
 
-        // tương thích ngược
-        registry.addResourceHandler("/src/data/images/products/**")
-                .addResourceLocations(productsLocation);
+                // Review images - lưu trong data/images/reviews
+                registry.addResourceHandler("/images/reviews/**")
+                                .addResourceLocations("file:data/images/reviews/");
 
-        registry.addResourceHandler("/src/data/images/categories/**")
-                .addResourceLocations(categoriesLocation);
-    }
+                // tương thích ngược
+                registry.addResourceHandler("/src/data/images/products/**")
+                                .addResourceLocations(productsLocation);
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+                registry.addResourceHandler("/src/data/images/categories/**")
+                                .addResourceLocations(categoriesLocation);
+        }
+
+        @Bean
+        public RestTemplate restTemplate() {
+                return new RestTemplate();
+        }
 }
