@@ -101,6 +101,7 @@ public class ProductSearchTools {
                         sb.append("\n   💰 ").append(formatPrice(p.getPrice())).append("\n");
                     }
                     sb.append("\nBạn muốn xem chi tiết sản phẩm nào?");
+                    log.info(sb.toString());
                     return sb.toString();
                 }
             }
@@ -136,7 +137,7 @@ public class ProductSearchTools {
             sb.append("\nMô tả: ").append(desc).append("\n");
         }
         
-        sb.append("\nXem đầy đủ: ").append(productDetailUrl(product.getProductId()));
+        sb.append("\nXem chi tiết: ").append(productDetailUrl(product.getProductId()));
         
         return sb.toString();
     }
@@ -164,7 +165,7 @@ public class ProductSearchTools {
         
         try {
             // Search trong vector store (RAG)
-            List<ProductRAGResponse> ragResults = productRAGService.searchProducts(query, limit, 0.35);
+            List<ProductRAGResponse> ragResults = productRAGService.searchProducts(query, limit, 0.7);
 
             if (ragResults.isEmpty()) {
                 return "Không tìm thấy sản phẩm phù hợp với mô tả: \"" + query + "\"\n" +
@@ -205,13 +206,14 @@ public class ProductSearchTools {
                     result.append("Chi tiết: ").append(productDetailUrl(p.getProductId())).append("\n");
                 }
 
-                if (p.getImageUrl() != null && !p.getImageUrl().isBlank()) {
-                    result.append("Ảnh: ").append(p.getImageUrl()).append("\n");
+                String img = toPublicProductImageUrl(p.getImageUrl());
+                if (img != null && !img.isBlank()) {
+                    result.append("Ảnh: ").append(img).append("\n");
                 }
 
                 result.append("\n");
             }
-
+            log.info(result.toString().trim());
             return result.toString().trim();
             
         } catch (Exception e) {
@@ -278,11 +280,11 @@ public class ProductSearchTools {
                     result.append(" | ").append(product.getCategory().getName());
                 }
                 result.append("\n");
-                result.append("   🔗 ").append(productDetailUrl(product.getProductId())).append("\n");
+                result.append("   Chi tiết: ").append(productDetailUrl(product.getProductId())).append("\n");
 
                 String img = toPublicProductImageUrl(product.getImageUrl());
                 if (img != null && !img.isBlank()) {
-                    result.append("   🖼️ ").append(img).append("\n");
+                    result.append("   Ảnh: ").append(img).append("\n");
                 }
             }
             

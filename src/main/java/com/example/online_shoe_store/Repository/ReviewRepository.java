@@ -15,7 +15,8 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     /**
      * Lấy danh sách đánh giá của user, sắp xếp theo ngày mới nhất
      */
-    List<Review> findByUserOrderByReviewDateDesc(User user);
+    @Query("SELECT DISTINCT r FROM Review r LEFT JOIN FETCH r.reviewImages WHERE r.user = :user ORDER BY r.reviewDate DESC")
+    List<Review> findByUserOrderByReviewDateDesc(@Param("user") User user);
 
     /**
      * Kiểm tra user đã đánh giá variant này chưa
@@ -25,18 +26,19 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     /**
      * Lấy danh sách đánh giá của sản phẩm variant
      */
-    List<Review> findByProductVariantOrderByReviewDateDesc(ProductVariant productVariant);
+    @Query("SELECT DISTINCT r FROM Review r LEFT JOIN FETCH r.reviewImages WHERE r.productVariant = :variant ORDER BY r.reviewDate DESC")
+    List<Review> findByProductVariantOrderByReviewDateDesc(@Param("variant") ProductVariant productVariant);
 
     /**
      * Lấy tất cả đánh giá của sản phẩm (qua tất cả variants)
      */
-    @Query("SELECT r FROM Review r WHERE r.productVariant.product.productId = :productId ORDER BY r.reviewDate DESC")
+    @Query("SELECT DISTINCT r FROM Review r LEFT JOIN FETCH r.reviewImages WHERE r.productVariant.product.productId = :productId ORDER BY r.reviewDate DESC")
     List<Review> findByProductIdOrderByReviewDateDesc(@Param("productId") String productId);
 
     /**
      * Lấy đánh giá theo rating cho sản phẩm
      */
-    @Query("SELECT r FROM Review r WHERE r.productVariant.product.productId = :productId AND r.rating = :rating ORDER BY r.reviewDate DESC")
+    @Query("SELECT DISTINCT r FROM Review r LEFT JOIN FETCH r.reviewImages WHERE r.productVariant.product.productId = :productId AND r.rating = :rating ORDER BY r.reviewDate DESC")
     List<Review> findByProductIdAndRatingOrderByReviewDateDesc(@Param("productId") String productId,
             @Param("rating") Integer rating);
 
@@ -45,5 +47,11 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
      */
     @Query("SELECT r.rating, COUNT(r) FROM Review r WHERE r.productVariant.product.productId = :productId GROUP BY r.rating")
     List<Object[]> countByProductIdGroupByRating(@Param("productId") String productId);
+
+    /**
+     * Lấy danh sách đánh giá theo userId (cho admin)
+     */
+    @Query("SELECT DISTINCT r FROM Review r LEFT JOIN FETCH r.reviewImages WHERE r.user.userId = :userId ORDER BY r.reviewDate DESC")
+    List<Review> findByUserIdOrderByReviewDateDesc(@Param("userId") String userId);
 
 }

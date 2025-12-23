@@ -59,9 +59,7 @@ export async function updateProduct(productId, data) {
  * Xóa sản phẩm
  */
 export async function deleteProduct(productId) {
-    const res = await fetch(`${BASE_URL}/${productId}`, {
-        method: 'DELETE'
-    });
+    const res = await fetch(`${BASE_URL}/${productId}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete product');
     return res.json();
 }
@@ -105,9 +103,7 @@ export async function updateVariant(variantId, data) {
  * Xóa variant
  */
 export async function deleteVariant(variantId) {
-    const res = await fetch(`${BASE_URL}/variants/${variantId}`, {
-        method: 'DELETE'
-    });
+    const res = await fetch(`${BASE_URL}/variants/${variantId}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete variant');
     return res.json();
 }

@@ -14,6 +14,7 @@ const loadCart = () => {
 
         // Xử lý logic Mua ngay sau khi render xong
         checkBuyNowParams();
+        checkBuyAgainParams();
     });
 };
 
@@ -50,9 +51,16 @@ const renderCartItems = (items) => {
                        onchange="calculateTotal()">
 
                 <div class="flex gap-4 flex-1">
-                    <img src="${item.imageUrl}" class="w-24 h-24 object-cover border border-gray-200 rounded-md">
+                    <a href="/product-detail/${item.productId}"
+   class="shrink-0 no-underline text-inherit hover:text-inherit visited:text-inherit focus:outline-none active:text-inherit">
+    <img src="${item.imageUrl}"
+         class="w-24 h-24 object-cover border border-gray-200 rounded-md">
+</a>
                     <div class="flex flex-col justify-between py-1">
-                        <h3 class="text-gray-800 font-medium line-clamp-2 text-base">${item.productName}</h3>
+                        <a href="/product-detail/${item.productId}"
+   class="no-underline text-inherit hover:text-inherit visited:text-inherit focus:outline-none active:text-inherit">
+                            <h3 class="text-gray-800 font-medium line-clamp-2 text-base">${item.productName}</h3>
+                        </a>
                         <div class="relative group cursor-pointer w-fit" onclick="openVariantModal('${item.productName}', '${item.productId}', '${item.cartItemId}')">
                             <div class="flex items-center gap-1 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded hover:bg-gray-200 border border-transparent hover:border-gray-300 transition">
                                 <span>Phân loại: <b>Size ${item.size}, ${item.color}</b></span>
@@ -89,34 +97,96 @@ const renderCartItems = (items) => {
     calculateTotal();
 };
 
+// --- 1. XỬ LÝ MUA NGAY (Logic cũ, dùng URL param) ---
 const checkBuyNowParams = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const buyNowId = urlParams.get('buyNowItem');
     const buyNowSize = urlParams.get('size');
 
     if (buyNowId) {
-        const checkboxes = document.querySelectorAll('.item-checkbox');
         let found = false;
-
-        checkboxes.forEach(chk => {
+        document.querySelectorAll('.item-checkbox').forEach(chk => {
             const pId = chk.getAttribute('data-pid');
             const pSize = chk.getAttribute('data-size');
-            const isMatch = (pId === buyNowId) && (!buyNowSize || pSize == buyNowSize);
 
-            if (isMatch) {
+            // Logic cũ: ID chính xác, Size lỏng
+            if (String(pId) === String(buyNowId) && (!buyNowSize || String(pSize) == String(buyNowSize))) {
                 chk.checked = true;
                 found = true;
-                chk.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                const row = chk.closest('.bg-white');
-                if (row) {
-                    row.style.transition = "background-color 0.5s";
-                    row.style.backgroundColor = "#e0f2fe";
-                    setTimeout(() => { row.style.backgroundColor = "#ffffff"; }, 1000);
-                }
+                highlightRow(chk);
             }
         });
-        if (found) calculateTotal();
+
+        if (found) {
+            calculateTotal();
+            scrollToCart();
+        }
     }
+};
+
+// --- 2. XỬ LÝ MUA LẠI (Logic mới, dùng LocalStorage) ---
+const checkBuyAgainParams = () => {
+    // 1. Lấy dữ liệu từ LocalStorage
+    const stored = localStorage.getItem('cart_selected_items');
+    if (!stored) return;
+
+    let targets = [];
+    try {
+        targets = JSON.parse(stored);
+        console.log("Load từ LocalStorage:", targets);
+
+        // Xóa ngay để tránh load lại khi F5
+        localStorage.removeItem('cart_selected_items');
+    } catch (e) {
+        console.error("Lỗi parse LocalStorage:", e);
+        return;
+    }
+
+    if (!targets || targets.length === 0) return;
+
+    let found = false;
+    document.querySelectorAll('.item-checkbox').forEach(chk => {
+        const rawPid = chk.getAttribute('data-pid');
+        const rawSize = chk.getAttribute('data-size');
+
+        // Normalize
+        const pId = String(rawPid).trim().toLowerCase();
+        const pSize = String(rawSize).trim().toLowerCase();
+
+        // Check match trong list targets
+        const isMatch = targets.some(t => {
+            const tPid = String(t.productId || t.pid).trim().toLowerCase();
+            const tSize = String(t.size).trim().toLowerCase();
+            return tPid === pId && tSize === pSize;
+        });
+
+        if (isMatch) {
+            chk.checked = true;
+            found = true;
+            highlightRow(chk);
+        }
+    });
+
+    if (found) {
+        calculateTotal();
+        scrollToCart();
+    }
+};
+
+// Helper: Hiệu ứng highlight
+const highlightRow = (checkbox) => {
+    const row = checkbox.closest('.bg-white');
+    if (row) {
+        row.style.transition = "background-color 0.5s";
+        row.style.backgroundColor = "#e0f2fe";
+        setTimeout(() => { row.style.backgroundColor = "#ffffff"; }, 1500);
+    }
+};
+
+// Helper: Scroll
+const scrollToCart = () => {
+    const container = document.getElementById('cartItemsContainer');
+    if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 document.addEventListener("DOMContentLoaded", function () {

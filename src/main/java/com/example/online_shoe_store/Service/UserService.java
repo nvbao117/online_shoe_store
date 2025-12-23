@@ -11,4 +11,10 @@ public interface UserService {
      * @return true nếu đăng ký ok, false nếu lỗi
      */
     boolean register(RegisterRequest request, StringBuilder errorMessage);
+
+    boolean updateProfile(String username, com.example.online_shoe_store.dto.request.UserProfileUpdateRequest request, StringBuilder errorMessage);
+
+    boolean changePassword(String username, com.example.online_shoe_store.dto.request.ChangePasswordRequest request, StringBuilder errorMessage);
+
+    boolean resetPassword(com.example.online_shoe_store.dto.request.ForgotPasswordRequest request, StringBuilder errorMessage);
 }

@@ -53,14 +53,6 @@ export async function fetchFilteredProducts(options = {}) {
 }
 
 
-// // sort products
-// export async function fetchSortedProducts(sortBy) {
-//     const res = await fetch(`/api/products/sort?sortBy=${sortBy}`);
-//     const products = await res.json();
-//     const productContainer = document.getElementById("product-container");
-//     renderProductGrid(productContainer,products);
-// }
-
 // Fetch products by list of IDs (for image search results)
 export async function fetchProductsByIds(productIds) {
     if (!productIds || productIds.length === 0) return [];

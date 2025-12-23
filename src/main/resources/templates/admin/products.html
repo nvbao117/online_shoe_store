@@ -27,7 +27,6 @@
         <!-- Filters -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mb-6">
           <div class="p-4 flex flex-wrap items-center gap-3">
-            <!-- Search -->
             <div class="relative w-64">
               <input id="product-search" type="text" placeholder="Tìm tên sản phẩm..."
                 class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pl-10">
@@ -38,20 +37,14 @@
                 </svg>
               </span>
             </div>
-
-            <!-- Category filter -->
             <select id="filter-category"
               class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">Tất cả danh mục</option>
             </select>
-
-            <!-- Brand filter -->
             <select id="filter-brand"
               class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">Tất cả thương hiệu</option>
             </select>
-
-            <!-- Status filter -->
             <select id="filter-status"
               class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">Tất cả trạng thái</option>
@@ -59,8 +52,6 @@
               <option value="INACTIVE">Ngừng bán</option>
               <option value="OUT_OF_STOCK">Hết hàng</option>
             </select>
-
-            <!-- Sort -->
             <select id="filter-sort"
               class="h-10 rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="createdAt:desc">Mới nhất</option>
@@ -70,8 +61,6 @@
               <option value="price:asc">Giá thấp → cao</option>
               <option value="price:desc">Giá cao → thấp</option>
             </select>
-
-            <!-- Count -->
             <span id="product-count" class="ml-auto text-sm text-slate-500"></span>
           </div>
         </div>
@@ -93,9 +82,7 @@
                   <th class="px-4 py-3 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody id="product-rows" class="divide-y divide-slate-100">
-                <!-- Products will be rendered here by JS -->
-              </tbody>
+              <tbody id="product-rows" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
         </div>
@@ -103,10 +90,8 @@
     </main>
   </div>
 
-  <!-- Modal Container -->
   <div id="modal-container"></div>
 
-  <!-- Scripts -->
   <div th:replace="~{fragments/admin-layout :: scripts}"></div>
   <script type="module" src="/pages/admin-products.page.js"></script>
 

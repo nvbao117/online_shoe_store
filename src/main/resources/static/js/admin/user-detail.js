@@ -17,6 +17,7 @@
     timelineCount: document.getElementById('timeline-count'),
     timelineList: document.getElementById('timeline-list'),
     reviewsCount: document.getElementById('reviews-count'),
+    reviewsPlaceholder: document.getElementById('reviews-placeholder'),
     error: document.getElementById('error')
   };
 
@@ -31,7 +32,9 @@
   };
 
   let state = {
-    orders: []
+    orders: [],
+    reviews: [],
+    reviewsLoaded: false
   };
 
   const fmtNumber = (value, opts = {}) => {
@@ -52,6 +55,12 @@
   };
 
   const badge = (text, cls) => `<span class="px-2 py-1 rounded-full text-xs font-semibold ${cls}">${text}</span>`;
+
+  const renderStars = (rating) => {
+    const full = '★'.repeat(rating);
+    const empty = '☆'.repeat(5 - rating);
+    return `<span class="text-amber-400">${full}</span><span class="text-slate-300">${empty}</span>`;
+  };
 
   const renderOrders = () => {
     const orders = state.orders;
@@ -121,6 +130,73 @@
     `).join('');
   };
 
+  const renderReviews = () => {
+    const reviews = state.reviews;
+    el.reviewsCount.textContent = `${reviews.length} đánh giá`;
+
+    if (reviews.length === 0) {
+      el.reviewsPlaceholder.innerHTML = '<div class="text-sm text-slate-500">Chưa có đánh giá nào.</div>';
+      return;
+    }
+
+    el.reviewsPlaceholder.innerHTML = reviews.map(r => {
+      // Render review images
+      let imagesHtml = '';
+      if (r.imageUrls && r.imageUrls.length > 0) {
+        imagesHtml = `
+          <div class="flex flex-wrap gap-2 mt-2">
+            ${r.imageUrls.map(url => `
+              <img src="${url}" alt="Review image" 
+                   class="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80"
+                   onclick="window.open('${url}', '_blank')"
+                   onerror="this.style.display='none'">
+            `).join('')}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm mb-3">
+          <div class="flex gap-4">
+            <img src="${r.productImage || '/images/logo-shop/favicon.png'}" 
+                 alt="${r.productName || 'Sản phẩm'}"
+                 class="w-16 h-16 object-cover rounded-lg border"
+                 onerror="this.onerror=null; this.src='/images/logo-shop/favicon.png'">
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-slate-800 truncate">${r.productName || 'Sản phẩm'}</div>
+              <div class="text-sm text-slate-500">Phân loại: ${r.variantColor || ''} - Size ${r.variantSize || ''}</div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-lg">${renderStars(r.rating)}</span>
+                <span class="text-xs text-slate-400">${fmtDate(r.reviewDate)}</span>
+              </div>
+              ${r.comment ? `<p class="text-sm text-slate-600 mt-2">${r.comment}</p>` : ''}
+              ${imagesHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  const loadReviews = async () => {
+    if (state.reviewsLoaded) {
+      renderReviews();
+      return;
+    }
+
+    el.reviewsPlaceholder.innerHTML = '<div class="text-sm text-slate-500">Đang tải đánh giá...</div>';
+
+    try {
+      const res = await axios.get(`/api/admin/users/${userId}/reviews`);
+      state.reviews = res.data || [];
+      state.reviewsLoaded = true;
+      renderReviews();
+    } catch (err) {
+      console.error('Error loading reviews:', err);
+      el.reviewsPlaceholder.innerHTML = '<div class="text-sm text-rose-500">Lỗi khi tải đánh giá.</div>';
+    }
+  };
+
   const render = (data) => {
     const u = data.user || {};
     const stats = data.stats || {};
@@ -164,6 +240,11 @@
         Object.entries(tabs.panels).forEach(([key, panel]) => {
           if (key === target) panel.classList.remove('hidden'); else panel.classList.add('hidden');
         });
+
+        // Load reviews khi click vào tab reviews
+        if (target === 'reviews') {
+          loadReviews();
+        }
       });
     });
   };
@@ -182,3 +263,4 @@
   bindTabs();
   load();
 })();
+
