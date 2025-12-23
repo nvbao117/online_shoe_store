@@ -128,7 +128,7 @@ public class OrderConfirmationEmailService {
         context.setVariable("total", formatPrice(total));
 
         // Tracking URL
-        context.setVariable("orderTrackingUrl", baseUrl + "/order/detail/" + order.getOrderId());
+        context.setVariable("orderTrackingUrl", baseUrl + "/orders/" + order.getOrderId());
 
         return templateEngine.process("email/order-confirmation-email", context);
     }
