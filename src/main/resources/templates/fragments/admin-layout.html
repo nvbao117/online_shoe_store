@@ -347,16 +347,35 @@
     // Highlight active nav item based on current path
     const navLinks = document.querySelectorAll('.nav-link');
     const currentPath = window.location.pathname;
+
+    // First, reset ALL nav links to inactive state
+    navLinks.forEach(link => {
+      link.classList.remove('active', 'bg-blue-50', 'text-blue-600');
+      link.classList.add('text-slate-700', 'hover:bg-slate-50');
+    });
+
+    // Find the best matching link (longest path match)
+    let bestMatch = null;
+    let bestMatchLength = 0;
+
     navLinks.forEach(link => {
       const href = link.getAttribute('href');
       if (!href || href === '#') return;
 
       const linkPath = new URL(href, window.location.origin).pathname;
       if (currentPath === linkPath || currentPath.startsWith(linkPath + '/')) {
-        navLinks.forEach(l => l.classList.remove('active', 'bg-blue-50', 'text-blue-600'));
-        link.classList.add('active', 'bg-blue-50', 'text-blue-600');
+        if (linkPath.length > bestMatchLength) {
+          bestMatchLength = linkPath.length;
+          bestMatch = link;
+        }
       }
     });
+
+    // Apply active styles to the best matching link
+    if (bestMatch) {
+      bestMatch.classList.remove('text-slate-700', 'hover:bg-slate-50');
+      bestMatch.classList.add('active', 'bg-blue-50', 'text-blue-600');
+    }
   </script>
 </div>
 
