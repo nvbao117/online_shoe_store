@@ -100,7 +100,7 @@ class ShoeStoreChatbot {
         this.setHidden(this.conversationView, false);
 
         if (this.messagesContainer.children.length === 0) {
-            this.addMessage("Xin chào! 👋 Chào mừng bạn đến với **5A Store**!\nMình là trợ lý ảo, sẵn sàng hỗ trợ bạn:\n- 🔍 Tìm kiếm giày phù hợp\n- 💰 Tư vấn giá cả\n- 📦 Tra cứu đơn hàng\n\nBạn cần hỗ trợ gì ạ?", 'bot');
+            this.addMessage("Xin chào! 👋 Chào mừng bạn đến với **5A Store**!\nMình là trợ lý ảo, sẵn sàng hỗ trợ bạn:\n- Tìm kiếm giày phù hợp\n- Tư vấn giá cả\n- Hỗ trợ các vấn đề của người dùng\n\nBạn cần hỗ trợ gì ạ?", 'bot');
         }
     }
 

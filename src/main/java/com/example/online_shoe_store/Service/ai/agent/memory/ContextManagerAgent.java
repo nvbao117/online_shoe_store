@@ -34,9 +34,7 @@ public interface ContextManagerAgent {
         
         - Nếu không cần context:
           "User Request: <yêu cầu>"
-          
-        
-        
+
         QUY TẮC:
         1. Dùng tiếng việt
         2. Mục tiêu duy nhất: Giúp agent sau (Router/Product/Order) hiểu rõ User muốn gì, cần thêm những gì.

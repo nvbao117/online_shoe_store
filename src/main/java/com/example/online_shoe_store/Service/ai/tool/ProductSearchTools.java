@@ -225,7 +225,32 @@ public class ProductSearchTools {
     // =========================================
     // FILTER PRODUCTS TOOL
     // =========================================
-
+    @Tool("Trả bảng size giày chuẩn")
+    public String sizeGuide(){
+        return """
+            # Bảng Size Giày Chuẩn Việt Nam
+            
+            ## 👨 Nam
+            | Chân(CM) | VN | US | EU   | UK  |
+            |----------|----|----|------|-----|
+            | 24.0     | 38 | 6  | 38⅔  | 5½  |
+            | 25.0     | 40 | 7  | 40   | 6½  |
+            | 26.0     | 41 | 8  | 41⅓  | 7½  |
+            | 27.0     | 42 | 9  | 42   | 8½  |
+            | 28.0     | 44 | 10 | 44⅓  | 9½  |
+            
+            ## 👩 Nữ
+            | Chân(CM) | VN | US | EU   | UK |
+            |----------|----|----|------|----|
+            | 23.0     | 36 | 5½ | 36   | 3  |
+            | 24.0     | 38 | 6½ | 38⅔  | 4½ |
+            | 25.0     | 39 | 7  | 39   | 5½ |
+            | 25.5     | 40 | 7½ | 40   | 6  |
+            | 26.0     | 41 | 8  | 41⅓  | 7  |
+            
+            **📏 Đo chân: Chiều dài gót→mũi + 1.5cm**
+            """;
+    }
     @Tool(name = "filterProducts", value = """
         Lọc sản phẩm theo tiêu chí cụ thể.
         Sử dụng khi khách hàng nêu tiêu chí rõ ràng như thương hiệu, giá, danh mục.
