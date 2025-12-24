@@ -13,6 +13,13 @@ export function formatDate(value) {
     return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+export function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 export function renderStatusBadge(status) {
     const map = {
         ACTIVE: { cls: 'bg-emerald-100 text-emerald-700', text: 'Đang bán' },
@@ -39,7 +46,7 @@ export function renderProductImage(imageUrl, name) {
         </div>`;
     }
     const url = normalizeImageUrl(imageUrl);
-    return `<img src="${url}" alt="${name || 'Product'}" class="w-12 h-12 object-cover rounded-lg border border-slate-200" onerror="this.src='/images/no-image.png'">`;
+    return `<img src="${url}" alt="${escapeHtml(name) || 'Product'}" class="w-12 h-12 object-cover rounded-lg border border-slate-200" onerror="this.src='/images/no-image.png'">`;
 }
 
 export function renderProductRow(product, isExpanded = false) {
@@ -54,12 +61,12 @@ export function renderProductRow(product, isExpanded = false) {
             </td>
             <td class="px-4 py-3">${renderProductImage(product.imageUrl, product.name)}</td>
             <td class="px-4 py-3">
-                <div class="font-medium text-slate-800">${product.name || ''}</div>
-                <div class="text-xs text-slate-500 truncate max-w-xs">${product.description || ''}</div>
+                <div class="font-medium text-slate-800">${escapeHtml(product.name)}</div>
+                <div class="text-xs text-slate-500 truncate max-w-xs">${escapeHtml(product.description)}</div>
             </td>
             <td class="px-4 py-3 text-slate-700 font-medium">${formatMoney(product.price)}</td>
-            <td class="px-4 py-3 text-slate-600">${product.brandName || '—'}</td>
-            <td class="px-4 py-3 text-slate-600">${product.categoryName || '—'}</td>
+            <td class="px-4 py-3 text-slate-600">${escapeHtml(product.brandName) || '—'}</td>
+            <td class="px-4 py-3 text-slate-600">${escapeHtml(product.categoryName) || '—'}</td>
             <td class="px-4 py-3">${renderStatusBadge(product.status)}</td>
             <td class="px-4 py-3 text-center">
                 <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
@@ -153,8 +160,9 @@ export function renderProductTable(products, expandedIds = new Set()) {
 export function renderProductModal(product = null, categories = [], brands = []) {
     const isEdit = !!product;
     const title = isEdit ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới';
-    const categoryOptions = categories.map(c => `<option value="${c.value}" ${product?.categoryId === c.value ? 'selected' : ''}>${c.label}</option>`).join('');
-    const brandOptions = brands.map(b => `<option value="${b.value}" ${product?.brandId === b.value ? 'selected' : ''}>${b.label}</option>`).join('');
+    const categoryOptions = categories.map(c => `<option value="${c.value}" ${product?.categoryId === c.value ? 'selected' : ''}>${escapeHtml(c.label)}</option>`).join('');
+    const brandOptions = brands.map(b => `<option value="${b.value}" ${product?.brandId === b.value ? 'selected' : ''}>${escapeHtml(b.label)}</option>`).join('');
+    const currentImageUrl = product?.imageUrl ? normalizeImageUrl(product.imageUrl) : null;
 
     return `
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="product-modal">
@@ -167,13 +175,14 @@ export function renderProductModal(product = null, categories = [], brands = [])
                 </div>
                 <form id="product-form" class="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
                     <input type="hidden" name="productId" value="${product?.productId || ''}">
+                    <input type="hidden" name="imageUrl" id="product-image-url" value="${product?.imageUrl || ''}">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Tên sản phẩm *</label>
-                        <input type="text" name="name" value="${product?.name || ''}" required class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" name="name" value="${escapeHtml(product?.name || '')}" required class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Mô tả</label>
-                        <textarea name="description" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">${product?.description || ''}</textarea>
+                        <textarea name="description" rows="3" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">${escapeHtml(product?.description || '')}</textarea>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -204,13 +213,31 @@ export function renderProductModal(product = null, categories = [], brands = [])
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">URL hình ảnh</label>
-                        <input type="text" name="imageUrl" value="${product?.imageUrl || ''}" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="/images/products/example.jpg">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Hình ảnh sản phẩm <span class="text-rose-500">*</span></label>
+                        <div class="flex items-start gap-4">
+                            <div id="product-image-preview" class="w-24 h-24 bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
+                                ${currentImageUrl
+            ? `<img src="${currentImageUrl}" alt="Preview" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<svg class=\\'w-8 h-8 text-slate-400\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'></path></svg>'">`
+            : `<svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`
+        }
+                            </div>
+                            <div class="flex-1">
+                                <label class="block w-full cursor-pointer">
+                                    <input type="file" name="imageFile" id="product-image-file" accept="image/*" class="hidden">
+                                    <div class="px-4 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium hover:bg-blue-100 transition flex items-center justify-center gap-2 border border-blue-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                        Chọn ảnh từ máy
+                                    </div>
+                                </label>
+                                <p class="text-xs text-slate-500 mt-2">PNG, JPG, WEBP. Tối đa 5MB</p>
+                                <div id="upload-status" class="text-xs mt-1 hidden"></div>
+                            </div>
+                        </div>
                     </div>
                 </form>
                 <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
                     <button type="button" class="close-modal-btn px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition">Hủy</button>
-                    <button type="submit" form="product-form" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium">${isEdit ? 'Lưu thay đổi' : 'Thêm sản phẩm'}</button>
+                    <button type="submit" form="product-form" id="submit-product-btn" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium">${isEdit ? 'Lưu thay đổi' : 'Thêm sản phẩm'}</button>
                 </div>
             </div>
         </div>
@@ -220,6 +247,7 @@ export function renderProductModal(product = null, categories = [], brands = [])
 export function renderVariantModal(productId, variant = null) {
     const isEdit = !!variant;
     const title = isEdit ? 'Sửa Variant' : 'Thêm Variant mới';
+    const currentImageUrl = variant?.imageUrl ? normalizeImageUrl(variant.imageUrl) : null;
 
     return `
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" id="variant-modal">
@@ -230,9 +258,10 @@ export function renderVariantModal(productId, variant = null) {
                         <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <form id="variant-form" class="p-6 space-y-4">
+                <form id="variant-form" class="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
                     <input type="hidden" name="variantId" value="${variant?.variantId || ''}">
                     <input type="hidden" name="productId" value="${productId}">
+                    <input type="hidden" name="imageUrl" id="variant-image-url" value="${variant?.imageUrl || ''}">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Size *</label>
@@ -248,18 +277,37 @@ export function renderVariantModal(productId, variant = null) {
                         <input type="number" name="stock" value="${variant?.stock || 0}" min="0" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">URL hình ảnh</label>
-                        <input type="text" name="imageUrl" value="${variant?.imageUrl || ''}" class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="/images/products/variant.jpg">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Hình ảnh variant <span class="text-rose-500">*</span></label>
+                        <div class="flex items-start gap-4">
+                            <div id="variant-image-preview" class="w-20 h-20 bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
+                                ${currentImageUrl
+            ? `<img src="${currentImageUrl}" alt="Preview" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<svg class=\\'w-6 h-6 text-slate-400\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'></path></svg>'">`
+            : `<svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`
+        }
+                            </div>
+                            <div class="flex-1">
+                                <label class="block w-full cursor-pointer">
+                                    <input type="file" name="variantImageFile" id="variant-image-file" accept="image/*" class="hidden">
+                                    <div class="px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium hover:bg-blue-100 transition flex items-center justify-center gap-2 border border-blue-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                        Chọn ảnh
+                                    </div>
+                                </label>
+                                <p class="text-xs text-slate-500 mt-1">PNG, JPG. Max 5MB</p>
+                                <div id="variant-upload-status" class="text-xs mt-1 hidden"></div>
+                            </div>
+                        </div>
                     </div>
                 </form>
                 <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
                     <button type="button" class="close-modal-btn px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition">Hủy</button>
-                    <button type="submit" form="variant-form" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium">${isEdit ? 'Lưu thay đổi' : 'Thêm variant'}</button>
+                    <button type="submit" form="variant-form" id="submit-variant-btn" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium">${isEdit ? 'Lưu thay đổi' : 'Thêm variant'}</button>
                 </div>
             </div>
         </div>
     `;
 }
+
 
 export function renderDeleteConfirmModal(type, name) {
     const typeText = type === 'product' ? 'sản phẩm' : 'variant';
@@ -271,7 +319,7 @@ export function renderDeleteConfirmModal(type, name) {
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <h3 class="text-lg font-semibold text-slate-800 mb-2">Xác nhận xóa</h3>
-                    <p class="text-slate-600 mb-6">Bạn có chắc muốn xóa ${typeText} <strong>${name}</strong>?</p>
+                    <p class="text-slate-600 mb-6">Bạn có chắc muốn xóa ${typeText} <strong>${escapeHtml(name)}</strong>?</p>
                     <div class="flex gap-3">
                         <button class="close-modal-btn flex-1 px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">Hủy</button>
                         <button class="confirm-delete-btn flex-1 px-4 py-2 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition font-medium">Xóa</button>
@@ -292,5 +340,5 @@ export function renderLoading() {
 }
 
 export function renderSelectOptions(options, selectedValue = '') {
-    return options.map(opt => `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${opt.label}</option>`).join('');
+    return options.map(opt => `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${escapeHtml(opt.label)}</option>`).join('');
 }

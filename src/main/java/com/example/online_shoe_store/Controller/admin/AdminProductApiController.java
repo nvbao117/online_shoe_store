@@ -7,8 +7,13 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +27,8 @@ public class AdminProductApiController {
     private final ProductVariantRepository variantRepository;
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
+
+    private static final String PRODUCT_IMAGES_DIR = "data/images/products";
 
     // ===================== PRODUCT ENDPOINTS =====================
 
@@ -45,12 +52,12 @@ public class AdminProductApiController {
                 .filter(p -> {
                     if (categoryId == null || categoryId.isBlank())
                         return true;
-                    return categoryId.equals(p.getCategoryId());
+                    return Objects.equals(categoryId, p.getCategoryId());
                 })
                 .filter(p -> {
                     if (brandId == null || brandId.isBlank())
                         return true;
-                    return brandId.equals(p.getBrandId());
+                    return Objects.equals(brandId, p.getBrandId());
                 })
                 .filter(p -> {
                     if (status == null || status.isBlank())
@@ -93,6 +100,11 @@ public class AdminProductApiController {
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductFormData form) {
+        // Validate required image
+        if (form.getImageUrl() == null || form.getImageUrl().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Vui lòng tải ảnh sản phẩm lên"));
+        }
+
         Product product = new Product();
         product.setProductId(UUID.randomUUID().toString());
         product.setName(form.getName());
@@ -115,6 +127,11 @@ public class AdminProductApiController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable("id") String productId, @RequestBody ProductFormData form) {
+        // Validate required image
+        if (form.getImageUrl() == null || form.getImageUrl().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Vui lòng tải ảnh sản phẩm lên"));
+        }
+
         return productRepository.findById(productId)
                 .map(product -> {
                     product.setName(form.getName());
@@ -221,6 +238,42 @@ public class AdminProductApiController {
                 .filter(b -> Boolean.TRUE.equals(b.getIsActive()))
                 .map(b -> new OptionItem(b.getBrandId(), b.getName()))
                 .collect(Collectors.toList());
+    }
+
+    // ===================== IMAGE UPLOAD =====================
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<?> uploadProductImage(@RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Vui lòng chọn file ảnh"));
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Chỉ chấp nhận file ảnh"));
+        }
+
+        try {
+            Path uploadDir = Paths.get(PRODUCT_IMAGES_DIR);
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename != null && originalFilename.contains(".")
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".jpg";
+            String newFilename = UUID.randomUUID().toString() + extension;
+
+            Path filePath = uploadDir.resolve(newFilename);
+            Files.copy(file.getInputStream(), filePath);
+
+            String imageUrl = "/images/products/" + newFilename;
+            return ResponseEntity.ok(Map.of("imageUrl", imageUrl, "filename", newFilename));
+
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Lỗi upload ảnh: " + e.getMessage()));
+        }
     }
 
     // ===================== DTOs =====================
