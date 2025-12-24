@@ -22,6 +22,7 @@ public interface IntentRouter {
         
         BẢNG PHÂN LOẠI:
         - PRODUCT: 
+          + Tư vấn size giày
           + Mua giày, tìm giày, hỏi giá, size, màu sắc.
           + Follow-up: "cho xem", "cái đó", "nó", "số 1", "màu đen có không".
           + Nếu ngữ cảnh đang nói về giày -> câu hỏi ngắn như "còn hàng không" là PRODUCT.
@@ -41,6 +42,6 @@ public interface IntentRouter {
         Input:
         {{request}}
         """)
-    @Agent(description = "Categorizes a user request")
+    @Agent(description = "Phân loại ý định (Intent) từ văn bản mô tả ngữ cảnh.")
     IntentCategory classify(@UserMessage @V("request") String request);
 }

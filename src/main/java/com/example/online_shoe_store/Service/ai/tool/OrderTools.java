@@ -123,127 +123,127 @@ public class OrderTools {
         return "Không tìm thấy đơn hàng";
     }
 
-    @Tool("Kiểm tra điều kiện hoàn tiền cho đơn hàng")
-    public String checkRefundEligibility(String orderId) {
-        log.info("[OrderTools] Checking refund eligibility for: {}", orderId);
-        
-        try {
-            if (orderId == null || orderId.isBlank()) {
-                return "Vui lòng cung cấp mã đơn hợp lệ.";
-            }
+//    @Tool("Kiểm tra điều kiện hoàn tiền cho đơn hàng")
+//    public String checkRefundEligibility(String orderId) {
+//        log.info("[OrderTools] Checking refund eligibility for: {}", orderId);
+//
+//        try {
+//            if (orderId == null || orderId.isBlank()) {
+//                return "Vui lòng cung cấp mã đơn hợp lệ.";
+//            }
+//
+//            String id = orderId.replaceAll("[^0-9]", "");
+//            if (id.isBlank()) {
+//                return "Vui lòng cung cấp mã đơn hợp lệ.";
+//            }
+//
+//            Optional<Order> orderOpt = orderRepository.findById(id);
+//
+//            if (orderOpt.isPresent()) {
+//                Order order = orderOpt.get();
+//                String status = order.getStatus() != null ? order.getStatus().toString().toUpperCase() : "";
+//
+//                // Check if within 7 days
+//                if (order.getOrderDate() != null) {
+//                    java.time.LocalDateTime sevenDaysAgo = java.time.LocalDateTime.now().minusDays(7);
+//                    boolean withinWindow = order.getOrderDate().isAfter(sevenDaysAgo);
+//
+//                    if (!withinWindow) {
+//                        return "❌ Đơn hàng đã quá 7 ngày, không đủ điều kiện hoàn tiền theo chính sách.";
+//                    }
+//                }
+//
+//                if (status.contains("DELIVERED") || status.contains("COMPLETED")) {
+//                    return String.format("""
+//                        ✅ Đơn hàng #%s đủ điều kiện hoàn tiền!
+//
+//                        📋 Điều kiện:
+//                        - Sản phẩm còn nguyên vẹn, chưa sử dụng
+//                        - Có đầy đủ tem, nhãn mác
+//
+//                        💰 Số tiền hoàn: %,dđ
+//                        ⏱️ Thời gian xử lý: 3-5 ngày làm việc
+//                        """, orderId, order.getTotalAmount() != null ? order.getTotalAmount().longValue() : 0L);
+//                } else if (status.contains("PENDING") || status.contains("PROCESSING")) {
+//                    return "⚠️ Đơn hàng chưa giao, vui lòng HỦY ĐƠN thay vì yêu cầu hoàn tiền.";
+//                } else {
+//                    return "❌ Đơn hàng không đủ điều kiện hoàn tiền do trạng thái: " + status;
+//                }
+//            }
+//        } catch (NumberFormatException e) {
+//            log.warn("Invalid order ID format: {}", orderId);
+//        }
+//
+//        return "Không tìm thấy đơn hàng";
+//    }
 
-            String id = orderId.replaceAll("[^0-9]", "");
-            if (id.isBlank()) {
-                return "Vui lòng cung cấp mã đơn hợp lệ.";
-            }
+//    @Tool("Phát hiện đơn hàng đáng ngờ (fraud detection)")
+//    public String detectSuspiciousPatterns(String email, String phone) {
+//        log.info("[OrderTools] Checking suspicious patterns for email: {}, phone: {}", email, phone);
+//
+//        // Placeholder implementation - in production, check:
+//        // - Multiple orders from same IP in short time
+//        // - High value orders from new accounts
+//        // - Unusual shipping addresses
+//        // - Known fraud patterns
+//
+//        StringBuilder sb = new StringBuilder("🔍 KẾT QUẢ KIỂM TRA GIAN LẬN:\n\n");
+//
+//        // Simulate checks
+//        boolean suspicious = false;
+//
+//        if (email != null && email.contains("+") && email.contains("@gmail")) {
+//            sb.append("⚠️ Email sử dụng alias Gmail (có dấu +)\n");
+//            suspicious = true;
+//        }
+//
+//        // Check for disposable email domains
+//        if (email != null && (email.contains("tempmail") || email.contains("guerrilla") || email.contains("10minute"))) {
+//            sb.append("🚨 Email tạm thời (disposable email)\n");
+//            suspicious = true;
+//        }
+//
+//        if (!suspicious) {
+//            sb.append("✅ Không phát hiện dấu hiệu đáng ngờ\n");
+//            sb.append("📋 Các kiểm tra đã thực hiện:\n");
+//            sb.append("- Email hợp lệ\n");
+//            sb.append("- Không có pattern bất thường\n");
+//        } else {
+//            sb.append("\n💡 Đề xuất: Xác minh qua điện thoại trước khi xử lý đơn");
+//        }
+//
+//        return sb.toString();
+//    }
 
-            Optional<Order> orderOpt = orderRepository.findById(id);
-            
-            if (orderOpt.isPresent()) {
-                Order order = orderOpt.get();
-                String status = order.getStatus() != null ? order.getStatus().toString().toUpperCase() : "";
-                
-                // Check if within 7 days
-                if (order.getOrderDate() != null) {
-                    java.time.LocalDateTime sevenDaysAgo = java.time.LocalDateTime.now().minusDays(7);
-                    boolean withinWindow = order.getOrderDate().isAfter(sevenDaysAgo);
-                    
-                    if (!withinWindow) {
-                        return "❌ Đơn hàng đã quá 7 ngày, không đủ điều kiện hoàn tiền theo chính sách.";
-                    }
-                }
-                
-                if (status.contains("DELIVERED") || status.contains("COMPLETED")) {
-                    return String.format("""
-                        ✅ Đơn hàng #%s đủ điều kiện hoàn tiền!
-                        
-                        📋 Điều kiện:
-                        - Sản phẩm còn nguyên vẹn, chưa sử dụng
-                        - Có đầy đủ tem, nhãn mác
-                        
-                        💰 Số tiền hoàn: %,dđ
-                        ⏱️ Thời gian xử lý: 3-5 ngày làm việc
-                        """, orderId, order.getTotalAmount() != null ? order.getTotalAmount().longValue() : 0L);
-                } else if (status.contains("PENDING") || status.contains("PROCESSING")) {
-                    return "⚠️ Đơn hàng chưa giao, vui lòng HỦY ĐƠN thay vì yêu cầu hoàn tiền.";
-                } else {
-                    return "❌ Đơn hàng không đủ điều kiện hoàn tiền do trạng thái: " + status;
-                }
-            }
-        } catch (NumberFormatException e) {
-            log.warn("Invalid order ID format: {}", orderId);
-        }
-        
-        return "Không tìm thấy đơn hàng";
-    }
-
-    @Tool("Phát hiện đơn hàng đáng ngờ (fraud detection)")
-    public String detectSuspiciousPatterns(String email, String phone) {
-        log.info("[OrderTools] Checking suspicious patterns for email: {}, phone: {}", email, phone);
-        
-        // Placeholder implementation - in production, check:
-        // - Multiple orders from same IP in short time
-        // - High value orders from new accounts
-        // - Unusual shipping addresses
-        // - Known fraud patterns
-        
-        StringBuilder sb = new StringBuilder("🔍 KẾT QUẢ KIỂM TRA GIAN LẬN:\n\n");
-        
-        // Simulate checks
-        boolean suspicious = false;
-        
-        if (email != null && email.contains("+") && email.contains("@gmail")) {
-            sb.append("⚠️ Email sử dụng alias Gmail (có dấu +)\n");
-            suspicious = true;
-        }
-        
-        // Check for disposable email domains
-        if (email != null && (email.contains("tempmail") || email.contains("guerrilla") || email.contains("10minute"))) {
-            sb.append("🚨 Email tạm thời (disposable email)\n");
-            suspicious = true;
-        }
-        
-        if (!suspicious) {
-            sb.append("✅ Không phát hiện dấu hiệu đáng ngờ\n");
-            sb.append("📋 Các kiểm tra đã thực hiện:\n");
-            sb.append("- Email hợp lệ\n");
-            sb.append("- Không có pattern bất thường\n");
-        } else {
-            sb.append("\n💡 Đề xuất: Xác minh qua điện thoại trước khi xử lý đơn");
-        }
-        
-        return sb.toString();
-    }
-
-    @Tool("Lấy lịch sử đơn hàng của khách")
-    public String getOrderHistory(String email) {
-        log.info("[OrderTools] Getting order history for: {}", email);
-        
-        // Simple implementation - in production, query by user email
-        List<Order> recentOrders = orderRepository.findAll().stream()
-                .sorted((a, b) -> {
-                    if (a.getOrderDate() == null) return 1;
-                    if (b.getOrderDate() == null) return -1;
-                    return b.getOrderDate().compareTo(a.getOrderDate());
-                })
-                .limit(5)
-                .toList();
-        
-        if (recentOrders.isEmpty()) {
-            return "Không tìm thấy lịch sử đơn hàng.";
-        }
-        
-        StringBuilder sb = new StringBuilder("📦 LỊCH SỬ ĐƠN HÀNG:\n\n");
-        
-        for (Order order : recentOrders) {
-            sb.append(String.format("#%d | %s | %,dđ | %s\n",
-                order.getOrderId(),
-                order.getOrderDate() != null ? 
-                    order.getOrderDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A",
-                order.getTotalAmount() != null ? order.getTotalAmount().longValue() : 0L,
-                order.getStatus() != null ? order.getStatus() : "N/A"));
-        }
-        
-        return sb.toString();
-    }
+//    @Tool("Lấy lịch sử đơn hàng của khách")
+//    public String getOrderHistory(String email) {
+//        log.info("[OrderTools] Getting order history for: {}", email);
+//
+//        // Simple implementation - in production, query by user email
+//        List<Order> recentOrders = orderRepository.findAll().stream()
+//                .sorted((a, b) -> {
+//                    if (a.getOrderDate() == null) return 1;
+//                    if (b.getOrderDate() == null) return -1;
+//                    return b.getOrderDate().compareTo(a.getOrderDate());
+//                })
+//                .limit(5)
+//                .toList();
+//
+//        if (recentOrders.isEmpty()) {
+//            return "Không tìm thấy lịch sử đơn hàng.";
+//        }
+//
+//        StringBuilder sb = new StringBuilder("📦 LỊCH SỬ ĐƠN HÀNG:\n\n");
+//
+//        for (Order order : recentOrders) {
+//            sb.append(String.format("#%d | %s | %,dđ | %s\n",
+//                order.getOrderId(),
+//                order.getOrderDate() != null ?
+//                    order.getOrderDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A",
+//                order.getTotalAmount() != null ? order.getTotalAmount().longValue() : 0L,
+//                order.getStatus() != null ? order.getStatus() : "N/A"));
+//        }
+//
+//        return sb.toString();
+//    }
 }
