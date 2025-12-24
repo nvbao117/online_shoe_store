@@ -22,8 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
                 String categoriesLocation = "file:"
                                 + (categoriesDir.endsWith("/") ? categoriesDir : categoriesDir + "/");
 
+                // Product images - tìm trong cả data/images/products (uploads mới) và
+                // productsDir (cũ)
                 registry.addResourceHandler("/images/products/**")
-                                .addResourceLocations(productsLocation);
+                                .addResourceLocations("file:data/images/products/", productsLocation);
 
                 registry.addResourceHandler("/images/categories/**")
                                 .addResourceLocations(categoriesLocation);
