@@ -4,6 +4,7 @@ import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 
 /**
  * Agent tư vấn chính sách shop (RAG-enabled)
@@ -45,7 +46,7 @@ public interface PolicyExpertAgent {
         ✓ Đúng: "Dạ bên em hỗ trợ đổi trong 7 ngày kể từ khi nhận hàng ạ. Giày cần còn nguyên tem nhãn và chưa qua sử dụng nhé!"
         ✗ Sai: "📦 CHÍNH SÁCH ĐỔI TRẢ: • Thời hạn: 7 ngày • Điều kiện: ..."
         """)
-    @Agent(description = "Answers questions about shop policies using RAG",
+    @Agent(description = "Trả lời các câu hỏi về chính sách , thời gian hoạt động , thông tin liên hệ của shop",
             outputKey = "response")
-    String answer(@UserMessage String request);
+    String answer(@UserMessage @V("request") String request);
 }

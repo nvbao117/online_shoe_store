@@ -1,6 +1,7 @@
 package com.example.online_shoe_store.Config.ai;
 
 import com.example.online_shoe_store.Service.ai.agent.shop.*;
+import com.example.online_shoe_store.Service.ai.agent.memory.ContextManagerAgent;
 import com.example.online_shoe_store.Service.ai.memory.SummarizerAgent;
 import com.example.online_shoe_store.Service.ai.rag.ProductRAGService;
 import com.example.online_shoe_store.Service.ai.tool.*;
@@ -27,6 +28,17 @@ public class AgentWiringConfig {
     public SummarizerAgent summarizerAgent(@Qualifier("workerModel") ChatModel baseModel) {
         return AgenticServices.agentBuilder(SummarizerAgent.class)
                 .chatModel(baseModel)
+                .build();
+    }
+
+    @Bean
+    public ContextManagerAgent contextManagerAgent(
+            @Qualifier("workerModel") ChatModel baseModel,
+            ContextManagerTools contextManagerTools
+    ) {
+        return AgenticServices.agentBuilder(ContextManagerAgent.class)
+                .chatModel(baseModel)
+                .tools(contextManagerTools)
                 .build();
     }
 
@@ -132,7 +144,7 @@ public class AgentWiringConfig {
                 )
                 .subAgents(
                         scope -> scope.readState("category", IntentCategory.UNKNOWN) == IntentCategory.UNKNOWN,
-                        smallTalkAgent
+                        policyExpertAgent
                 )
                 .build();
 
