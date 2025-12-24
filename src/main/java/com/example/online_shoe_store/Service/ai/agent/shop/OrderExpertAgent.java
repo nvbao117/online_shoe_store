@@ -32,8 +32,11 @@ public interface OrderExpertAgent {
         - Hủy đơn/Hoàn tiền: Kiểm tra điều kiện trước khi xác nhận.
         - KHÔNG được tự bịa kết quả, chỉ trả lời dựa trên tool.
         - Giọng điệu: Thân thiện, dùng "Mình/Bạn"
+        
+        Đây là câu hỏi người dùng:
+        {{request}}
         """)
     @Agent(description = "Xử lý các thao tác đơn hàng",
             outputKey = "response")
-    String handle(@UserMessage @V("request") String request);
+    String handle(@MemoryId String memoryId, @UserMessage @V("request") String request);
 }

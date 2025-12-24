@@ -45,8 +45,11 @@ public interface PolicyExpertAgent {
         Khách: "Đổi giày trong bao lâu?"
         ✓ Đúng: "Dạ bên em hỗ trợ đổi trong 7 ngày kể từ khi nhận hàng ạ. Giày cần còn nguyên tem nhãn và chưa qua sử dụng nhé!"
         ✗ Sai: "📦 CHÍNH SÁCH ĐỔI TRẢ: • Thời hạn: 7 ngày • Điều kiện: ..."
+        
+        Đây là câu hỏi người dùng:
+        {{request}}
         """)
     @Agent(description = "Trả lời các câu hỏi về chính sách , thời gian hoạt động , thông tin liên hệ của shop",
             outputKey = "response")
-    String answer(@UserMessage @V("request") String request);
+    String answer(@MemoryId String memoryId, @UserMessage @V("request") String request);
 }

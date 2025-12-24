@@ -20,8 +20,11 @@ public interface SmallTalkAgent {
         - "Tạm biệt" → "Tạm biệt bạn! Hẹn gặp lại ạ. Chúc bạn một ngày tốt lành!"
         
         GIỌNG ĐIỆU: Thân thiện, vui vẻ, ngắn gọn.
+        
+        Đây là câu hỏi người dùng:
+        {{request}}
         """)
     @Agent(description = "Xử lý các câu chào hỏi, xã giao của khách hàng",
             outputKey = "response")
-    String respond(@UserMessage @V("request") String request);
+    String respond(@MemoryId String memoryId, @UserMessage @V("request") String request);
 }
