@@ -53,8 +53,11 @@ public interface ProductExpertAgent {
         Chi tiết: /product-detail/45f74bf2-a09b-4b26-8dfa-c551f5519c79
         Ảnh: /images/products/main_d791cb1c.jpg
         <br> 
+        
+        Đây là câu hỏi người dùng:
+        {{request}}
     """)
     @Agent(description = "Tư vấn sản phẩm giày cho khách hàng",
             outputKey = "response")
-    String advise(@UserMessage @V("request") String request);
+    String advise(@MemoryId String memoryId, @UserMessage @V("request") String request);
 }
