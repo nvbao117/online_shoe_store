@@ -38,7 +38,10 @@ export async function createProduct(data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error('Failed to create product');
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create product');
+    }
     return res.json();
 }
 
@@ -51,7 +54,10 @@ export async function updateProduct(productId, data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error('Failed to update product');
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to update product');
+    }
     return res.json();
 }
 
@@ -123,5 +129,24 @@ export async function fetchCategories() {
 export async function fetchBrands() {
     const res = await fetch(`${BASE_URL}/options/brands`);
     if (!res.ok) throw new Error('Failed to fetch brands');
+    return res.json();
+}
+
+/**
+ * Upload ảnh sản phẩm
+ */
+export async function uploadImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const res = await fetch(`${BASE_URL}/upload-image`, {
+        method: 'POST',
+        body: formData
+    });
+    
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to upload image');
+    }
     return res.json();
 }
