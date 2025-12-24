@@ -1,6 +1,7 @@
 package com.example.online_shoe_store.Config.ai;
 
 import com.example.online_shoe_store.Service.ai.agent.shop.*;
+import com.example.online_shoe_store.Service.ai.memory.SummarizerAgent;
 import com.example.online_shoe_store.Service.ai.rag.ProductRAGService;
 import com.example.online_shoe_store.Service.ai.tool.*;
 import com.example.online_shoe_store.dto.agent.IntentCategory;
@@ -20,6 +21,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Slf4j
 public class AgentWiringConfig {
+
+
+    @Bean
+    public SummarizerAgent summarizerAgent(@Qualifier("workerModel") ChatModel baseModel) {
+        return AgenticServices.agentBuilder(SummarizerAgent.class)
+                .chatModel(baseModel)
+                .build();
+    }
 
     // ====== RAG cho policy (nếu cần) ======
 
@@ -42,7 +51,7 @@ public class AgentWiringConfig {
     public IntentRouter intentRouter(@Qualifier("workerModel") ChatModel baseModel){
         return AgenticServices.agentBuilder(IntentRouter.class)
                 .chatModel(baseModel)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(4))
                 .outputKey("category")
                 .build();
     }
@@ -56,7 +65,7 @@ public class AgentWiringConfig {
         ) {
         return AgenticServices.agentBuilder(ProductExpertAgent.class)
                 .chatModel(baseModel)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(8))
                 .tools(productSearchTools, inventoryTools, productRAGService)
                 .outputKey("response")
                 .build();
@@ -69,7 +78,7 @@ public class AgentWiringConfig {
     ) {
         return AgenticServices.agentBuilder(OrderExpertAgent.class)
                 .chatModel(baseModel)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(8))
                 .tools(orderTools)
                 .outputKey("response")
                 .build();
@@ -81,7 +90,7 @@ public class AgentWiringConfig {
     ) {
         return AgenticServices.agentBuilder(PolicyExpertAgent.class)
                 .chatModel(baseModel)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(4))
                 .contentRetriever(policyRetriever)
                 .outputKey("response")
                 .build();
@@ -91,7 +100,7 @@ public class AgentWiringConfig {
     public SmallTalkAgent smallTalkAgent(@Qualifier("workerModel") ChatModel baseModel) {
         return AgenticServices.agentBuilder(SmallTalkAgent.class)
                 .chatModel(baseModel)
-                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(10))
+                .chatMemoryProvider(id -> MessageWindowChatMemory.withMaxMessages(4))
                 .outputKey("response")
                 .build();
     }
@@ -123,7 +132,7 @@ public class AgentWiringConfig {
                 )
                 .subAgents(
                         scope -> scope.readState("category", IntentCategory.UNKNOWN) == IntentCategory.UNKNOWN,
-                        productExpertAgent
+                        smallTalkAgent
                 )
                 .build();
 

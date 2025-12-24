@@ -7,6 +7,7 @@ import com.example.online_shoe_store.Entity.enums.MessageRole;
 import com.example.online_shoe_store.Repository.ConversationMessageRepository;
 import com.example.online_shoe_store.Repository.ConversationRepository;
 import com.example.online_shoe_store.Service.ai.agent.shop.ShopChatAgent;
+import com.example.online_shoe_store.Service.ai.memory.HybridMemoryService;
 import com.example.online_shoe_store.dto.request.ChatRequest;
 import com.example.online_shoe_store.dto.response.ChatResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,12 @@ public class ChatBotService {
     private final ShopChatAgent shopChatAgent;
     private final ConversationRepository conversationRepository;
     private final ConversationMessageRepository messageRepository;
+    private final HybridMemoryService hybridMemoryService;
 
     @Transactional
     public ChatResponse processMessage(ChatRequest request) {
         long startTime = System.currentTimeMillis();
         
-        // Generate sessionId if not provided
         String sessionId = request.getSessionId();
         if (sessionId == null || sessionId.isBlank()) {
             sessionId = java.util.UUID.randomUUID().toString();
@@ -43,13 +44,17 @@ public class ChatBotService {
         // 2. Save user message
         saveMessage(conversation, MessageRole.USER, request.getMessage());
         
-        // 3. Get AI response
-        String answer = shopChatAgent.chat(sessionId, request.getMessage());
+        // 3. Enrich message với context window (summary + 3 tin nhắn gần nhất)
+        String enrichedMessage = hybridMemoryService.enrichWithContext(sessionId, request.getMessage());
+        log.debug("[ChatBot] Enriched message tokens: ~{}", hybridMemoryService.estimateTokens(enrichedMessage));
         
-        // 4. Save assistant response
+        // 4. Get AI response với context đầy đủ
+        String answer = shopChatAgent.chat(sessionId, enrichedMessage);
+        
+        // 5. Save assistant response
         saveMessage(conversation, MessageRole.ASSISTANT, answer);
         
-        // 5. Update conversation metadata
+        // 6. Update conversation metadata
         conversation.setLastMessageAt(LocalDateTime.now());
         conversation.setMessageCount(conversation.getMessageCount() + 2);
         conversationRepository.save(conversation);

@@ -296,13 +296,6 @@ class ShoeStoreChatbot {
             .replace(/\*(?!\*)(.*?)\*/g, '<em>$1</em>')
             .replace(/_(?!_)(.*?)_/g, '<em>$1</em>')
 
-            // Bullet points: - text or • text or ✅ text
-            .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
-            .replace(/^[✅☑️✓]\s*(.+)$/gm, '<li class="checked">✅ $1</li>')
-
-            // Numbered list: 1. text
-            .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
-
             // Price formatting - handle various formats
             .replace(/(\d{1,3}(?:[,.\s]?\d{3})*)\s*đ(?:ồng)?/gi, '<span class="price">$1đ</span>')
             .replace(/(\d{1,3}(?:[,.\s]?\d{3})*)\s*VND/gi, '<span class="price">$1đ</span>')
@@ -336,11 +329,6 @@ class ShoeStoreChatbot {
 
             // Line breaks
             .replace(/\n/g, '<br>');
-
-        // Wrap list items in ul
-        if (formatted.includes('<li>')) {
-            formatted = formatted.replace(/(<li[^>]*>.*?<\/li>)+/g, '<ul class="bot-list">$&</ul>');
-        }
 
         return formatted;
     }
