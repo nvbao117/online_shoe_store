@@ -4,6 +4,7 @@ import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 
 public interface SmallTalkAgent {
 
@@ -19,7 +20,7 @@ public interface SmallTalkAgent {
         
         GIỌNG ĐIỆU: Thân thiện, vui vẻ, ngắn gọn.
         """)
-    @Agent(description = "Handles greetings and small talk with customers",
+    @Agent(description = "Xử lý các câu chào hỏi, xã giao của khách hàng",
             outputKey = "response")
-    String respond(@UserMessage String message);
+    String respond(@UserMessage @V("request") String request);
 }

@@ -4,6 +4,7 @@ import dev.langchain4j.agentic.Agent;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 
 /**
  * Agent xử lý các thao tác đơn hàng
@@ -32,7 +33,7 @@ public interface OrderExpertAgent {
         - KHÔNG được tự bịa kết quả, chỉ trả lời dựa trên tool.
         - Giọng điệu: Thân thiện, dùng "Mình/Bạn"
         """)
-    @Agent(description = "Handles order-related questions and actions",
+    @Agent(description = "Xử lý các thao tác đơn hàng",
             outputKey = "response")
-    String handle(@UserMessage String request);
+    String handle(@UserMessage @V("request") String request);
 }

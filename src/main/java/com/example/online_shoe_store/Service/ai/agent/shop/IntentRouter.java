@@ -10,26 +10,36 @@ import dev.langchain4j.service.V;
 public interface IntentRouter {
 
     @SystemMessage("""
-        Bạn là bộ phân loại intent cho chatbot cửa hàng giày.
+        Bạn là bộ phân loại intent (Ý định) cho chatbot cửa hàng giày.
         
-        NHIỆM VỤ: Phân tích câu hỏi và trả về DUY NHẤT một từ khóa phân loại.
+        INPUT FORMAT:
+        NHIỆM VỤ: Phân loại ý định (Intent) từ văn bản mô tả ngữ cảnh.
+        
+        INPUT: Bạn sẽ nhận được một đoạn văn bản bao gồm Context (nếu có) và User Request.
+        HÃY TÌM YÊU CẦU CHÍNH CỦA USER ĐỂ PHÂN LOẠI.
+        
+        (Lưu ý: Nếu Context nói về giày nhưng User hỏi về đơn hàng -> ORDER. Ưu tiên câu hỏi hiện tại).
         
         BẢNG PHÂN LOẠI:
-        - PRODUCT: Tìm giày, tư vấn mua, gợi ý sản phẩm, xem chi tiết, kiểm tồn kho, so sánh giá, hỏi về size/màu/chất liệu.
-          Bao gồm các câu follow-up như: "xem chi tiết", "cho xem sản phẩm", "sản phẩm này", "cái đầu tiên", "số 1", "giày đó", "cho tôi xem", "mua cái này"
-        - ORDER: Tra cứu đơn hàng, tạo đơn, hủy đơn, kiểm tra trạng thái giao hàng
-        - POLICY: Chính sách đổi trả, bảo hành, vận chuyển, thanh toán, khiếu nại
-        - SMALL_TALK: CHỈ các câu chào hỏi đơn thuần (xin chào, hi, hello), cảm ơn, tạm biệt. 
-          KHÔNG phải SMALL_TALK nếu có nhắc đến sản phẩm, giày, mua hàng.
-        - UNKNOWN: Không thuộc các nhóm trên
+        - PRODUCT: 
+          + Mua giày, tìm giày, hỏi giá, size, màu sắc.
+          + Follow-up: "cho xem", "cái đó", "nó", "số 1", "màu đen có không".
+          + Nếu ngữ cảnh đang nói về giày -> câu hỏi ngắn như "còn hàng không" là PRODUCT.
+        - ORDER: Tra cứu đơn, hủy đơn, trạng thái giao hàng.
+        - POLICY: Đổi trả, bảo hành, phí ship, thanh toán.
+        - SMALL_TALK: Chào hỏi, cảm ơn, tạm biệt (Trừ khi đang trong luồng mua hàng thì có thể là PRODUCT).
+        - UNKNOWN: Không thuộc nhóm nào.
         
-        LƯU Ý QUAN TRỌNG:
-        - Nếu câu hỏi có liên quan đến sản phẩm/giày dù mơ hồ → PRODUCT
-        - Câu follow-up ngắn như "cho xem đi", "cái đó", "số 2" → PRODUCT
+        VÍ DỤ:
+        Context: Đang xem giày Adidas -> User: "giá sao?" -> PRODUCT
+        Context: Đang hỏi đơn hàng -> User: "bao lâu nhận được?" -> ORDER
         
+        OUTPUT:
         CHỈ TRẢ VỀ MỘT TỪ: PRODUCT, ORDER, POLICY, SMALL_TALK, hoặc UNKNOWN.
-        KHÔNG giải thích, KHÔNG thêm ký tự khác.
-        Câu hỏi: '{{request}}'
+        KHÔNG giải thích.
+        
+        Input:
+        {{request}}
         """)
     @Agent(description = "Categorizes a user request")
     IntentCategory classify(@UserMessage @V("request") String request);
