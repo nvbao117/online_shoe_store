@@ -92,18 +92,15 @@ public class OrderAPIController {
                         return ResponseEntity.status(403).body("Không có quyền truy cập");
                     }
                     
-                    // Allow cancellation for PENDING, AWAITING_PAYMENT, CONFIRMED, PROCESSING
-                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.PENDING 
-                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.AWAITING_PAYMENT
-                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.CONFIRMED
-                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.PROCESSING) {
+                    // Only allow cancellation for PENDING
+                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.PENDING) {
                         
                         String cancelReason = reason != null ? reason : "Khách hàng hủy";
                         order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.CANCELLED, cancelReason, user.getName());
                         orderRepository.save(order);
                         return ResponseEntity.ok().body("Đã hủy đơn hàng thành công");
                     }
-                    return ResponseEntity.badRequest().body("Không thể hủy đơn hàng ở trạng thái hiện tại");
+                    return ResponseEntity.badRequest().body("Chỉ có thể hủy đơn hàng khi đang chờ xác nhận");
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

@@ -11,13 +11,24 @@ window.handleCancelOrder = async function (orderId) {
     await cancelOrder(orderId, 'Khách hàng hủy');
     alert('Đã hủy đơn hàng thành công');
 
-    // Re-fetch and render to update UI immediately
-    try {
-      const orders = await fetchMyOrders();
-      renderAllOrders(orders);
-    } catch (err) {
-      console.error("Failed to reload orders automatically", err);
-      window.location.reload();
+    // Re-fetch and render to update UI by clicking the active tab
+    const activeTab = document.querySelector('.order-subtab.text-blue-600'); // Based on active class logic in profile.ui.js
+    // OR safer:
+    // const activeTab = document.querySelector('.order-subtab.active') || document.querySelector('.order-subtab[data-tab="all"]');
+
+    // In profile.ui.js we saw it adds 'active' class. Let's use that.
+    const currentTab = document.querySelector('.order-subtab.active');
+
+    if (currentTab) {
+      currentTab.click();
+    } else {
+      // Fallback if no tab system or standalone page
+      try {
+        const orders = await fetchMyOrders();
+        renderAllOrders(orders);
+      } catch (err) {
+        window.location.reload();
+      }
     }
 
   } catch (e) {
@@ -59,9 +70,8 @@ function renderOrderCard(order) {
   // Show review button only for delivered/completed orders
   const showReviewBtn = order?.status === 'DELIVERED' || order?.status === 'COMPLETED';
 
-  // Show cancel button for pending/processing states
-  const showCancelBtn = order?.status === 'PENDING' || order?.status === 'AWAITING_PAYMENT'
-    || order?.status === 'CONFIRMED' || order?.status === 'PROCESSING';
+  // Show cancel button for pending only
+  const showCancelBtn = order?.status === 'PENDING';
 
   return `
     <div class="border border-gray-100 rounded-xl bg-white p-4 md:p-6 hover:shadow-md transition-shadow" data-order-id="${escapeAttr(order?.orderId)}">
