@@ -2,12 +2,71 @@ const AdminOrderPage = {
     API_URL: '/api/admin/orders',
 
     init() {
+        this.bindFilterEvents();
         this.loadOrders();
+    },
+
+    bindFilterEvents() {
+        // Search button
+        const btnSearch = document.getElementById('btn-search');
+        if (btnSearch) {
+            btnSearch.addEventListener('click', () => this.loadOrders());
+        }
+
+        // Reset button
+        const btnReset = document.getElementById('btn-reset');
+        if (btnReset) {
+            btnReset.addEventListener('click', () => this.resetFilters());
+        }
+
+        // Enter key on search input
+        const searchInput = document.getElementById('search-keyword');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.loadOrders();
+                }
+            });
+        }
+
+        // Auto search when filters change
+        const filterStatus = document.getElementById('filter-status');
+        const filterPaymentStatus = document.getElementById('filter-payment-status');
+        const filterPaymentMethod = document.getElementById('filter-payment-method');
+
+        if (filterStatus) filterStatus.addEventListener('change', () => this.loadOrders());
+        if (filterPaymentStatus) filterPaymentStatus.addEventListener('change', () => this.loadOrders());
+        if (filterPaymentMethod) filterPaymentMethod.addEventListener('change', () => this.loadOrders());
+    },
+
+    resetFilters() {
+        document.getElementById('search-keyword').value = '';
+        document.getElementById('filter-status').value = '';
+        document.getElementById('filter-payment-status').value = '';
+        document.getElementById('filter-payment-method').value = '';
+        this.loadOrders();
+    },
+
+    getFilterParams() {
+        const keyword = document.getElementById('search-keyword')?.value || '';
+        const status = document.getElementById('filter-status')?.value || '';
+        const paymentStatus = document.getElementById('filter-payment-status')?.value || '';
+        const paymentMethod = document.getElementById('filter-payment-method')?.value || '';
+
+        const params = new URLSearchParams();
+        if (keyword.trim()) params.append('keyword', keyword.trim());
+        if (status) params.append('status', status);
+        if (paymentStatus) params.append('paymentStatus', paymentStatus);
+        if (paymentMethod) params.append('paymentMethod', paymentMethod);
+
+        return params.toString();
     },
 
     async loadOrders() {
         try {
-            const res = await fetch(this.API_URL);
+            const queryString = this.getFilterParams();
+            const url = queryString ? `${this.API_URL}?${queryString}` : this.API_URL;
+            const res = await fetch(url);
             if (res.ok) {
                 const data = await res.json();
                 this.render(data);
@@ -76,6 +135,14 @@ const AdminOrderPage = {
                     </button>`;
             }
 
+            // Show Mark as Delivered if SHIPPED, IN_TRANSIT, or OUT_FOR_DELIVERY
+            if (['SHIPPED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'].includes(order.status)) {
+                actionsHtml += `
+                    <button class="btn-delivered p-1.5 text-green-600 hover:bg-green-50 rounded" title="Xác nhận đã giao hàng" data-id="${order.orderId}">
+                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>`;
+            }
+
             actionsHtml += `
                 <button class="btn-delete p-1.5 text-red-600 hover:bg-red-50 rounded" title="Xoá" data-id="${order.orderId}">
                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -130,6 +197,15 @@ const AdminOrderPage = {
                 const id = e.currentTarget.dataset.id;
                 if (confirm('Xác nhận đơn hàng này?')) {
                     this.confirmOrder(id);
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-delivered').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                if (confirm('Xác nhận đã giao hàng thành công?')) {
+                    this.markAsDelivered(id);
                 }
             });
         });
@@ -229,6 +305,22 @@ const AdminOrderPage = {
             }
         } catch (e) {
             console.error(e);
+        }
+    },
+
+    async markAsDelivered(id) {
+        try {
+            const res = await fetch(`${this.API_URL}/${id}/mark-delivered`, { method: 'POST' });
+            if (res.ok) {
+                alert('Đã xác nhận giao hàng thành công');
+                this.loadOrders();
+            } else {
+                const text = await res.text();
+                alert('Lỗi: ' + text);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Lỗi khi xác nhận giao hàng');
         }
     },
 

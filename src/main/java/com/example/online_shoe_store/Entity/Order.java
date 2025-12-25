@@ -25,7 +25,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"orderItems", "user", "vouchers", "payment", "shipDetail"})
+@ToString(exclude = { "orderItems", "user", "vouchers", "payment", "shipDetail" })
 @EqualsAndHashCode(of = "orderId")
 public class Order {
 
@@ -52,12 +52,10 @@ public class Order {
     @Builder.Default
     private BigDecimal shippingFee = BigDecimal.ZERO;
 
-
     @DecimalMin(value = "0.0", message = "Tổng giảm giá không được âm")
     @Column(name = "discount_amount", precision = 10, scale = 2)
     @Builder.Default
     private BigDecimal discountAmount = BigDecimal.ZERO;
-
 
     // Thông tin vận chuyển
     @Column(name = "tracking_number", length = 100)
@@ -91,7 +89,6 @@ public class Order {
     // Thời hạn thanh toán (tự động tính toán)
     @Column(name = "payment_expiry_at")
     private LocalDateTime paymentExpiryAt;
-
 
     // Thông tin audit
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -151,6 +148,7 @@ public class Order {
         // Cập nhật final amount khi có thay đổi
         calculateFinalAmount();
     }
+
     private void calculateFinalAmount() {
         if (totalAmount != null) {
             BigDecimal subtotal = totalAmount
@@ -211,12 +209,15 @@ public class Order {
             case PAYMENT_FAILED:
                 return List.of(OrderStatus.AWAITING_PAYMENT, OrderStatus.CANCELLED).contains(to);
             case CONFIRMED:
-                return List.of(OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.CANCELLED,
-                        OrderStatus.REFUNDED).contains(to);
+                return List
+                        .of(OrderStatus.PROCESSING, OrderStatus.SHIPPED, OrderStatus.COMPLETED, OrderStatus.CANCELLED,
+                                OrderStatus.REFUNDED)
+                        .contains(to);
             case PROCESSING:
                 return List.of(OrderStatus.READY_FOR_SHIPMENT, OrderStatus.SHIPPED, OrderStatus.CANCELLED).contains(to);
             case SHIPPED:
-                return List.of(OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED, OrderStatus.COMPLETED,
+                return List.of(OrderStatus.IN_TRANSIT, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED,
+                        OrderStatus.COMPLETED,
                         OrderStatus.RETURN_REQUESTED).contains(to);
             case IN_TRANSIT:
                 return List.of(OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED, OrderStatus.COMPLETED,
@@ -225,6 +226,15 @@ public class Order {
                 return List.of(OrderStatus.DELIVERED, OrderStatus.COMPLETED, OrderStatus.RETURN_REQUESTED).contains(to);
             case DELIVERED:
                 return List.of(OrderStatus.COMPLETED, OrderStatus.RETURN_REQUESTED).contains(to);
+            case COMPLETED:
+                return List.of(OrderStatus.RETURN_REQUESTED).contains(to);
+            case RETURN_REQUESTED:
+                return List.of(OrderStatus.RETURN_IN_PROGRESS, OrderStatus.COMPLETED, OrderStatus.CANCELLED)
+                        .contains(to);
+            case RETURN_IN_PROGRESS:
+                return List.of(OrderStatus.RETURNED, OrderStatus.REFUNDED, OrderStatus.PARTIALLY_REFUNDED).contains(to);
+            case RETURNED:
+                return List.of(OrderStatus.REFUNDED, OrderStatus.PARTIALLY_REFUNDED).contains(to);
             default:
                 return false;
         }
@@ -236,7 +246,7 @@ public class Order {
 
     // Helper method to add status history
     private void addStatusHistory(OrderStatus oldStatus, OrderStatus newStatus,
-                                  String note, String changedBy) {
+            String note, String changedBy) {
         OrderStatusHistory history = OrderStatusHistory.builder()
                 .order(this)
                 .oldStatus(oldStatus)
@@ -264,16 +274,14 @@ public class Order {
     private ShipDetail shipDetail;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "Order_Voucher",
-            joinColumns = {@JoinColumn(name = "order_id")},
-            inverseJoinColumns = {@JoinColumn(name = "voucher_id")})
+    @JoinTable(name = "Order_Voucher", joinColumns = { @JoinColumn(name = "order_id") }, inverseJoinColumns = {
+            @JoinColumn(name = "voucher_id") })
     @Builder.Default
     private List<Voucher> vouchers = new ArrayList<>();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
-
 
     @Transient
     public Payment getActivePayment() {
@@ -291,6 +299,7 @@ public class Order {
         return payments.stream()
                 .anyMatch(p -> p.getPaymentStatus() == PaymentStatus.COMPLETED);
     }
+
     public Payment getSuccessfulPayment() {
         return payments.stream()
                 .filter(p -> p.getPaymentStatus() == PaymentStatus.COMPLETED)
