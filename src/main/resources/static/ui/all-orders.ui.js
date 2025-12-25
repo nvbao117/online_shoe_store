@@ -136,6 +136,10 @@ function renderOrderCard(order) {
             Đánh Giá
           </button>
           ` : ''}
+          <button onclick="viewOrderDetail('${escapeAttr(order?.orderId)}')"
+                  class="px-5 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium transition">
+            Xem Chi Tiết
+          </button>
           <button onclick="reorderProduct('${escapeAttr(first.productId)}')"
                   class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
             Mua Lại
@@ -163,6 +167,15 @@ window.reorderProduct = function (productId) {
     return;
   }
   window.location.href = `/product-detail/${productId}`;
+};
+
+// View order detail - navigate to order detail page
+window.viewOrderDetail = function (orderId) {
+  if (!orderId) {
+    alert('Không tìm thấy mã đơn hàng');
+    return;
+  }
+  window.location.href = `/orders/${orderId}`;
 };
 
 function normalizeImageUrl(url) {

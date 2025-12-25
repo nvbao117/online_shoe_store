@@ -160,6 +160,10 @@
                     <span class="info-label">Phí vận chuyển</span>
                     <span class="info-value" id="shippingFee">...</span>
                 </div>
+                <div class="info-row" id="discountRow" style="display: none;">
+                    <span class="info-label text-success">Giảm giá</span>
+                    <span class="info-value text-success" id="discountAmount">...</span>
+                </div>
                 <div class="info-row mt-3 pt-3 border-top">
                     <span class="info-label fw-bold text-dark">Tổng cộng</span>
                     <span class="info-value fw-bold text-primary fs-5" id="totalAmount">...</span>
@@ -203,6 +207,14 @@
 
                 document.getElementById('subtotal').textContent = formatter.format(order.totalAmount);
                 document.getElementById('shippingFee').textContent = formatter.format(order.shippingFee || 0);
+
+                // Show discount if applicable
+                const discountAmount = order.discountAmount || 0;
+                if (discountAmount > 0) {
+                    document.getElementById('discountRow').style.display = 'flex';
+                    document.getElementById('discountAmount').textContent = '-' + formatter.format(discountAmount);
+                }
+
                 document.getElementById('totalAmount').textContent = formatter.format(order.finalAmount);
 
                 // Items

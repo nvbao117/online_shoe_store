@@ -118,11 +118,8 @@
                     <div class="coupon-section">
                         <h3 class="coupon-title">Mã khuyến mãi</h3>
                         <div class="coupon-input-group">
-                            <input type="text"
-                                   id="voucherInputStep2"
-                                   class="form-control"
-                                   placeholder="Mã giảm giá"
-                                   readonly>
+                            <input type="text" id="voucherInputStep2" class="form-control" placeholder="Mã giảm giá"
+                                readonly>
                         </div>
                     </div>
 
@@ -185,9 +182,10 @@
                         shippingMethod: shippingMethod
                     };
 
-                    const voucherData = JSON.parse(sessionStorage.getItem('checkoutVoucherData') || 'null');
+                    const voucherData = JSON.parse(localStorage.getItem('checkoutVoucherData') || sessionStorage.getItem('checkoutVoucherData') || 'null');
                     if (voucherData?.voucherCode) {
                         requestData.voucherCode = voucherData.voucherCode;
+                        requestData.discountAmount = voucherData.discountAmount || 0;
                     }
 
                     const response = await fetch('/api/checkout/place-order', {

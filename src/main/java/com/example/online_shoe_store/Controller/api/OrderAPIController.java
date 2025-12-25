@@ -139,6 +139,7 @@ public class OrderAPIController {
                 .createdAt(order.getCreatedAt())
                 .totalAmount(order.getTotalAmount())
                 .shippingFee(order.getShippingFee())
+                .discountAmount(order.getDiscountAmount())
                 .finalAmount(order.getFinalAmount() != null ? order.getFinalAmount() : order.getTotalAmount())
                 .status(order.getStatus().name())
                 .paymentMethod(paymentMethodVal)

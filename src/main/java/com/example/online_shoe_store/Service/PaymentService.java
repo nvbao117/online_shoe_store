@@ -233,7 +233,6 @@ public class PaymentService {
                     payment.setPaymentStatus(PaymentStatus.FAILED);
                     payment.setFailureReason("Amount mismatch");
                     paymentRepository.save(payment);
-
                     throw new PaymentProcessingException("Amount mismatch - possible fraud attempt");
                 }
 

@@ -23,6 +23,7 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ShipDetailRepository shipDetailRepository;
+    private final VoucherRepository voucherRepository;
 
     @Transactional
     public String placeOrder(User user, CheckoutRequest request, List<String> selectedCartItemIds){
@@ -88,9 +89,25 @@ public class CheckoutService {
                 }
             }
         }
+        
         orderItemRepository.saveAll(orderItems);
 
         order.setTotalAmount(totalAmount);
+        
+        // Apply voucher if provided
+        if (request.getVoucherCode() != null && !request.getVoucherCode().isBlank()) {
+            Voucher voucher = voucherRepository.findByCodeIgnoreCase(request.getVoucherCode().trim())
+                    .orElse(null);
+            if (voucher != null) {
+                order.getVouchers().add(voucher);
+                order.setDiscountAmount(request.getDiscountAmount() != null 
+                        ? request.getDiscountAmount() : BigDecimal.ZERO);
+                // Increment usage count
+                voucher.setUsedCount(voucher.getUsedCount() + 1);
+                voucherRepository.save(voucher);
+            }
+        }
+        
         orderRepository.save(order);
 
         return order.getOrderId();

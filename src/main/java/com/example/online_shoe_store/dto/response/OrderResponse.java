@@ -13,6 +13,7 @@ public class OrderResponse {
     private LocalDateTime createdAt;
     private BigDecimal totalAmount;
     private BigDecimal shippingFee;
+    private BigDecimal discountAmount;
     private BigDecimal finalAmount;
     private String status;
     private String paymentMethod;

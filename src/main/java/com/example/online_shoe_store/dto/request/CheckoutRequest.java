@@ -2,6 +2,8 @@ package com.example.online_shoe_store.dto.request;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class CheckoutRequest {
     // From Step 1
@@ -18,4 +20,9 @@ public class CheckoutRequest {
     private String shippingMethod;
     
     private String note;
+    
+    // Voucher/Discount
+    private String voucherCode;
+    private BigDecimal discountAmount;
 }
+
