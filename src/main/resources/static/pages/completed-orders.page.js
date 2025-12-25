@@ -88,11 +88,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Return
         container.querySelectorAll('.btn-return').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 const orderId = btn.getAttribute('data-order-id');
-                // Simple interaction for now
                 if (confirm(`Bạn muốn gửi yêu cầu trả hàng/hoàn tiền cho đơn hàng #${orderId}?`)) {
-                    alert('Yêu cầu của bạn đã được ghi nhận. Nhân viên sẽ liên hệ sớm.');
+                    try {
+                        btn.disabled = true;
+                        btn.innerText = 'Đang xử lý...';
+
+                        const res = await fetch(`/api/orders/${orderId}/request-return`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify('Khách hàng yêu cầu hoàn trả')
+                        });
+
+                        if (res.ok) {
+                            alert('Yêu cầu hoàn trả đã được gửi thành công! Nhân viên sẽ xử lý sớm nhất.');
+                            // Reload orders to update UI
+                            window.location.reload();
+                        } else {
+                            const text = await res.text();
+                            alert('Lỗi: ' + text);
+                            btn.disabled = false;
+                            btn.innerText = 'Trả hàng';
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Có lỗi xảy ra khi gửi yêu cầu hoàn trả.');
+                        btn.disabled = false;
+                        btn.innerText = 'Trả hàng';
+                    }
                 }
             });
         });

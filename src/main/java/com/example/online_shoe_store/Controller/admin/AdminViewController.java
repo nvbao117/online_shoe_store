@@ -31,4 +31,9 @@ public class AdminViewController {
     public String adminOrders() {
         return "/admin/orders";
     }
+
+    @GetMapping("/returns")
+    public String adminReturns() {
+        return "/admin/returns";
+    }
 }
