@@ -506,6 +506,7 @@ function initVoucherSelection() {
     const voucherInput = document.getElementById('voucherInput');
     const voucherList = document.getElementById('voucherList');
     const applyButton = document.getElementById('applyVoucherBtn');
+    const voucherSuggestion = document.getElementById('voucherSuggestion');
 
     if (voucherInput) {
         voucherInput.addEventListener('click', async () => {
@@ -542,23 +543,39 @@ function initVoucherSelection() {
     }
 }
 
+if (voucherSuggestion) {
+    voucherSuggestion.addEventListener('click', (event) => {
+        const tag = event.target.closest('.coupon-tag');
+        if (!tag?.dataset?.code) return;
+        selectedVoucherCode = tag.dataset.code;
+        if (voucherInput) voucherInput.value = tag.dataset.code;
+        showVoucherMessage('');
+    });
+}
+
 async function updateVoucherList() {
     const voucherList = document.getElementById('voucherList');
     if (!voucherList) return;
 
     try {
         voucherList.innerHTML = '<div class="voucher-item">Đang tải voucher...</div>';
-        const productIds = getCheckoutProductIds();
-        const query = new URLSearchParams({ subtotal: baseSubtotal });
-        productIds.forEach(id => query.append('productIds', id));
-        const res = await fetch(`/api/vouchers/valid?${query.toString()}`);
+        const res = await fetch('/api/vouchers/valid', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                subtotal: baseSubtotal,
+                items: getVoucherApplyItems()
+            })
+        });
         if (!res.ok) {
             throw new Error('Không thể tải voucher');
         }
         const vouchers = await res.json();
         renderVoucherList(vouchers);
+        updateVoucherSuggestion(vouchers);
     } catch (error) {
         voucherList.innerHTML = '<div class="voucher-item voucher-item-disabled">Không thể tải voucher</div>';
+        updateVoucherSuggestion([]);
     }
 }
 
@@ -572,8 +589,11 @@ function renderVoucherList(vouchers) {
     }
 
     voucherList.innerHTML = vouchers.map(voucher => `
-        <div class="voucher-item" data-code="${voucher.code}">
-            <div class="voucher-item-code">${voucher.code} • ${formatVoucherLabel(voucher)}</div>
+        <div class="voucher-item ${voucher.recommended ? 'voucher-item-recommended' : ''}" data-code="${voucher.code}">
+            <div class="voucher-item-code">
+                ${voucher.code} • ${formatVoucherLabel(voucher)}
+                ${voucher.recommended ? '<span class="coupon-tag" data-code="' + voucher.code + '">Tốt nhất</span>' : ''}
+            </div>
             <div class="voucher-item-desc">${voucher.description || 'Voucher áp dụng cho đơn hàng'}</div>
         </div>
     `).join('');
@@ -593,6 +613,33 @@ function toggleVoucherList(shouldShow) {
     const voucherList = document.getElementById('voucherList');
     if (!voucherList) return;
     voucherList.hidden = !shouldShow;
+}
+
+function updateVoucherSuggestion(vouchers) {
+    const voucherSuggestion = document.getElementById('voucherSuggestion');
+    if (!voucherSuggestion) return;
+
+    const bestVoucher = Array.isArray(vouchers)
+        ? vouchers.find(voucher => voucher.recommended)
+        : null;
+
+    if (!bestVoucher) {
+        voucherSuggestion.hidden = true;
+        voucherSuggestion.innerHTML = '';
+        return;
+    }
+
+    voucherSuggestion.hidden = false;
+    voucherSuggestion.innerHTML = `
+        <span class="coupon-label">Đề xuất tốt nhất:</span>
+        <span class="coupon-tag" data-code="${bestVoucher.code}">${bestVoucher.code}</span>
+    `;
+
+    const voucherInput = document.getElementById('voucherInput');
+    if (voucherInput && !voucherInput.value) {
+        selectedVoucherCode = bestVoucher.code;
+        voucherInput.value = bestVoucher.code;
+    }
 }
 
 async function applySelectedVoucher() {
@@ -668,13 +715,6 @@ function persistVoucherSelection(voucherCode, payload) {
     };
     sessionStorage.setItem('checkoutVoucherData', JSON.stringify(data));
     localStorage.setItem('checkoutVoucherData', JSON.stringify(data));
-}
-
-function getCheckoutProductIds() {
-    if (!checkoutData?.cartItems) return [];
-    return checkoutData.cartItems
-        .map(item => item.productId)
-        .filter(Boolean);
 }
 
 function getVoucherApplyItems() {

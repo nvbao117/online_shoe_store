@@ -13,4 +13,6 @@ public class VoucherValidResponse {
     private BigDecimal discountValue;
     private String description;
     private BigDecimal maxDiscountAmount;
+    private BigDecimal estimatedDiscount;
+    private boolean recommended;
 }
