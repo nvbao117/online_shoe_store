@@ -24,7 +24,6 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ShipDetailRepository shipDetailRepository;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public String placeOrder(User user, CheckoutRequest request, List<String> selectedCartItemIds){
