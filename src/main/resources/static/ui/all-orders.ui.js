@@ -1,5 +1,30 @@
 const allBox = document.querySelector('[data-content="all"]');
 
+// Cancel order
+import { cancelOrder, fetchMyOrders } from "../api/orders.api.js";
+
+window.handleCancelOrder = async function (orderId) {
+  if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return;
+
+  try {
+    // Basic loading indication could be added here
+    await cancelOrder(orderId, 'Khách hàng hủy');
+    alert('Đã hủy đơn hàng thành công');
+
+    // Re-fetch and render to update UI immediately
+    try {
+      const orders = await fetchMyOrders();
+      renderAllOrders(orders);
+    } catch (err) {
+      console.error("Failed to reload orders automatically", err);
+      window.location.reload();
+    }
+
+  } catch (e) {
+    alert(e.message || 'Có lỗi xảy ra khi hủy đơn hàng');
+  }
+};
+
 export function renderAllOrders(orders) {
   if (!allBox) return;
 
@@ -33,6 +58,10 @@ function renderOrderCard(order) {
 
   // Show review button only for delivered/completed orders
   const showReviewBtn = order?.status === 'DELIVERED' || order?.status === 'COMPLETED';
+
+  // Show cancel button for pending/processing states
+  const showCancelBtn = order?.status === 'PENDING' || order?.status === 'AWAITING_PAYMENT'
+    || order?.status === 'CONFIRMED' || order?.status === 'PROCESSING';
 
   return `
     <div class="border border-gray-100 rounded-xl bg-white p-4 md:p-6 hover:shadow-md transition-shadow" data-order-id="${escapeAttr(order?.orderId)}">
@@ -84,6 +113,13 @@ function renderOrderCard(order) {
 
         <div class="flex flex-wrap gap-3 md:justify-end">
 
+          ${showCancelBtn ? `
+          <button onclick="handleCancelOrder('${escapeAttr(order?.orderId)}')" 
+                  class="px-5 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 text-sm font-medium transition">
+            Hủy Đơn
+          </button>
+          ` : ''}
+
           ${showReviewBtn ? `
           <button onclick="navigateToReviewsTab()" 
                   class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
@@ -99,6 +135,7 @@ function renderOrderCard(order) {
     </div>
   `;
 }
+
 
 // Navigate to Reviews tab when clicking review button from orders
 window.navigateToReviewsTab = function () {

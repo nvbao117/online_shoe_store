@@ -81,6 +81,33 @@ public class OrderAPIController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable String orderId, @RequestBody(required = false) String reason) {
+        User user = getCurrentUser();
+        if (user == null) return ResponseEntity.status(401).build();
+
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    if (!order.getUser().getUserId().equals(user.getUserId())) {
+                        return ResponseEntity.status(403).body("Không có quyền truy cập");
+                    }
+                    
+                    // Allow cancellation for PENDING, AWAITING_PAYMENT, CONFIRMED, PROCESSING
+                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.PENDING 
+                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.AWAITING_PAYMENT
+                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.CONFIRMED
+                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.PROCESSING) {
+                        
+                        String cancelReason = reason != null ? reason : "Khách hàng hủy";
+                        order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.CANCELLED, cancelReason, user.getName());
+                        orderRepository.save(order);
+                        return ResponseEntity.ok().body("Đã hủy đơn hàng thành công");
+                    }
+                    return ResponseEntity.badRequest().body("Không thể hủy đơn hàng ở trạng thái hiện tại");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     private OrderResponse mapToOrderResponse(Order order) {
         ShipDetail shipDetail = order.getShipDetail();
         String formattedAddress = "N/A";

@@ -7,7 +7,6 @@ import com.example.online_shoe_store.dto.request.CheckoutRequest;
 import com.example.online_shoe_store.dto.response.OrderWSMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,7 +23,6 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ShipDetailRepository shipDetailRepository;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public String placeOrder(User user, CheckoutRequest request, List<String> selectedCartItemIds){
@@ -46,7 +44,7 @@ public class CheckoutService {
                 .district(request.getDistrict())
                 .ward(request.getWard())
                 .detail(request.getAddress())
-                .isDefault(hasNoDefaultAddress) // Set as default if user has no default address
+                .isDefault(hasNoDefaultAddress)
                 .build();
 
         shipDetail = shipDetailRepository.save(shipDetail);
