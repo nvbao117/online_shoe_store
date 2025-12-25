@@ -4,6 +4,7 @@ import com.example.online_shoe_store.Service.VoucherService;
 import com.example.online_shoe_store.dto.request.VoucherApplyRequest;
 import com.example.online_shoe_store.dto.request.VoucherCreateRequest;
 import com.example.online_shoe_store.dto.request.VoucherStatusUpdateRequest;
+import com.example.online_shoe_store.dto.request.VoucherValidRequest;
 import com.example.online_shoe_store.dto.response.VoucherApplyResponse;
 import com.example.online_shoe_store.dto.response.VoucherAdminListResponse;
 import com.example.online_shoe_store.dto.response.VoucherMetadataResponse;
@@ -41,6 +42,11 @@ public class VoucherApiController {
             @RequestParam(value = "productIds", required = false) List<String> productIds
     ) {
         return ResponseEntity.ok(voucherService.getValidVouchers(subtotal, productIds));
+    }
+
+    @PostMapping("/valid")
+    public ResponseEntity<List<VoucherValidResponse>> getValidVouchers(@RequestBody VoucherValidRequest request) {
+        return ResponseEntity.ok(voucherService.getValidVouchers(request));
     }
 
     @PostMapping("/apply")

@@ -16,6 +16,7 @@ import com.example.online_shoe_store.dto.request.VoucherApplyRequest;
 import com.example.online_shoe_store.dto.request.VoucherApplyRequestItem;
 import com.example.online_shoe_store.dto.request.VoucherCreateRequest;
 import com.example.online_shoe_store.dto.request.VoucherStatusUpdateRequest;
+import com.example.online_shoe_store.dto.request.VoucherValidRequest;
 import com.example.online_shoe_store.dto.response.OptionItemResponse;
 import com.example.online_shoe_store.dto.response.VoucherApplyResponse;
 import com.example.online_shoe_store.dto.response.VoucherAdminListResponse;
@@ -61,16 +62,48 @@ public class VoucherService {
         List<Product> products = loadProducts(productIds);
 
         // Chỉ lấy voucher ACTIVE và còn hiệu lực theo thời gian
-        return voucherRepository.findByStatusIgnoreCaseAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+        List<VoucherValidResponse> responses = voucherRepository
+                .findByStatusIgnoreCaseAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                         "ACTIVE",
                         now,
                         now
                 )
                 .stream()
-                .filter(voucher -> isSubtotalEligible(voucher, safeSubtotal))
                 .filter(voucher -> isScopeEligible(voucher, products))
-                .map(this::mapToValidResponse)
+                .filter(voucher -> isSubtotalEligible(voucher, safeSubtotal))
+                .map(voucher -> {
+                    BigDecimal discountAmount = calculateDiscountAmount(voucher, safeSubtotal);
+                    return mapToValidResponse(voucher, discountAmount);
+                })
+                .sorted(validVoucherComparator())
                 .collect(Collectors.toList());
+
+        markRecommended(responses);
+        return responses;
+    }
+
+    public List<VoucherValidResponse> getValidVouchers(VoucherValidRequest request) {
+        BigDecimal subtotal = request != null && request.getSubtotal() != null
+                ? request.getSubtotal()
+                : BigDecimal.ZERO;
+        List<VoucherApplyRequestItem> items = request != null ? request.getItems() : null;
+        List<Product> products = loadProducts(extractProductIds(items));
+        LocalDateTime now = LocalDateTime.now();
+
+        List<VoucherValidResponse> responses = voucherRepository
+                .findByStatusIgnoreCaseAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                        "ACTIVE",
+                        now,
+                        now
+                )
+                .stream()
+                .filter(voucher -> isScopeEligible(voucher, products))
+                .map(voucher -> buildValidResponseForItems(voucher, items, subtotal))
+                .flatMap(Optional::stream)
+                .sorted(validVoucherComparator())
+                .collect(Collectors.toList());
+        markRecommended(responses);
+        return responses;
     }
 
     public VoucherApplyResponse applyVoucher(VoucherApplyRequest request) {
@@ -348,13 +381,15 @@ public class VoucherService {
         return subtotal.compareTo(minOrder) >= 0;
     }
 
-    private VoucherValidResponse mapToValidResponse(Voucher voucher) {
+    private VoucherValidResponse mapToValidResponse(Voucher voucher, BigDecimal estimatedDiscount) {
         return VoucherValidResponse.builder()
                 .code(voucher.getCode())
                 .discountType(mapDiscountType(voucher.getDiscountType()))
                 .discountValue(voucher.getDiscountValue())
                 .description(voucher.getDescription())
                 .maxDiscountAmount(voucher.getMaxDiscountValue())
+                .estimatedDiscount(estimatedDiscount != null ? estimatedDiscount : BigDecimal.ZERO)
+                .recommended(false)
                 .build();
     }
 
@@ -398,6 +433,57 @@ public class VoucherService {
             return Collections.emptyList();
         }
         return productRepository.findAllById(cleaned);
+    }
+
+
+    private List<String> extractProductIds(List<VoucherApplyRequestItem> items) {
+        if (items == null || items.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return items.stream()
+                .filter(Objects::nonNull)
+                .map(VoucherApplyRequestItem::getProductId)
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private Optional<VoucherValidResponse> buildValidResponseForItems(
+            Voucher voucher,
+            List<VoucherApplyRequestItem> items,
+            BigDecimal subtotal
+    ) {
+        BigDecimal eligibleSubtotal = resolveEligibleSubtotal(voucher, items, subtotal);
+        if (eligibleSubtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            return Optional.empty();
+        }
+
+        BigDecimal subtotalForMinOrder = usesScopedSubtotal(voucher) ? eligibleSubtotal : subtotal;
+        if (!isSubtotalEligible(voucher, subtotalForMinOrder)) {
+            return Optional.empty();
+        }
+
+        BigDecimal discountAmount = calculateDiscountAmount(voucher, eligibleSubtotal);
+        return Optional.of(mapToValidResponse(voucher, discountAmount));
+    }
+
+    private Comparator<VoucherValidResponse> validVoucherComparator() {
+        return Comparator.comparing(
+                        (VoucherValidResponse response) -> Optional
+                                .ofNullable(response.getEstimatedDiscount())
+                                .orElse(BigDecimal.ZERO)
+                )
+                .reversed()
+                .thenComparing(VoucherValidResponse::getCode, String.CASE_INSENSITIVE_ORDER);
+    }
+
+    private void markRecommended(List<VoucherValidResponse> responses) {
+        if (responses == null || responses.isEmpty()) {
+            return;
+        }
+        VoucherValidResponse best = responses.get(0);
+        best.setRecommended(true);
     }
 
     private boolean isScopeEligible(Voucher voucher, List<Product> products) {
