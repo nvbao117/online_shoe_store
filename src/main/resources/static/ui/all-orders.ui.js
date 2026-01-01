@@ -95,7 +95,7 @@ function renderOrderCard(order) {
               ${escapeHtml(String(first.quantity))}
             </span>
           ` : ''}
-        </div>
+        </div>1
 
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-3">

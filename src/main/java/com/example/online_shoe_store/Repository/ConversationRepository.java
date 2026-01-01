@@ -1,6 +1,7 @@
 package com.example.online_shoe_store.Repository;
 
 import com.example.online_shoe_store.Entity.Conversation;
+import com.example.online_shoe_store.Entity.ConversationMessage;
 import com.example.online_shoe_store.Entity.enums.IntentType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -42,13 +43,11 @@ public interface ConversationRepository extends JpaRepository<Conversation, Stri
     /**
      * Tìm conversations theo intent cuối
      */
-    List<Conversation> findByLastPrimaryIntentOrderByLastMessageAtDesc(IntentType intent);
-    
     /**
      * Đếm conversations đang active
      */
     long countByIsActiveTrue();
-    
+
     /**
      * Đếm conversations trong khoảng thời gian
      */
