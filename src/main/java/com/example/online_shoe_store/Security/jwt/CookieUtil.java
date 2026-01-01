@@ -11,7 +11,7 @@ public class CookieUtil {
     public static void setAccessCookie(HttpServletResponse res, String token, Duration ttl) {
         ResponseCookie c = ResponseCookie.from("access_token", token)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(ttl)
@@ -22,7 +22,7 @@ public class CookieUtil {
     public static void setRefreshCookie(HttpServletResponse res, String token, Duration ttl) {
         ResponseCookie c = ResponseCookie.from("refresh_token", token)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(ttl)
@@ -32,11 +32,11 @@ public class CookieUtil {
 
     public static void clearAuthCookies(HttpServletResponse res) {
         ResponseCookie a = ResponseCookie.from("access_token", "")
-                .httpOnly(true).secure(true).sameSite("Lax")
+                .httpOnly(true).secure(false).sameSite("Lax")
                 .path("/").maxAge(0).build();
 
         ResponseCookie r = ResponseCookie.from("refresh_token", "")
-                .httpOnly(true).secure(true).sameSite("Lax")
+                .httpOnly(true).secure(false).sameSite("Lax")
                 .path("/").maxAge(0).build();
 
         res.addHeader(HttpHeaders.SET_COOKIE, a.toString());
