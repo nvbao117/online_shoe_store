@@ -1,136 +1,233 @@
-# Online Shoe Store
+# 👟 Online Shoe Store
 
-## 📖 Hướng Dẫn Quy Trình Git & GitHub Cho Team
+E-commerce shoe store with AI-powered chatbot, built with Spring Boot, MySQL, and ChromaDB.
 
-Tài liệu này quy định quy trình làm việc (workflow) của team để đảm bảo code luôn sạch, dễ quản lý và tránh xung đột (conflict).
+## 🚀 Quick Start with Docker
 
-### 🛠 1. Setup Dự Án (Lần đầu tiên)
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- Valid API keys for AI features (optional, chatbot will be disabled without keys)
 
-1.  **Clone repository về máy:**
-    ```bash
-    git clone https://github.com/nvbao117/online_shoe_store.git
-    cd online_shoe_store
-    ```
-
-### 🔄 2. Quy Trình Làm Việc Hàng Ngày (Workflow)
-
-Mỗi khi bắt đầu một tính năng mới hoặc sửa lỗi, hãy tuân thủ 5 bước sau:
-
-#### Bước 1: Cập nhật branch chính (dev)
-Luôn đảm bảo bạn đang ở branch gốc và code của bạn là mới nhất.
+### 1. Clone Repository
 ```bash
-git checkout dev
-git pull origin dev
+git clone https://github.com/nvbao117/online_shoe_store.git
+cd online_shoe_store
 ```
 
-#### Bước 2: Tạo branch mới
-**Tuyệt đối không code trực tiếp trên `dev`**. Hãy tạo branch riêng theo quy tắc đặt tên:
-*   Tính năng mới: `feature/ten-tinh-nang` (VD: `feature/login-page`, `feature/cart-logic`)
-*   Sửa lỗi: `bugfix/ten-loi` (VD: `bugfix/fix-header-css`)
-*   Hotfix (gấp): `hotfix/ten-loi`
-
+### 2. Configure Environment Variables
 ```bash
-git checkout -b feature/ten-tinh-nang-cua-ban
+# Copy example file
+cp .env.example .env
+
+# Edit .env and fill in your values (see Configuration section below)
 ```
 
-#### Bước 3: Code và Commit
-Thực hiện thay đổi code. Khi commit, hãy viết message rõ ràng, dễ hiểu.
+### 3. Run with Docker
 ```bash
-git add .
-git commit -m "Mô tả ngắn gọn những gì bạn đã làm"
-```
-*   ✅ Tốt: `"Thêm giao diện đăng nhập"`, `"Sửa lỗi hiển thị giá sản phẩm"`
-*   ❌ Tệ: `"fix"`, `"update"`, `"abc"`
-
-#### Bước 4: Push code lên GitHub
-```bash
-git push origin feature/ten-tinh-nang-cua-ban
+docker-compose up -d
 ```
 
-#### Bước 5: Tạo Pull Request (PR)
-1.  Truy cập repository trên GitHub.
-2.  Nhấn nút **Compare & pull request**.
-3.  Viết tiêu đề và mô tả PR (làm gì, ảnh hưởng ra sao).
-4.  Tag thành viên khác vào mục **Reviewers** để họ kiểm tra code.
-5.  Sau khi được approve, tiến hành **Merge** vào `dev`.
+### 4. Access Application
+- **Web App**: http://localhost:8080
+- **ChromaDB**: http://localhost:8001
+
+### 5. View Logs
+```bash
+# All services
+docker-compose logs -f
+
+# Only app
+docker-compose logs -f app
+```
+
+### 6. Stop Application
+```bash
+# Stop (keep data)
+docker-compose down
+
+# Stop and remove all data
+docker-compose down -v
+```
 
 ---
 
-### ⚠️ 3. Xử Lý Xung Đột (Conflict)
+## ⚙️ Configuration
 
-Nếu khi Merge hoặc Pull báo lỗi **Conflict**, đừng lo lắng:
-1.  Git sẽ đánh dấu các file bị conflict.
-2.  Mở file đó lên, bạn sẽ thấy các dòng `<<<<<<< HEAD`, `=======`, `>>>>>>>`.
-3.  Chọn code đúng (giữ code cũ, lấy code mới, hoặc kết hợp cả hai) và xóa các ký tự đánh dấu đi.
-4.  Sau khi sửa xong:
-    ```bash
-    git add .
-    git commit -m "Resolve conflict"
-    git push
-    ```
+Edit `.env` file with your values:
+
+### Required
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root password | `your_secure_password` |
+| `MYSQL_PASSWORD` | MySQL user password | `your_secure_password` |
+| `JWT_SECRET` | JWT signing key (32+ chars) | `your_jwt_secret_key_here_32chars` |
+
+### AI Features (Optional)
+| Variable | Description | Get from |
+|----------|-------------|----------|
+| `ANTHROPIC_API_KEY` | Claude API key | [console.anthropic.com](https://console.anthropic.com) |
+| `OPENAI_API_KEY` | OpenAI API key | [platform.openai.com](https://platform.openai.com) |
+
+### Email (Optional)
+| Variable | Description |
+|----------|-------------|
+| `MAIL_USERNAME` | Gmail address |
+| `MAIL_PASSWORD` | Gmail App Password |
+
+### Google OAuth (Optional)
+| Variable | Description |
+|----------|-------------|
+| `GOOGLE_CLIENT_ID` | Google OAuth Client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth Secret |
+
+### Payment - VNPay (Optional)
+| Variable | Description |
+|----------|-------------|
+| `VNPAY_TMN_CODE` | VNPay Terminal Code |
+| `VNPAY_HASH_SECRET` | VNPay Hash Secret |
 
 ---
 
-### 🔄 4. Cập Nhật Code Mới Từ Dev (Sync)
-**Tình huống:** Bạn đang code tính năng A, nhưng Team vừa merge tính năng B vào `dev`. Bạn muốn lấy tính năng B về để code tiếp mà không mất tính năng A.
+## 🏗️ Architecture
 
-**Cách làm:**
-1.  **Commit** code hiện tại của bạn (dù chưa xong cũng phải commit để lưu lại).
-2.  **Cập nhật branch dev:**
-    ```bash
-    git checkout dev
-    git pull origin dev
-    ```
-3.  **Merge dev vào branch của bạn:**
-    ```bash
-    git checkout feature/ten-branch-cua-ban
-    git merge dev
-    ```
-4.  Nếu có conflict, xem lại **Mục 3**.
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Docker Network                        │
+├─────────────────┬─────────────────┬─────────────────────┤
+│     MySQL       │    ChromaDB     │    Spring Boot      │
+│   (Database)    │  (Vector Store) │      (App)          │
+│   Port: 3306    │   Port: 8001    │   Port: 8080        │
+└─────────────────┴─────────────────┴─────────────────────┘
+```
+
+### Services
+| Service | Image | Purpose |
+|---------|-------|---------|
+| `mysql` | `mysql:8.0` | Primary database |
+| `chromadb` | `chromadb/chroma:0.4.24` | Vector store for AI embeddings |
+| `app` | Custom (Dockerfile) | Spring Boot application |
 
 ---
 
-### � 5. Các Quy Tắc Chung Cần Tuân Thủ
+## 🛠️ Development
 
-#### 1. Quy tắc đặt tên (Naming Convention)
-*   **Biến & Hàm:** Sử dụng `camelCase`.
-    *   VD: `getUserInfo()`, `cartTotal`, `isLoggedIn`.
-*   **Class & Component:** Sử dụng `PascalCase`.
-    *   VD: `UserController`, `HeaderComponent`.
-*   **Database (Cột & Bảng):** Sử dụng `snake_case`.
-    *   VD: `user_id`, `created_at`, `product_orders`.
-*   **Hằng số (Constant):** Sử dụng `UPPER_CASE_SNAKE`.
-    *   VD: `MAX_UPLOAD_SIZE`, `DEFAULT_PAGE_LIMIT`.
+### Run Hybrid Mode (Recommended for Development)
+Use Docker for databases, run app locally for hot-reload:
 
-#### 2. Code Style & Chất Lượng Code
-*   **Clean Code:** Xóa hết các dòng `console.log`, code bị comment (commented-out code) không dùng đến trước khi push.
-*   **Format:** Luôn format code (Ctrl+Alt+L trong IDE hoặc dùng Prettier) trước khi commit.
-*   **Comment:** Viết comment cho các đoạn logic phức tạp, khó hiểu. Không comment những thứ hiển nhiên.
-*   **Hardcode:** Hạn chế hardcode (VD: không viết cứng chuỗi kết nối DB hay API URL trong code, hãy đưa vào file config/env).
+```bash
+# Start databases only
+docker-compose up -d mysql chromadb
 
-#### 3. Quy tắc Commit Message
-Nên viết commit có tiền tố để dễ phân loại:
-*   `[Feature]`: Tính năng mới.
-*   `[Fix]`: Sửa lỗi.
-*   `[Refactor]`: Tối ưu code mà không thay đổi tính năng.
-*   `[Docs]`: Sửa tài liệu.
-*   **Ví dụ:** `[Feature] Thêm chức năng reset mật khẩu`, `[Fix] Sửa lỗi layout trên mobile`.
+# Run app locally
+./mvnw spring-boot:run
+```
 
-#### 4. Quy tắc Pull Request (PR)
-*   **Phạm vi:** Mỗi Pull Request chỉ nên giải quyết **một vấn đề cụ thể**. Không gộp chung việc sửa nhiều lỗi và thêm tính năng vào cùng 1 PR (khó review).
-*   **Self-test:** Tự kiểm tra kỹ chức năng của mình chạy ổn định trước khi nhờ người khác review.
-*   **Review:** PR bắt buộc phải có ít nhất **1 approve** từ thành viên khác mới được merge vào `dev`.
+### Rebuild After Code Changes
+```bash
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
 
-### �📝 6. Một Số Lệnh Git Cơ Bản
-| Chức năng | Lệnh |
-| :--- | :--- |
-| Kiểm tra trạng thái file | `git status` |
-| Xem lịch sử commit | `git log` |
-| Hủy các thay đổi chưa add | `git checkout .` |
-| Xem danh sách branch | `git branch` |
-| Xóa branch (sau khi merge) | `git branch -d ten-branch` |
-
-### �📝 7. Tạo nhánh trên local gắn với nhánh đã có trên repo
-vd git checkout -b dev origin/dev
 ---
-**Lưu ý:** Luôn giao tiếp với team khi chuẩn bị merge những thay đổi lớn!
+
+## 📁 Project Structure
+
+```
+online_shoe_store/
+├── src/
+│   ├── main/
+│   │   ├── java/          # Java source code
+│   │   └── resources/
+│   │       ├── templates/ # Thymeleaf templates
+│   │       └── static/    # CSS, JS, images
+│   └── data/
+│       ├── images/        # Product images
+│       └── script_sql/    # SQL scripts
+├── Dockerfile             # Multi-stage Docker build
+├── docker-compose.yml     # Docker orchestration
+├── .env.example           # Environment template
+└── pom.xml                # Maven dependencies
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Port Already in Use
+```bash
+# Find process using port
+netstat -ano | findstr :8080
+
+# Kill process (Windows)
+taskkill /PID <PID> /F
+
+# Or change port in .env
+APP_PORT=8081
+```
+
+### Docker Build Cache Issues
+```bash
+docker builder prune -f
+docker-compose build --no-cache
+```
+
+### Reset Database
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+
+### View Container Status
+```bash
+docker-compose ps
+```
+
+---
+
+## 🌟 Features
+
+- 🛒 **E-commerce**: Product catalog, cart, checkout
+- 🤖 **AI Chatbot**: Powered by Claude (Anthropic) with RAG
+- 🔐 **Authentication**: JWT + Google OAuth2
+- 💳 **Payment**: VNPay integration (Vietnam)
+- 📧 **Email**: Order notifications, password reset
+- 📱 **Responsive**: Mobile-friendly design
+
+---
+
+## � Git Workflow
+
+### Branch Naming
+- Feature: `feature/feature-name`
+- Bugfix: `bugfix/bug-name`
+- Hotfix: `hotfix/issue-name`
+
+### Commit Message Format
+```
+[Type] Description
+
+Examples:
+[Feature] Add login page
+[Fix] Fix cart calculation
+[Refactor] Optimize database queries
+```
+
+### Workflow
+1. `git checkout dev && git pull`
+2. `git checkout -b feature/your-feature`
+3. Code and commit
+4. `git push origin feature/your-feature`
+5. Create Pull Request → Review → Merge
+
+---
+
+## 📝 License
+
+This project is for educational purposes.
+
+---
+
+## 👥 Contributors
+
+- Team 5 Anh Em

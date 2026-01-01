@@ -46,7 +46,7 @@ public class LoginController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
-        return "/login/register";      // trỏ tới templates/login/register.html
+        return "login/register";      // trỏ tới templates/login/register.html
     }
 
     @PostMapping("/register")
@@ -58,7 +58,7 @@ public class LoginController {
 
         if (!ok) {
             model.addAttribute("errorMessage", errorMessage.toString());
-            return "/login/register";
+            return "login/register";
         }
 
         // đăng ký ok -> quay về trang login

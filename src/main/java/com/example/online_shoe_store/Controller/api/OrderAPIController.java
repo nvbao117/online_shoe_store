@@ -61,22 +61,77 @@ public class OrderAPIController {
     @PostMapping("/{orderId}/received")
     public ResponseEntity<?> confirmReceived(@PathVariable String orderId) {
         User user = getCurrentUser();
-        if (user == null) return ResponseEntity.status(401).build();
+        if (user == null)
+            return ResponseEntity.status(401).build();
 
         return orderRepository.findById(orderId)
                 .map(order -> {
                     if (!order.getUser().getUserId().equals(user.getUserId())) {
                         return ResponseEntity.status(403).body("Không có quyền truy cập");
                     }
-                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.SHIPPED 
-                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.CONFIRMED
-                        || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.IN_TRANSIT) {
-                        
-                        order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.COMPLETED, "Khách đã nhận hàng", user.getName());
+                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.SHIPPED
+                            || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.CONFIRMED
+                            || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.IN_TRANSIT) {
+
+                        order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.COMPLETED,
+                                "Khách đã nhận hàng", user.getName());
                         orderRepository.save(order);
                         return ResponseEntity.ok().body("Đã xác nhận nhận hàng");
                     }
                     return ResponseEntity.badRequest().body("Trạng thái đơn hàng không hợp lệ để xác nhận");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable String orderId, @RequestBody(required = false) String reason) {
+        User user = getCurrentUser();
+        if (user == null)
+            return ResponseEntity.status(401).build();
+
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    if (!order.getUser().getUserId().equals(user.getUserId())) {
+                        return ResponseEntity.status(403).body("Không có quyền truy cập");
+                    }
+
+                    // Only allow cancellation for PENDING
+                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.PENDING) {
+
+                        String cancelReason = reason != null ? reason : "Khách hàng hủy";
+                        order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.CANCELLED,
+                                cancelReason, user.getName());
+                        orderRepository.save(order);
+                        return ResponseEntity.ok().body("Đã hủy đơn hàng thành công");
+                    }
+                    return ResponseEntity.badRequest().body("Chỉ có thể hủy đơn hàng khi đang chờ xác nhận");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{orderId}/request-return")
+    public ResponseEntity<?> requestReturn(@PathVariable String orderId, @RequestBody(required = false) String reason) {
+        User user = getCurrentUser();
+        if (user == null)
+            return ResponseEntity.status(401).build();
+
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    if (!order.getUser().getUserId().equals(user.getUserId())) {
+                        return ResponseEntity.status(403).body("Không có quyền truy cập");
+                    }
+
+                    // Only allow return request for COMPLETED or DELIVERED orders
+                    if (order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.COMPLETED
+                            || order.getStatus() == com.example.online_shoe_store.Entity.enums.OrderStatus.DELIVERED) {
+
+                        String returnReason = reason != null ? reason : "Khách hàng yêu cầu hoàn trả";
+                        order.updateStatus(com.example.online_shoe_store.Entity.enums.OrderStatus.RETURN_REQUESTED,
+                                returnReason, user.getName());
+                        orderRepository.save(order);
+                        return ResponseEntity.ok().body("Đã gửi yêu cầu hoàn trả thành công");
+                    }
+                    return ResponseEntity.badRequest().body("Chỉ có thể yêu cầu hoàn trả đơn hàng đã hoàn thành");
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -102,8 +157,9 @@ public class OrderAPIController {
         }
 
         Payment payment = order.getSuccessfulPayment();
-        String paymentMethodVal = (payment != null && payment.getPaymentMethod() != null) 
-                ? payment.getPaymentMethod().getMethodName() : "COD";
+        String paymentMethodVal = (payment != null && payment.getPaymentMethod() != null)
+                ? payment.getPaymentMethod().getMethodName()
+                : "COD";
         String paymentStatusVal = (payment != null) ? payment.getPaymentStatus().name() : "PENDING";
 
         List<OrderResponse.OrderItemResponse> items = order.getOrderItems().stream()
@@ -115,6 +171,7 @@ public class OrderAPIController {
                 .createdAt(order.getCreatedAt())
                 .totalAmount(order.getTotalAmount())
                 .shippingFee(order.getShippingFee())
+                .discountAmount(order.getDiscountAmount())
                 .finalAmount(order.getFinalAmount() != null ? order.getFinalAmount() : order.getTotalAmount())
                 .status(order.getStatus().name())
                 .paymentMethod(paymentMethodVal)
@@ -129,10 +186,10 @@ public class OrderAPIController {
     private OrderResponse.OrderItemResponse mapToOrderItemResponse(OrderItem item) {
         String imageUrl = "/images/placeholder.png";
         if (item.getProductVariant() != null && item.getProductVariant().getImageUrl() != null) {
-             imageUrl = item.getProductVariant().getImageUrl();
-             if (imageUrl.startsWith("src/data")) {
-                 imageUrl = imageUrl.replace("src/data", "");
-             }
+            imageUrl = item.getProductVariant().getImageUrl();
+            if (imageUrl.startsWith("src/data")) {
+                imageUrl = imageUrl.replace("src/data", "");
+            }
         }
 
         return OrderResponse.OrderItemResponse.builder()

@@ -1,0 +1,10 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+startCommand = "java $JAVA_OPTS -jar app.war"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

@@ -5,6 +5,7 @@ const ProfilePage = {
     // Elements
     usernameEl: document.getElementById('profile-username'),
     nameInput: document.getElementById('profile-name'),
+    nameDisplay: document.getElementById('user-name'),
     emailDisplay: document.getElementById('profile-email-display'),
     emailInput: document.getElementById('profile-email-input'),
     emailEditBtn: document.getElementById('btn-edit-email'),
@@ -43,7 +44,11 @@ const ProfilePage = {
 
     render(data) {
         if (this.usernameEl) this.usernameEl.innerText = data.username;
-        if (this.nameInput) this.nameInput.value = data.name;
+        if (this.nameInput)
+        {
+            this.nameInput.value = data.name;
+            this.nameDisplay.innerText = data.name;
+        }
 
         // Render masked email/phone initally
         this.renderEmail(data.email, false);

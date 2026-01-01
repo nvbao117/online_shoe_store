@@ -100,7 +100,7 @@ class ShoeStoreChatbot {
         this.setHidden(this.conversationView, false);
 
         if (this.messagesContainer.children.length === 0) {
-            this.addMessage("Xin chào! 👋 Chào mừng bạn đến với **5A Store**!\nMình là trợ lý ảo, sẵn sàng hỗ trợ bạn:\n- 🔍 Tìm kiếm giày phù hợp\n- 💰 Tư vấn giá cả\n- 📦 Tra cứu đơn hàng\n\nBạn cần hỗ trợ gì ạ?", 'bot');
+            this.addMessage("Xin chào! 👋 Chào mừng bạn đến với **5A Store**!\nMình là trợ lý ảo, sẵn sàng hỗ trợ bạn:\n- Tìm kiếm giày phù hợp\n- Tư vấn giá cả\n- Hỗ trợ các vấn đề của người dùng\n\nBạn cần hỗ trợ gì ạ?", 'bot');
         }
     }
 
@@ -287,6 +287,26 @@ class ShoeStoreChatbot {
     formatBotMessage(text) {
         if (!text) return '';
 
+        // Detect PRODUCT JSON block
+        // Handle malformed closing tags (e.g. [/PRODUCTS_JSON> or missing bracket)
+        // Capture everything between [PRODUCTS_JSON] and the next [/PRODUCTS_JSON...] or end of string if malformed
+        const jsonMatch = text.match(/\[PRODUCTS_JSON\]([\s\S]*?)(\[\/PRODUCTS_JSON\]|\[\/PRODUCTS_JSON>|$)/);
+
+        if (jsonMatch && jsonMatch[1]) {
+            try {
+                const productJson = JSON.parse(jsonMatch[1].trim());
+                if (Array.isArray(productJson) && productJson.length > 0) {
+                    const cardsHtml = this.renderProductCards(productJson);
+                    // Replace the entire block (including malformed end tag) with rendered HTML
+                    text = text.replace(jsonMatch[0], cardsHtml);
+                }
+            } catch (e) {
+                console.error("Error parsing product JSON:", e);
+                // If parsing fails, remove the block to avoid showing raw code
+                text = text.replace(jsonMatch[0], "");
+            }
+        }
+
         let formatted = text
             // Bold: **text** or __text__
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -296,15 +316,11 @@ class ShoeStoreChatbot {
             .replace(/\*(?!\*)(.*?)\*/g, '<em>$1</em>')
             .replace(/_(?!_)(.*?)_/g, '<em>$1</em>')
 
-            // Bullet points: - text or • text or ✅ text
-            .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
-            .replace(/^[✅☑️✓]\s*(.+)$/gm, '<li class="checked">✅ $1</li>')
-
-            // Numbered list: 1. text
-            .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
-
             // Price formatting - handle various formats
-            .replace(/(\d{1,3}(?:[,.\s]?\d{3})*)\s*đ(?:ồng)?/gi, '<span class="price">$1đ</span>')
+            // Use negative lookahead to avoid matching words starting with "đ" (like "đôi", "điểm")
+            // \p{L} requires 'u' flag which replace might not support easily without changing all regexes
+            // So we use a range of common Vietnamese chars or simple boundary check
+            .replace(/(\d{1,3}(?:[,.\s]?\d{3})*)\s*đ(?:ồng)?(?![a-zA-Zà-ỹÀ-Ỹ])/gi, '<span class="price">$1đ</span>')
             .replace(/(\d{1,3}(?:[,.\s]?\d{3})*)\s*VND/gi, '<span class="price">$1đ</span>')
 
             // Product name highlight: 【text】
@@ -337,12 +353,35 @@ class ShoeStoreChatbot {
             // Line breaks
             .replace(/\n/g, '<br>');
 
-        // Wrap list items in ul
-        if (formatted.includes('<li>')) {
-            formatted = formatted.replace(/(<li[^>]*>.*?<\/li>)+/g, '<ul class="bot-list">$&</ul>');
-        }
-
         return formatted;
+    }
+
+    renderProductCards(products) {
+        if (!products || products.length === 0) return '';
+
+        // 1 column grid for larger cards
+        let html = '<div class="product-cards-grid" style="display:grid;grid-template-columns:1fr;gap:12px;margin:12px 0;width:100%;">';
+        products.forEach(p => {
+            html += `
+                <div class="product-card">
+                    <div class="product-card-image">
+                        <img src="${p.imageUrl || '/images/placeholder.jpg'}" 
+                             alt="${p.name}" 
+                             onerror="this.src='/images/placeholder.jpg'">
+                    </div>
+                    <div class="product-card-info">
+                        <span class="product-card-brand">${p.brand}</span>
+                        <h4 class="product-card-name">${p.name}</h4>
+                        <span class="product-card-price">${p.priceFormatted}</span>
+                        <a href="/product-detail/${p.productId}" class="product-card-link">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        return html;
     }
 
     maybeRenderEscalationQuickReplies(text) {

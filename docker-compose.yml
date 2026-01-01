@@ -1,0 +1,194 @@
+
+services:
+  # ==================================
+  # MySQL Database
+  # ==================================
+  mysql:
+    image: mysql:8.0
+    container_name: shoe_store_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-shoe_store}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Mount SQL dump file for auto-initialization
+      - ./src/data/script_sql/dump-shoe_store-202601012053.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - shoe_store_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ==================================
+  # ChromaDB - Vector Store for AI
+  # ==================================
+  chromadb:
+    image: chromadb/chroma:0.4.24
+    container_name: shoe_store_chromadb
+    restart: unless-stopped
+    ports:
+      - "${CHROMA_PORT:-8001}:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    networks:
+      - shoe_store_network
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat')\""]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ==================================
+  # Spring Boot Application
+  # ==================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shoe_store_app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      # ==================================
+      # Application
+      # ==================================
+      SPRING_APPLICATION_NAME: online_shoe_store
+      SERVER_PORT: 8080
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      
+      # ==================================
+      # Database Configuration
+      # ==================================
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-shoe_store}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USERNAME:-root}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_SHOW_SQL: "false"
+      SPRING_JPA_PROPERTIES_HIBERNATE_HBM2DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      
+      # ==================================
+      # AI Configuration
+      # ==================================
+      # OpenAI
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      
+      # Anthropic
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL_WORKER: ${ANTHROPIC_MODEL_WORKER:-claude-3-5-haiku-20241022}
+      ANTHROPIC_MODEL_ORCHESTRATOR: ${ANTHROPIC_MODEL_ORCHESTRATOR:-claude-3-5-haiku-20241022}
+      
+      # ChromaDB
+      CHROMA_BASE_URL: http://chromadb:8000
+      CHROMA_COLLECTION_NAME: faq_shoe_store
+      
+      # AI Logging
+      AI_LOGGING_REQUESTS: ${AI_LOGGING_REQUESTS:-false}
+      AI_LOGGING_RESPONSES: ${AI_LOGGING_RESPONSES:-false}
+      
+      # FAQ Agent Settings
+      FAQ_AGENT_TEMPERATURE: "0.3"
+      FAQ_AGENT_MAX_TOKENS: "1024"
+      FAQ_AGENT_MEMORY_MAX_MESSAGES: "10"
+      FAQ_AGENT_RAG_MAX_RESULTS: "3"
+      FAQ_AGENT_RAG_MIN_SCORE: "0.6"
+      FAQ_AGENT_RAG_FORCE_REINGEST: "false"
+      SEARCH_AGENT_EMBEDDING_FORCE_REINGEST: "false"
+      
+      # ==================================
+      # Payment Gateway - VNPay
+      # ==================================
+      PAYMENT_VNPAY_TMN_CODE: ${VNPAY_TMN_CODE}
+      PAYMENT_VNPAY_HASH_SECRET: ${VNPAY_HASH_SECRET}
+      PAYMENT_VNPAY_PAY_URL: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+      PAYMENT_VNPAY_RETURN_URL: ${APP_BASE_URL:-http://localhost:8080}/api/payments/vnpay/callback
+      PAYMENT_VNPAY_API_URL: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+      REFUND_URL: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+      REFUND_IP: ${REFUND_IP:-localhost:8080}
+      
+      # ==================================
+      # JWT Configuration
+      # ==================================
+      APP_JWT_SECRET: ${JWT_SECRET}
+      APP_JWT_ACCESSMINUTES: "15"
+      APP_JWT_REFRESHDAYSREMEMBER: "7"
+      APP_JWT_REFRESHDAYSNORMAL: "1"
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_TOKEN_EXPIRATION_MS: "900000"
+      JWT_REFRESH_TOKEN_EXPIRATION_MS: "604800000"
+      JWT_ACCESS_MINUTES: "15"
+      JWT_REFRESH_DAYS_REMEMBER: "7"
+      JWT_REFRESH_DAYS_NORMAL: "1"
+      
+      # ==================================
+      # Email Configuration
+      # ==================================
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: "587"
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
+      SUPPORT_EMAIL_FROM: ${SUPPORT_EMAIL:-vubaonguyen2809@gmail.com}
+      SUPPORT_EMAIL_TO: ${SUPPORT_EMAIL:-vubaonguyen2809@gmail.com}
+      
+      # ==================================
+      # Google OAuth2
+      # ==================================
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_SCOPE: openid,profile,email
+      
+      # ==================================
+      # Storage Paths
+      # ==================================
+      APP_STORAGE_PRODUCTS: /app/data/images/products/
+      APP_STORAGE_CATEGORIES: /app/data/images/categories/
+      
+      # ==================================
+      # Logging
+      # ==================================
+      LOGGING_LEVEL_DEV_LANGCHAIN4J: ${LOG_LEVEL_LANGCHAIN4J:-INFO}
+      LOGGING_LEVEL_DEV_LANGCHAIN4J_MODEL_ANTHROPIC: ${LOG_LEVEL_ANTHROPIC:-INFO}
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_SERVLET_MVC_METHOD_ANNOTATION_REQUESTMAPPINGHANDLERMAPPING: INFO
+      
+    depends_on:
+      mysql:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - shoe_store_network
+    volumes:
+      - app_logs:/app/logs
+      - ./src/data/images:/app/data/images
+
+# ==================================
+# Networks
+# ==================================
+networks:
+  shoe_store_network:
+    driver: bridge
+
+# ==================================
+# Volumes
+# ==================================
+volumes:
+  mysql_data:
+    driver: local
+  chroma_data:
+    driver: local
+  app_logs:
+    driver: local

@@ -1,16 +1,16 @@
 const pendingBox = document.querySelector('[data-content="pending"]');
 export function renderPendingOrders(orders) {
-    // Không có dữ liệu
-    if (!orders || orders.length === 0) {
-        pendingBox.innerHTML = `
+  // Không có dữ liệu
+  if (!orders || orders.length === 0) {
+    pendingBox.innerHTML = `
             <div class="p-6 text-center text-slate-500 text-base">
                 📦 Không có đơn hàng chờ xác nhận
             </div>
         `;
-        return;
-    }
+    return;
+  }
 
-    pendingBox.innerHTML = `
+  pendingBox.innerHTML = `
         <div class="space-y-4">
             ${orders.map(order => `
                 <div
@@ -77,6 +77,7 @@ export function renderPendingOrders(orders) {
                       <button
                         class="btn-cancel flex-1 md:flex-none px-5 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 text-sm font-medium transition"
                         data-order-id="${order.orderId}"
+                        onclick="handleCancelOrder('${order.orderId}')"
                       >
                         Hủy đơn
                       </button>
@@ -97,12 +98,12 @@ export function renderPendingOrders(orders) {
 /* ===== helpers ===== */
 
 function formatPrice(price) {
-    return Number(price).toLocaleString("vi-VN") + " ₫";
+  return Number(price).toLocaleString("vi-VN") + " ₫";
 }
 
 function mapStatus(status) {
-    if (status === "PENDING") return "Chờ xác nhận";
-    if (status === "CONFIRMED") return "Đã xác nhận";
-    if (status === "CANCELLED") return "Đã hủy";
-    return status;
+  if (status === "PENDING") return "Chờ xác nhận";
+  if (status === "CONFIRMED") return "Đã xác nhận";
+  if (status === "CANCELLED") return "Đã hủy";
+  return status;
 }

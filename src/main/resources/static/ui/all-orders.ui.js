@@ -1,5 +1,41 @@
 const allBox = document.querySelector('[data-content="all"]');
 
+// Cancel order
+import { cancelOrder, fetchMyOrders } from "../api/orders.api.js";
+
+window.handleCancelOrder = async function (orderId) {
+  if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return;
+
+  try {
+    // Basic loading indication could be added here
+    await cancelOrder(orderId, 'Khách hàng hủy');
+    alert('Đã hủy đơn hàng thành công');
+
+    // Re-fetch and render to update UI by clicking the active tab
+    const activeTab = document.querySelector('.order-subtab.text-blue-600'); // Based on active class logic in profile.ui.js
+    // OR safer:
+    // const activeTab = document.querySelector('.order-subtab.active') || document.querySelector('.order-subtab[data-tab="all"]');
+
+    // In profile.ui.js we saw it adds 'active' class. Let's use that.
+    const currentTab = document.querySelector('.order-subtab.active');
+
+    if (currentTab) {
+      currentTab.click();
+    } else {
+      // Fallback if no tab system or standalone page
+      try {
+        const orders = await fetchMyOrders();
+        renderAllOrders(orders);
+      } catch (err) {
+        window.location.reload();
+      }
+    }
+
+  } catch (e) {
+    alert(e.message || 'Có lỗi xảy ra khi hủy đơn hàng');
+  }
+};
+
 export function renderAllOrders(orders) {
   if (!allBox) return;
 
@@ -34,6 +70,9 @@ function renderOrderCard(order) {
   // Show review button only for delivered/completed orders
   const showReviewBtn = order?.status === 'DELIVERED' || order?.status === 'COMPLETED';
 
+  // Show cancel button for pending only
+  const showCancelBtn = order?.status === 'PENDING';
+
   return `
     <div class="border border-gray-100 rounded-xl bg-white p-4 md:p-6 hover:shadow-md transition-shadow" data-order-id="${escapeAttr(order?.orderId)}">
       <div class="flex items-center justify-between pb-3 border-b border-gray-100">
@@ -56,7 +95,7 @@ function renderOrderCard(order) {
               ${escapeHtml(String(first.quantity))}
             </span>
           ` : ''}
-        </div>
+        </div>1
 
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-3">
@@ -84,12 +123,23 @@ function renderOrderCard(order) {
 
         <div class="flex flex-wrap gap-3 md:justify-end">
 
+          ${showCancelBtn ? `
+          <button onclick="handleCancelOrder('${escapeAttr(order?.orderId)}')" 
+                  class="px-5 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 text-sm font-medium transition">
+            Hủy Đơn
+          </button>
+          ` : ''}
+
           ${showReviewBtn ? `
           <button onclick="navigateToReviewsTab()" 
                   class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
             Đánh Giá
           </button>
           ` : ''}
+          <button onclick="viewOrderDetail('${escapeAttr(order?.orderId)}')"
+                  class="px-5 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium transition">
+            Xem Chi Tiết
+          </button>
           <button onclick="reorderProduct('${escapeAttr(first.productId)}')"
                   class="px-5 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
             Mua Lại
@@ -99,6 +149,7 @@ function renderOrderCard(order) {
     </div>
   `;
 }
+
 
 // Navigate to Reviews tab when clicking review button from orders
 window.navigateToReviewsTab = function () {
@@ -116,6 +167,15 @@ window.reorderProduct = function (productId) {
     return;
   }
   window.location.href = `/product-detail/${productId}`;
+};
+
+// View order detail - navigate to order detail page
+window.viewOrderDetail = function (orderId) {
+  if (!orderId) {
+    alert('Không tìm thấy mã đơn hàng');
+    return;
+  }
+  window.location.href = `/orders/${orderId}`;
 };
 
 function normalizeImageUrl(url) {

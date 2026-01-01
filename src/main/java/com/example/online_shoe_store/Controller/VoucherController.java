@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class VoucherController {
     @GetMapping({"/voucher-status", "/admin/voucher", "/admin/vouchers"})
     public String showAdminVoucherStatus() {
-        return "/admin/voucher-status";
+        return "admin/voucher-status";
     }
 
     @GetMapping({"/admin/voucher-create", "/admin/vouchers/create"})
     public String showAdminVoucherCreate() {
-        return "/admin/voucher-create";
+        return "admin/voucher-create";
     }
 }

@@ -174,47 +174,47 @@ public class ProductSearchTools {
             
             log.info("[ProductSearchTools] RAG returned {} results", ragResults.size());
             
-            // Format results
+            // Build JSON array for products
+            StringBuilder jsonArray = new StringBuilder("[");
+            boolean first = true;
+            
+            for (ProductRAGResponse p : ragResults) {
+                if (!first) jsonArray.append(",");
+                first = false;
+                
+                String name = escapeJson(p.getName() != null ? p.getName() : "(Không có tên)");
+                String brand = escapeJson(p.getBrandName() != null ? p.getBrandName() : "");
+                String category = escapeJson(p.getCategoryName() != null ? p.getCategoryName() : "");
+                String productId = p.getProductId() != null ? p.getProductId() : "";
+                String img = toPublicProductImageUrl(p.getImageUrl());
+                
+                BigDecimal price = p.getPrice();
+                String priceFormatted = p.getPriceFormatted();
+                if (priceFormatted == null && price != null) {
+                    priceFormatted = formatPrice(price);
+                }
+                
+                jsonArray.append("{")
+                    .append("\"name\":\"").append(name).append("\",")
+                    .append("\"brand\":\"").append(brand).append("\",")
+                    .append("\"category\":\"").append(category).append("\",")
+                    .append("\"price\":").append(price != null ? price.intValue() : 0).append(",")
+                    .append("\"priceFormatted\":\"").append(escapeJson(priceFormatted != null ? priceFormatted : "")).append("\",")
+                    .append("\"productId\":\"").append(productId).append("\",")
+                    .append("\"imageUrl\":\"").append(escapeJson(img != null ? img : "")).append("\"")
+                    .append("}");
+            }
+            jsonArray.append("]");
+            
+            // Format result with JSON block
             StringBuilder result = new StringBuilder();
             result.append("Tìm thấy ").append(ragResults.size()).append(" sản phẩm phù hợp:\n\n");
+            result.append("[PRODUCTS_JSON]\n");
+            result.append(jsonArray);
+            result.append("\n[/PRODUCTS_JSON]");
             
-            int index = 1;
-            for (ProductRAGResponse p : ragResults) {
-                String name = p.getName() != null ? p.getName() : "(Không có tên)";
-                result.append(index++).append(". **").append(name).append("**");
-
-                if (p.getBrandName() != null && !p.getBrandName().isBlank()) {
-                    result.append(" | ").append(p.getBrandName());
-                }
-                result.append("\n");
-
-                String priceText = p.getPriceFormatted();
-                if (priceText == null || priceText.isBlank()) {
-                    if (p.getPrice() != null) priceText = formatPrice(p.getPrice());
-                }
-                if (priceText != null) {
-                    result.append("Giá: ").append(priceText);
-                    if (p.getCategoryName() != null && !p.getCategoryName().isBlank()) {
-                        result.append(" | ").append(p.getCategoryName());
-                    }
-                    result.append("\n");
-                }
-
-                if (p.getProductDetailUrl() != null && !p.getProductDetailUrl().isBlank()) {
-                    result.append("Chi tiết: ").append(p.getProductDetailUrl()).append("\n");
-                } else if (p.getProductId() != null && !p.getProductId().isBlank()) {
-                    result.append("Chi tiết: ").append(productDetailUrl(p.getProductId())).append("\n");
-                }
-
-                String img = toPublicProductImageUrl(p.getImageUrl());
-                if (img != null && !img.isBlank()) {
-                    result.append("Ảnh: ").append(img).append("\n");
-                }
-
-                result.append("\n");
-            }
-            log.info(result.toString().trim());
-            return result.toString().trim();
+            log.info("[ProductSearchTools] Returning JSON block with {} products", ragResults.size());
+            return result.toString();
             
         } catch (Exception e) {
             log.error("[ProductSearchTools] Semantic search error", e);
@@ -225,7 +225,32 @@ public class ProductSearchTools {
     // =========================================
     // FILTER PRODUCTS TOOL
     // =========================================
-
+    @Tool("Trả bảng size giày chuẩn")
+    public String sizeGuide(){
+        return """
+            # Bảng Size Giày Chuẩn Việt Nam
+            
+            ## 👨 Nam
+            | Chân(CM) | VN | US | EU   | UK  |
+            |----------|----|----|------|-----|
+            | 24.0     | 38 | 6  | 38⅔  | 5½  |
+            | 25.0     | 40 | 7  | 40   | 6½  |
+            | 26.0     | 41 | 8  | 41⅓  | 7½  |
+            | 27.0     | 42 | 9  | 42   | 8½  |
+            | 28.0     | 44 | 10 | 44⅓  | 9½  |
+            
+            ## 👩 Nữ
+            | Chân(CM) | VN | US | EU   | UK |
+            |----------|----|----|------|----|
+            | 23.0     | 36 | 5½ | 36   | 3  |
+            | 24.0     | 38 | 6½ | 38⅔  | 4½ |
+            | 25.0     | 39 | 7  | 39   | 5½ |
+            | 25.5     | 40 | 7½ | 40   | 6  |
+            | 26.0     | 41 | 8  | 41⅓  | 7  |
+            
+            **📏 Đo chân: Chiều dài gót→mũi + 1.5cm**
+            """;
+    }
     @Tool(name = "filterProducts", value = """
         Lọc sản phẩm theo tiêu chí cụ thể.
         Sử dụng khi khách hàng nêu tiêu chí rõ ràng như thương hiệu, giá, danh mục.
@@ -263,31 +288,42 @@ public class ProductSearchTools {
                 return noResult.toString();
             }
             
-            // Format results
+            // Build JSON array
+            StringBuilder jsonArray = new StringBuilder("[");
+            boolean first = true;
+            
+            for (Product product : products) {
+                if (!first) jsonArray.append(",");
+                first = false;
+                
+                String name = escapeJson(product.getName());
+                String brandName = product.getBrand() != null ? escapeJson(product.getBrand().getName()) : "";
+                String categoryName = product.getCategory() != null ? escapeJson(product.getCategory().getName()) : "";
+                String productId = product.getProductId();
+                String img = toPublicProductImageUrl(product.getImageUrl());
+                BigDecimal price = product.getPrice();
+                String priceFormatted = formatPrice(price);
+                
+                jsonArray.append("{")
+                    .append("\"name\":\"").append(name).append("\",")
+                    .append("\"brand\":\"").append(brandName).append("\",")
+                    .append("\"category\":\"").append(categoryName).append("\",")
+                    .append("\"price\":").append(price != null ? price.intValue() : 0).append(",")
+                    .append("\"priceFormatted\":\"").append(escapeJson(priceFormatted)).append("\",")
+                    .append("\"productId\":\"").append(productId).append("\",")
+                    .append("\"imageUrl\":\"").append(escapeJson(img != null ? img : "")).append("\"")
+                    .append("}");
+            }
+            jsonArray.append("]");
+            
+            // Format result with JSON block
             StringBuilder result = new StringBuilder();
             result.append("Tìm thấy ").append(products.size()).append(" sản phẩm:\n\n");
+            result.append("[PRODUCTS_JSON]\n");
+            result.append(jsonArray);
+            result.append("\n[/PRODUCTS_JSON]");
             
-            int index = 1;
-            for (Product product : products) {
-                result.append(index++).append(". **").append(product.getName()).append("**");
-                
-                if (product.getBrand() != null) {
-                    result.append(" | ").append(product.getBrand().getName());
-                }
-                result.append("\n");
-                result.append("   💰 ").append(formatPrice(product.getPrice()));
-                if (product.getCategory() != null) {
-                    result.append(" | ").append(product.getCategory().getName());
-                }
-                result.append("\n");
-                result.append("   Chi tiết: ").append(productDetailUrl(product.getProductId())).append("\n");
-
-                String img = toPublicProductImageUrl(product.getImageUrl());
-                if (img != null && !img.isBlank()) {
-                    result.append("   Ảnh: ").append(img).append("\n");
-                }
-            }
-            
+            log.info("[ProductSearchTools] filterProducts returning JSON block with {} products", products.size());
             return result.toString();
             
         } catch (Exception e) {
@@ -342,4 +378,14 @@ public class ProductSearchTools {
         if (price == null) return "N/A";
         return VND_FORMAT.format(price) + "đ";
     }
+    
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
 }
+

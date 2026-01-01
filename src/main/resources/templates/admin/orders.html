@@ -11,6 +11,90 @@
       <p class="text-slate-500 text-sm">Danh sách đơn hàng toàn hệ thống</p>
     </div>
 
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Search Box -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tìm kiếm</label>
+          <div class="relative">
+            <input type="text" id="search-keyword" placeholder="Nhập tên khách hàng hoặc mã đơn..."
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái đơn</label>
+          <select id="filter-status"
+            class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <option value="">Tất cả</option>
+            <option value="PENDING">Chờ xác nhận</option>
+            <option value="CONFIRMED">Đã xác nhận</option>
+            <option value="PROCESSING">Đang xử lý</option>
+            <option value="SHIPPED">Đã giao cho DVVC</option>
+            <option value="IN_TRANSIT">Đang vận chuyển</option>
+            <option value="OUT_FOR_DELIVERY">Đang giao hàng</option>
+            <option value="DELIVERED">Đã giao hàng</option>
+            <option value="COMPLETED">Hoàn thành</option>
+            <option value="CANCELLED">Đã hủy</option>
+            <option value="EXPIRED">Hết hạn</option>
+          </select>
+        </div>
+
+        <!-- Payment Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Thanh toán</label>
+          <select id="filter-payment-status"
+            class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <option value="">Tất cả</option>
+            <option value="PAID">Đã thanh toán</option>
+            <option value="UNPAID">Chưa thanh toán</option>
+          </select>
+        </div>
+
+        <!-- Payment Method Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Hình thức TT</label>
+          <select id="filter-payment-method"
+            class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <option value="">Tất cả</option>
+            <option value="COD">COD</option>
+            <option value="VNPay">VNPay</option>
+            <option value="MoMo">MoMo</option>
+            <option value="ZaloPay">ZaloPay</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filter Actions -->
+      <div class="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+        <button id="btn-search"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          Tìm kiếm
+        </button>
+        <button id="btn-reset"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+            </path>
+          </svg>
+          Đặt lại
+        </button>
+      </div>
+    </div>
+
     <!-- Order Table -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div class="overflow-x-auto">
@@ -120,7 +204,7 @@
     </div>
   </main>
 
-  <script type="module" src="/pages/admin-orders.page.js?v=4"></script>
+  <script type="module" src="/pages/admin-orders.page.js?v=5"></script>
   <div th:replace="~{fragments/admin-layout :: scripts}"></div>
 </body>
 

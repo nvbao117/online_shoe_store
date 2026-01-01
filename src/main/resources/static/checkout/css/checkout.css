@@ -476,6 +476,11 @@ body {
     cursor: pointer;
 }
 
+.voucher-item-recommended {
+    background: rgba(79, 70, 229, 0.08);
+    border-left: 3px solid var(--primary);
+}
+
 .voucher-item:hover {
     background: #f8fafc;
 }

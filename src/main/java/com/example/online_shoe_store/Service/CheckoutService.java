@@ -7,7 +7,6 @@ import com.example.online_shoe_store.dto.request.CheckoutRequest;
 import com.example.online_shoe_store.dto.response.OrderWSMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,7 +23,7 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ShipDetailRepository shipDetailRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final VoucherRepository voucherRepository;
 
     @Transactional
     public String placeOrder(User user, CheckoutRequest request, List<String> selectedCartItemIds){
@@ -46,7 +45,7 @@ public class CheckoutService {
                 .district(request.getDistrict())
                 .ward(request.getWard())
                 .detail(request.getAddress())
-                .isDefault(hasNoDefaultAddress) // Set as default if user has no default address
+                .isDefault(hasNoDefaultAddress)
                 .build();
 
         shipDetail = shipDetailRepository.save(shipDetail);
@@ -90,9 +89,25 @@ public class CheckoutService {
                 }
             }
         }
+        
         orderItemRepository.saveAll(orderItems);
 
         order.setTotalAmount(totalAmount);
+        
+        // Apply voucher if provided
+        if (request.getVoucherCode() != null && !request.getVoucherCode().isBlank()) {
+            Voucher voucher = voucherRepository.findByCodeIgnoreCase(request.getVoucherCode().trim())
+                    .orElse(null);
+            if (voucher != null) {
+                order.getVouchers().add(voucher);
+                order.setDiscountAmount(request.getDiscountAmount() != null 
+                        ? request.getDiscountAmount() : BigDecimal.ZERO);
+                // Increment usage count
+                voucher.setUsedCount(voucher.getUsedCount() + 1);
+                voucherRepository.save(voucher);
+            }
+        }
+        
         orderRepository.save(order);
 
         return order.getOrderId();
