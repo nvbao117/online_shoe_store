@@ -3,8 +3,8 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-healthcheckPath = "/"
-healthcheckTimeout = 300
-startCommand = "java $JAVA_OPTS -jar app.war"
+# Disable healthcheck temporarily until app is properly configured
+healthcheckPath = ""
+startCommand = "java -Xmx512m -jar app.war"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
