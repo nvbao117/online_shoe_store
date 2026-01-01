@@ -160,24 +160,12 @@ public class ConversationMessage {
     // ═══════════════════════════════════════════
     // HELPER METHODS
     // ═══════════════════════════════════════════
-    
-    /**
-     * Kiểm tra message từ user
-     */
     public boolean isFromUser() {
         return role == MessageRole.USER;
     }
-    
-    /**
-     * Kiểm tra message từ assistant
-     */
     public boolean isFromAssistant() {
         return role == MessageRole.ASSISTANT;
     }
-    
-    /**
-     * Kiểm tra có intent được detect không
-     */
     public boolean hasIntent() {
         return primaryIntent != null && primaryIntent != IntentType.UNKNOWN;
     }

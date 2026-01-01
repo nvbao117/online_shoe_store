@@ -20,21 +20,21 @@ public class HomeViewController {
 
     @GetMapping("/home")
     public String home() {
-        return "/home/home";
+        return "home/home";
     }
     @GetMapping("/products")
     public String produtcs() {
-        return "/products/product-list";
+        return "products/product-list";
     }
 
     @GetMapping("/about")
     public String about() {
-        return "/about_contact/about";
+        return "about_contact/about";
     }
 
     @GetMapping("/contact")
     public String contact() {
-        return "/about_contact/contact";
+        return "about_contact/contact";
     }
     // gio hang duoc lay ben cart controller
 

@@ -1,6 +1,5 @@
 package com.example.online_shoe_store.Controller.api;
 
-import com.example.online_shoe_store.Service.ai.agent.shop.ShopChatAgent;
 import com.example.online_shoe_store.dto.request.ChatRequest;
 import com.example.online_shoe_store.dto.response.ChatResponse;
 import com.example.online_shoe_store.Service.ChatBotService;
@@ -8,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController

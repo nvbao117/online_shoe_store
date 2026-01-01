@@ -9,31 +9,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminViewController {
     @GetMapping("/dashboard")
     public String adminHome() {
-        return "/admin/dashboard";
+        return "admin/dashboard";
     }
 
     @GetMapping("/users")
     public String adminUsers() {
-        return "/admin/users";
+        return "admin/users";
     }
 
     @GetMapping("/users/{id}")
     public String adminUserDetail() {
-        return "/admin/user-detail";
+        return "admin/user-detail";
     }
 
     @GetMapping("/products")
     public String adminProducts() {
-        return "/admin/products";
+        return "admin/products";
     }
 
     @GetMapping("/orders")
     public String adminOrders() {
-        return "/admin/orders";
+        return "admin/orders";
     }
 
     @GetMapping("/returns")
     public String adminReturns() {
-        return "/admin/returns";
+        return "admin/returns";
     }
 }

@@ -67,7 +67,25 @@ public interface ConversationMessageRepository extends JpaRepository<Conversatio
     @Query("SELECT m.primaryIntent, COUNT(m) FROM ConversationMessage m " +
            "WHERE m.role = 'USER' GROUP BY m.primaryIntent")
     List<Object[]> countByIntent();
+
+
+    List<ConversationMessage> findByConversationSessionIdOrderByCreatedAtAsc(String sessionId);
+
+    /**
+     * Tìm N messages gần nhất theo session ID (cho ContextManager)
+     */
+    @Query("SELECT m FROM ConversationMessage m WHERE m.conversation.sessionId = :sessionId ORDER BY m.createdAt DESC")
+    List<ConversationMessage> findRecentBySessionId(@Param("sessionId") String sessionId, Pageable pageable);
     
+    default List<ConversationMessage> findRecentBySessionId(String sessionId, int limit) {
+        return findRecentBySessionId(sessionId, Pageable.ofSize(limit));
+    }
+
+    /**
+     * Xóa messages theo session ID của conversation
+     */
+    void deleteByConversationSessionId(String sessionId);
+
     /**
      * Thống kê theo agent
      */
@@ -85,4 +103,6 @@ public interface ConversationMessageRepository extends JpaRepository<Conversatio
      * Paginated messages của conversation
      */
     Page<ConversationMessage> findByConversationIdOrderByCreatedAtDesc(String conversationId, Pageable pageable);
+
+
 }
