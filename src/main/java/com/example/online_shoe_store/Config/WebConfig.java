@@ -10,10 +10,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-        @Value("${app.storage.products}")
+        @Value("${app.storage.products:./data/images/products/}")
         private String productsDir;
 
-        @Value("${app.storage.categories}")
+        @Value("${app.storage.categories:./data/images/categories/}")
         private String categoriesDir;
 
         @Override
